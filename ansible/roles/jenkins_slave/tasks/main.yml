@@ -1,0 +1,389 @@
+---
+- include_vars: '{{ role_path }}/vars/versions.yml'
+
+- name: Add Networking services and related tools (SLE_15) repo
+  zypper_repository:
+    repo: https://download.opensuse.org/repositories/network/SLE_15/
+    name: Networking services and related tools (SLE_15)
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Basesystem repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Basesystem/
+    name: SLE-15-SP5-Module-Basesystem
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Basesystem-Updates repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Basesystem-Updates/
+    name: SLE-15-SP5-Module-Basesystem-Updates
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Containers repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Containers/
+    name: SLE-15-SP5-Module-Containers
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Containers-Updates repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Containers-Updates/
+    name: SLE-15-SP5-Module-Containers-Updates
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Python3 repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Python3/
+    name: SLE-15-SP5-Module-Python3
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: Add SLE-15-SP5-Module-Python3-Updates repo
+  zypper_repository:
+    repo: https://arm.sero.gic.ericsson.se/artifactory/simple/proj-suse-repos-rpm-local/SLE15/SLE-15-SP5-Module-Python3-Updates/
+    name: SLE-15-SP5-Module-Python3-Updates
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+# Refresh all repos
+- name: runrefresh for all repo
+  zypper_repository:
+    repo: '*'
+    runrefresh: yes
+
+- name: "install legacy python3.6"
+  package:
+    name:
+      - python3-pip
+
+# note: WA - remove this in the future, python3.6 reached EOL
+- name: "install legacy python3.6 packages"
+  shell:
+    cmd: "python3.6 -m pip install \
+      md2cf==1.5.1 \
+      flake8==3.9.2 \
+      jsonschema==3.2.0 \
+      xmlschema==1.9.2 \
+      certifi==2019.3.9 \
+      chardet==3.0.4 \
+      idna==2.8 \
+      Markdown==3.1.1 \
+      requests==2.22.0 \
+      urllib3==1.25.3 \
+      oyaml \
+      paramiko \
+      prettytable \
+      mistune==0.8.4 \
+      tortilla==0.5.0 \
+      PyYAML==6.0 \
+      gitignore_parser==0.0.8 \
+      ansible==2.9.*"
+
+- name: "install required packages"
+  package:
+    name:
+      - sudo
+      - java-17-openjdk
+      - jq
+      - unzip
+      - libatomic1
+      - git-core
+      - wget
+      - python3-netifaces
+      - vim
+      - vim-data
+      - less
+      - sshpass
+      - bind-utils
+      - python311
+      - python311-pip
+      - rsync
+      - patch
+
+- name: update alternatives for python
+  alternatives:
+    name: python3
+    link: /usr/bin/python3
+    path: /usr/bin/python3.11
+    # priority: 50
+
+- name: ugrade pip3 package to latest
+  pip:
+    name: pip
+    state: latest
+
+- import_tasks: eceabuild.yml
+
+- name: Set authorized key for user root copying it to Jenkins slave
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '{{ role_path }}/files/id_rsa_eceaproj.pub') }}"
+
+- name: install shellcheck
+  zypper:
+    name: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/shellcheck/ShellCheck-0.8.0-lp155.1.1.x86_64.rpm"
+    disable_gpg_check: yes
+
+- name: install python-flake8
+  pip:
+    name: flake8
+    version: 3.9.2
+
+- name: install python-jsonschema
+  pip:
+    name: jsonschema
+    version: 3.2.0
+
+- name: install python-xmlschema
+  pip:
+    name: xmlschema
+    version: 1.9.2
+
+- name: install python-pyyaml
+  pip:
+    name: pyyaml
+    version: 6.0
+
+- name: install python-md2cf
+  pip:
+    name: md2cf
+    version: 2.0.1
+
+- name: install pmd
+  unarchive:
+    src: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/pmd/5.8.1/pmd-5.8.1.zip"
+    dest: /opt/
+    remote_src: yes
+
+- name: link pmd folder
+  file:
+    src: /opt/pmd-bin-5.8.1
+    dest: /opt/pmd
+    state: link
+
+- name: install python packages required for md_to_conf
+  pip:
+    name:
+      - certifi==2019.3.9
+      - chardet==5.1.0
+      - idna==2.8
+      - Markdown==3.1.1
+      - requests==2.28.2
+      - urllib3==1.25.3
+      - rich-argparse==1.0.0
+      - rich==13.0.1
+      - mistune==0.8.4
+      - gitignorefile==1.1.2
+
+- name: install python packages required for cluster-info-collector
+  pip:
+    name:
+      - oyaml
+      - prettytable
+      - paramiko
+      - ansible==9.2.*
+      - kubernetes=={{ python_kubernetes_version }}
+      - selenium==4.16.0
+      - jmespath
+      - hostsman==1.1.5
+      - lxml
+    executable: pip3
+
+- name: "install kubernetes.core:3.0.0 ansible module"  # by default the v2.4.0 is included in ansible 9
+  community.general.ansible_galaxy_install:
+    type: collection
+    name: kubernetes.core:3.0.0
+    dest: /usr/lib/python3.11/site-packages/ansible_collections  # this is the path where ansible put the modules at installation
+    force: true
+
+- name: create directory for ansible roles
+  file:
+    path: /etc/ansible/roles  # eceabuild can access to the roles placed in this directory
+    state: directory
+
+- name: install kwoodson.yedit ansible role
+  community.general.ansible_galaxy_install:
+    type: role
+    name: kwoodson.yedit
+    dest: /etc/ansible/roles
+    force: true
+
+- name: install Spin CLI
+  get_url:
+    url: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/spin/1.17.0/spin"
+    dest: /usr/local/bin/
+    mode: +x
+
+- name: install nfs-client package required for NFS mount steps
+  zypper:
+    name: nfs-client
+  tags: nfs
+
+- name: mount commonci nfs
+  mount:
+    path: /data/nfs/productci
+    src: seliics00309.ete.ka.sw.ericsson.se:/data/nfs/commonci
+    fstype: nfs
+    opts: rw,soft,bg,nfsvers=3
+    state: mounted
+  tags: nfs
+
+- name: mount input-files nfs
+  mount:
+    path: /data/nfs/input-files
+    src: seliics00309.ete.ka.sw.ericsson.se:/data/nfs/input-files
+    fstype: nfs
+    opts: ro,soft,bg,nfsvers=3
+    state: mounted
+  tags: nfs
+
+- name: mount datastore_02 (from seliics01772) nfs share
+  mount:
+    path: /data/nfs/datastore_02
+    src: seliics01772.seli.gic.ericsson.se:/datastore_02/3200
+    fstype: nfs
+    opts: rw,soft,bg,nfsvers=3
+    state: mounted
+  tags: nfs
+
+- name: mount spotfire_cn nfs
+  mount:
+    path: /data/nfs/spotfire_cn
+    src: seliics00309.ete.ka.sw.ericsson.se:/data/nfs/product_ci/spotfire_cn
+    fstype: nfs
+    opts: ro,soft,bg,nfsvers=3
+    state: mounted
+  tags: nfs
+
+- name: create Jenkins workspace
+  file:
+    path: "{{ jenkins_home }}"
+    state: directory
+    owner: eceabuild
+    group: eceabuild
+    mode: 0755
+
+- name: create Test Jenkins workspace
+  file:
+    path: "{{ test_jenkins_home }}"
+    state: directory
+    owner: eceabuild
+    group: eceabuild
+    mode: 0755
+
+- name: Delete _ws-cleanup folders which are older than 10 hours from Jenkins workspace
+  ansible.builtin.cron:
+    name: "Delete old _ws-cleanup from Jenkins folder"
+    minute: "0"
+    job: "find {{ jenkins_home }} -mindepth 1 -maxdepth 1 -mmin +600 -name '*_ws-cleanup*' -exec rm -rf {} \\;"
+  tags: ws_cleanup
+
+- name: Delete _ws-cleanup folders which are older than 10 hours from Test Jenkins workspace
+  ansible.builtin.cron:
+    name: "Delete old _ws-cleanup from Test Jenkins folder"
+    minute: "10"
+    job: "find {{ test_jenkins_home }} -mindepth 1 -maxdepth 1 -mmin +600 -name '*_ws-cleanup*' -exec rm -rf {} \\;"
+  tags: ws_cleanup
+
+- name: install yq
+  get_url:
+    url: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/github-generic/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64"
+    dest: /usr/local/bin/yq
+    mode: +x
+
+- name: install yq-4.x
+  get_url:
+    url: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/github-generic/mikefarah/yq/releases/download/v4.33.3/yq_linux_amd64"
+    dest: /usr/local/bin/yq-4.x
+    mode: +x
+
+- name: yq-4.x generate a shell completion file for bash
+  shell:
+    cmd: "yq-4.x shell-completion bash > /etc/bash_completion.d/yq"
+
+- name: Download certificates
+  get_url:
+    url: "{{ item }}"
+    dest: /etc/pki/trust/anchors/
+  loop:
+    - http://pki.ericsson.se/CertData/EGADRootCA.crt
+    - http://pki.ericsson.se/CertData/EGADIssuingCA3.crt
+  tags: update_ca_trust
+
+- name: Update CA trust
+  command: update-ca-certificates
+  tags: update_ca_trust
+
+- name: install moreutils-0.67
+  unarchive:
+    src: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/moreutils/0.67/moreutils-0.67.tar.gz"
+    dest: /opt/
+    remote_src: yes
+
+- name: install datamash
+  zypper:
+    name: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/datamash/1.8-150400.15.11/datamash-1.8-150400.15.11.x86_64.rpm"
+    disable_gpg_check: yes
+  tags: datamash
+
+- name: ensure /opt/helm directory exists
+  file:
+    path: /opt/helm
+    state: directory
+
+- name: install helm
+  unarchive:
+    src: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/helm/v{{ helm_version }}/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+    dest: /opt/helm/
+    remote_src: yes
+  tags: helm
+
+#This is the default install dir in https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+- name: link helm to /usr/local/bin
+  file:
+    src: /opt/helm/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    state: link
+  tags: helm
+
+- name: "Install Chrome browser + Webdriver required for Spotfire install job"
+  block:
+    - name: "Install Chrome browser"
+      zypper:
+        name: "{{ chrome_package_rpm }}"
+        disable_gpg_check: yes
+        state: present
+
+    - name: Remove google-chrome repo
+      zypper_repository:
+        name: google-chrome
+        state: absent
+
+    - name: "Create {{ chrome_driver_dir }} directory"
+      file:
+        path: "{{ chrome_driver_dir }}"
+        state: directory
+
+    - name: "Unzip Chromedriver"
+      unarchive:
+        src: "{{ chrome_driver }}"
+        dest: "{{ chrome_driver_dir }}"
+        remote_src: yes
+  vars:
+    chrome_package_rpm: https://arm.seli.gic.ericsson.se/artifactory/proj-btap-external-generic-local/com/google/chrome/115.0.5790.170/google-chrome-stable-115.0.5790.170-1.x86_64.rpm
+    chrome_driver: https://arm.seli.gic.ericsson.se/artifactory/proj-btap-external-generic-local/com/google/chrome/115.0.5790.170/chromedriver-linux64.zip
+    chrome_driver_dir: /usr/bin/chrome_driver
+  tags: chrome

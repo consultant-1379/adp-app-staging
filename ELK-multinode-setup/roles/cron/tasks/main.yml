@@ -1,0 +1,8 @@
+- name: Cleanup logstash partition and filesystem mounts
+  cron:
+    name: "Remove old logstash output files."
+    minute: "*/10"
+    hour: "*"
+    weekday: "*"
+    job: "find /data/logstash/archive/ -type f -mtime 6 -exec rm -f {} \;"
+    disabled: "no"

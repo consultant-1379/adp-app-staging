@@ -1,0 +1,9 @@
+services:
+  - eric-csm-st
+  - eric-lcm-smart-helm-hooks
+  - dimensioning-framework
+  - eric-si-application-sys-info-handler
+  - eric-adp-gui-aggregator-service
+  - eric-oss-schema-registry-sr
+repos:
+  - proj-adp-gs-all-helm

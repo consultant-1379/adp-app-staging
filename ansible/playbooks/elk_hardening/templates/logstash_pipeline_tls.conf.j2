@@ -1,0 +1,17 @@
+input {
+  beats {
+    port => 5044
+    ssl => true
+    ssl_key => "/etc/logstash/tls/private/{{ ansible_hostname }}.pkcs8.key"
+    ssl_certificate => "/etc/logstash/tls/certs/{{ ansible_hostname }}.crt"
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["https://{{ inventory_hostname }}:9200"]
+    cacert => "/etc/logstash/tls/certs/ca-bundle-ericsson-internal.crt"
+    user => "logstash_writer"
+    password => "{{ es_passwords.logstash_writer }}"
+  }
+}

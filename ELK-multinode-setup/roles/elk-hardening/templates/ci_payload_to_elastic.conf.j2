@@ -1,0 +1,54 @@
+input {
+  tcp {
+    id => "json_txt"
+    host => "0.0.0.0"
+    port => {{utf_ci_logs_port}}
+    codec => json
+    type => "json_tcp"
+  }
+}
+filter {
+  if ! [index] {
+    mutate {
+      add_field => { "index" => "utf-logs" }
+    }
+  }
+  if "CI_PAYLOAD:" in [message] {
+    grok {
+      match => { "message" => "CI_PAYLOAD:%{GREEDYDATA:cipayload_data}" }
+      tag_on_failure => [ "should_be_a_ci_payload_line" ]
+    }
+    json {
+      source => cipayload_data
+      target => cipayload
+    }
+  }
+  mutate {
+    convert => { "scenario_result_int" => "integer" }
+    remove_field => "cipayload_data"
+    remove_field => "host"
+    remove_field => "port"
+    remove_field => "@version"
+#    remove_field => "@timestamp"
+  }
+}
+output {
+  elasticsearch {
+    hosts => [ {{logstash_target}} ]
+    user => "{{ elastic_user }}"
+    password => "{{ elastic_passwd }}"
+    index => "%{index}-%{+YYYY.MM.dd}"
+    #cacert => "/run/secrets/lumberjackOutput-certs/ca-bundle-ericsson-internal.crt"
+    ssl => true
+    ssl_certificate_verification => false
+    cacert => "/etc/logstash/certs/ca/ca.crt"
+  }
+  file {
+    path => "/data/logstash/archive/%{index}/%{index}_%{build_tag}_logstash-backup_%{+YYYY.MM.dd}.log"
+#    dir_mode => 022
+#    file_mode => 022
+#    codec => json
+#    id => "json_txt"
+# Cluster field is needed.
+  }
+}

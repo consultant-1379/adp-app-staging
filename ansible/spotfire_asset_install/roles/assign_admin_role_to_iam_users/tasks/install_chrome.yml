@@ -1,0 +1,25 @@
+---
+- name: "Install Chrome browser on SLES"
+  zypper:
+    name: "{{ chrome_package_rpm }}"
+    disable_gpg_check: yes
+    state: present
+  become: yes
+
+- name: Remove google-chrome repo
+  zypper_repository:
+    name: google-chrome
+    state: absent
+
+- name: "Create {{ chrome_driver_dir }} directory"
+  file:
+    path: "{{ chrome_driver_dir }}"
+    state: directory
+  become: yes
+
+- name: "Unzip Chromedriver"
+  unarchive:
+    src: "{{ chrome_driver }}"
+    dest: "{{ chrome_driver_dir }}"
+    remote_src: yes
+  become: yes

@@ -1,0 +1,108 @@
+---
+- name: install parted package
+  package: name=parted state=present
+
+- name: install lvm package
+  package: name=lvm state=present
+
+#- debug: msg="{{ item.mount }}"
+#  with_items:
+#  - "{{ ansible_mounts }}"
+#  when: item.device is search("/dev/sdb")
+
+#- name: Output disk information
+#  debug:
+#    var: hostvars[inventory_hostname].ansible_devices["sdb"]
+#  when: hostvars[inventory_hostname].ansible_devices.sdb is defined
+
+- name: show lvm items
+  debug:
+     var "{{ item }}"
+  with_dict: "{{ ansible_lvm }}"
+
+- name: show pvs items
+  debug:
+     msg="{{ item.value['vg'] }}"
+  with_dict: "{{ ansible_lvm.pvs }}"
+  when:
+    - item.key is search("/dev/sdb")
+
+- name: Initialize an empty list for PV's
+  set_fact:
+    pvs_on_server: []
+
+- name: Collect /dev/sdb PV's
+  set_fact:
+    pvs_on_server: "{{ pvs_on_server + [ item.value['vg'] ] }}"
+  with_dict: "{{ ansible_lvm.pvs }}"
+  when:
+    - item.key is search("/dev/sdb")
+
+
+- debug: var=pvs_on_server
+
+- name: show sdb vgs items
+  debug:
+     msg="{{ item }}"
+  with_dict: "{{ ansible_lvm.vgs }}"
+  when:
+    - item.key in pvs_on_server
+
+- name: Initialize an empty list for VG's
+  set_fact:
+    vgs_on_server: []
+
+- name: Collect /dev/sdb VG's
+  set_fact:
+    vgs_on_server: "{{ vgs_on_server + [ item.key ] }}"
+  with_dict: "{{ ansible_lvm.vgs }}"
+  when:
+    - item.key in pvs_on_server
+
+- debug: var=vgs_on_server
+
+- name: Initialize an empty list for LV's
+  set_fact:
+    lvs_on_server: []
+
+- name: Collect /dev/sdb VG's
+  set_fact:
+    lvs_on_server: "{{ lvs_on_server + [ item.key ] }}"
+  with_dict: "{{ ansible_lvm.lvs }}"
+  when:
+    - item.value['vg'] in vgs_on_server
+
+- debug: var=lvs_on_server
+
+- meta: end_play
+
+- name: unmount and remove from fstab sdb items
+  mount:
+    path: "{{ item.mount }}"
+    state: absent
+  with_items:
+  - "{{ ansible_mounts }}"
+  when: item.device is search("/dev/sdb")
+
+- name: unmount sdb items
+  mount:
+    path: "{{ item.mount }}"
+    state: unmounted
+  with_items:
+  - "{{ ansible_mounts }}"
+  when: item.device is search("/dev/sdb")
+
+- parted: device=/dev/sdb unit=MiB
+  register: sdb_info
+
+# Remove all partitions from disk
+- parted:
+    device: /dev/sdb
+    number: "{{ item.num }}"
+    state: absent
+  with_items:
+   - "{{ sdb_info.partitions }}"
+
+#- name: "Clean sdb with dd"
+#  command: 'dd if=/dev/zero of=/dev/sdb bs=1M count=100 oflag=direct,dsync'
+#  when: hostvars[inventory_hostname].ansible_devices.sdb is defined

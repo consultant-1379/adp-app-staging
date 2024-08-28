@@ -1,0 +1,6 @@
+[gerrit]
+host=gerrit.ericsson.se
+port=29418
+project=adp-app-staging
+defaultbranch=master
+defaultremote=origin

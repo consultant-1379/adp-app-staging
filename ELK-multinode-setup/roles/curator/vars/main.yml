@@ -1,0 +1,10 @@
+currator_settings:
+  user:
+    clusername: elk_cleaner
+    clpassword: fCNz26MKmLjJxYt
+  elkconfig:
+    elkhosts:
+      - 10.61.197.96
+      - 10.61.197.97
+      - 10.61.197.98
+    elkport: 9200

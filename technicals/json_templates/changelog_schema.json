@@ -1,0 +1,277 @@
+{
+    "$schema": "changelog schema",
+    "$id": "changelog_schema.json",
+    "type": "object",
+    "title": "Changelog schema",
+    "description": "The Changelog schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "microserviceName": "Name of the microservice",
+            "version": "number",
+            "buildImageVersion": "Bob image set version if Bob is used, else the version of the build environment.",
+            "microserviceCiVersion": "microservice CI version",
+            "microserviceTestVersion": "microservice test version",
+            "mockservices": [
+                {
+                    "mockService": "mock service name or ID",
+                    "mockServiceVersion": "mock service version"
+                }
+            ],
+            "gitHash": "Git hash",
+            "documentFragment": "document fragment",
+            "documentVersion": "document version",
+            "trList": [
+                "TRs that were mentioned in the commit messages"
+            ],
+            "epicList": [
+                "Epics that were mentioned in the commit messages"
+            ],
+            "additionalChanges": [
+                "Additional changes that were mentioned in the commit messages"
+            ]
+        }
+    ],
+    "required": [
+        "microserviceName",
+        "version",
+        "buildImageVersion",
+        "microserviceCiVersion",
+        "microserviceTestVersion",
+        "mockservices",
+        "gitHash",
+        "documentFragment",
+        "documentVersion",
+        "trList",
+        "epicList",
+        "additionalChanges"
+    ],
+    "properties": {
+        "microserviceName": {
+            "$id": "#/properties/microserviceName",
+            "type": "string",
+            "title": "The microserviceName schema",
+            "description": "Name of the microservice",
+            "default": "",
+            "examples": [
+                "eric-eea-dummy-microservice"
+            ]
+        },
+        "version": {
+            "$id": "#/properties/version",
+            "type": "string",
+            "title": "The version schema",
+            "description": "Microservice version.",
+            "default": "",
+            "examples": [
+                "1.0.0"
+            ]
+        },
+        "buildImageVersion": {
+            "$id": "#/properties/buildImageVersion",
+            "type": "string",
+            "title": "The buildImageVersion schema",
+            "description": "Bob image set version if Bob is used, else the version of the build environment",
+            "default": "",
+            "examples": [
+                "0.1.0-123"
+            ]
+        },
+        "microserviceCiVersion": {
+            "$id": "#/properties/microserviceCiVersion",
+            "type": "string",
+            "title": "The microserviceCiVersion schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "610cec6"
+            ]
+        },
+        "microserviceTestVersion": {
+            "$id": "#/properties/microserviceTestVersion",
+            "type": "string",
+            "title": "The microserviceTestVersion schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "610cec6"
+            ]
+        },
+        "mockservices": {
+            "$id": "#/properties/mockservices",
+            "type": "array",
+            "title": "The mockservices schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "mockService": "mock service name or ID",
+                        "mockServiceVersion": "mock service version"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/mockservices/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/mockservices/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "mockService": "mock service name or ID",
+                                "mockServiceVersion": "mock service version"
+                            }
+                        ],
+                        "required": [
+                            "mockService",
+                            "mockServiceVersion"
+                        ],
+                        "properties": {
+                            "mockService": {
+                                "$id": "#/properties/mockservices/items/anyOf/0/properties/mockService",
+                                "type": "string",
+                                "title": "The mockService schema",
+                                "description": "mock service name or ID or N/A.",
+                                "default": "",
+                                "examples": [
+                                    "mock service name or ID"
+                                ]
+                            },
+                            "mockServiceVersion": {
+                                "$id": "#/properties/mockservices/items/anyOf/0/properties/mockServiceVersion",
+                                "type": "string",
+                                "title": "The mockServiceVersion schema",
+                                "description": "mock service version or N/A.",
+                                "default": "",
+                                "examples": [
+                                    "mock service version"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        },
+        "gitHash": {
+            "$id": "#/properties/gitHash",
+            "type": "string",
+            "title": "The gitHash schema",
+            "description": "GIT hash.",
+            "default": "",
+            "examples": [
+                "610cec6"
+            ]
+        },
+        "documentFragment": {
+            "$id": "#/properties/documentFragment",
+            "type": "string",
+            "title": "The documentFragment schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "document fragment"
+            ]
+        },
+        "documentVersion": {
+            "$id": "#/properties/documentVersion",
+            "type": "string",
+            "title": "The documentVersion schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "document version"
+            ]
+        },
+        "trList": {
+            "$id": "#/properties/trList",
+            "type": "array",
+            "title": "The trList schema",
+            "description": "TRs that were mentioned in the commit messages.",
+            "default": [],
+            "examples": [
+                [
+                    "TRs that were mentioned in the commit messages"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/trList/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/trList/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "TRs that were mentioned in the commit messages.",
+                        "default": "",
+                        "examples": [
+                            "HT 123456"
+                        ]
+                    }
+                ]
+            }
+        },
+        "epicList": {
+            "$id": "#/properties/epicList",
+            "type": "array",
+            "title": "The epicList schema",
+            "description": "Epics that were mentioned in the commit messages",
+            "default": [],
+            "examples": [
+                [
+                    "Epics that were mentioned in the commit messages"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/epicList/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/epicList/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "Epics that were mentioned in the commit messages.",
+                        "default": "",
+                        "examples": [
+                            "EEAEPP-12345"
+                        ]
+                    }
+                ]
+            }
+        },
+        "additionalChanges": {
+            "$id": "#/properties/additionalChanges",
+            "type": "array",
+            "title": "The additionalChanges schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "Additional changes that were mentioned in the commit messages"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/additionalChanges/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/additionalChanges/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "Additional changes that were mentioned in the commit messages"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

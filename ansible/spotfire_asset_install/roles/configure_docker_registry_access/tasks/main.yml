@@ -1,0 +1,86 @@
+---
+- name: Save Container registry URL from cluster
+  block:
+    - kubernetes.core.helm_info:
+        release_name: '{{ container_registry.release_name }}'
+        release_namespace: '{{ container_registry.namespace }}'
+      register: cr_helm_info
+    - assert:
+        that: cr_helm_info.status is defined
+        fail_msg: "Seems that container registry is not deployed in {{ container_registry.namespace }} namespace"
+    - set_fact:
+        container_registry_url: "{{ cr_helm_info['status']['values']['ingress']['hostname'] }}"
+  when: container_registry_url == 'auto'
+
+- name: "Read Container registry IP address / port from cluster"
+  block:
+    - kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Service
+        name: '{{ container_registry.ingress_svc }}'
+        namespace: '{{ container_registry.ingress_namespace }}'
+      register: cr_ingress_svc
+    - assert:
+        that: cr_ingress_svc.resources|length == 1
+        fail_msg: "Seems that {{ container_registry.ingress_svc }} service does not exist in {{ container_registry.ingress_namespace }} namespace!"
+    - assert:
+        that: cr_ingress_svc.resources[0].spec.type == "LoadBalancer"
+        fail_msg: "{{ container_registry.ingress_svc }} service should have LoadBalancer type"
+  when: container_registry_ip == 'auto' or
+        container_registry_port == 'auto'
+
+- name: Save container registry IP address from cluster
+  set_fact:
+    container_registry_ip: "{{ cr_ingress_svc.resources[0].status.loadBalancer.ingress[0].ip }}"
+  when: container_registry_ip == 'auto'
+
+- name: Save Container registry port from cluster
+  set_fact:
+    container_registry_port: "{{ cr_ingress_svc | json_query('resources[0].spec.ports[?name==`https`].port') | first }}"
+  when: container_registry_port == 'auto'
+
+- set_fact:
+    container_registry_url_with_port: "{{ container_registry_url }}:{{ container_registry_port }}"
+
+- name: "Summarize the container registry parameters"
+  pause:
+    seconds: 1
+    prompt: |
+      CR FQDN: {{ container_registry_url }}
+      CR IP: {{ container_registry_ip }}
+      CR PORT: {{ container_registry_port }}
+      CR complete name: {{ container_registry_url_with_port }}
+
+- name: "Add registry IP - FQDN to /etc/hosts file"
+  command: "{{ item }}"
+  loop:
+    - "hostsman -r {{ container_registry_url }}"
+    - "hostsman -i {{ container_registry_url }}:{{ container_registry_ip }}"
+  become: yes
+
+- name: "Create directory for container registry in /etc/docker/ dir"
+  block:
+    - name: "Create container registry dir in /etc/docker/"
+      file:
+        path: '{{ cr_dir }}'
+        state: directory
+    - name: "Copy ca.crt file to {{ cr_dir }}"
+      copy:
+        src: '{{ container_registry_ca_cert }}'
+        dest: '{{ cr_dir }}/ca.crt'
+  vars:
+    cr_dir: '/etc/docker/certs.d/{{ container_registry_url_with_port }}'
+  become: yes
+
+- name: "Test login to {{ container_registry_url_with_port }} registry and force re-authentication"
+  community.docker.docker_login:
+    registry: "{{ container_registry_url_with_port }}"
+    username: "{{ container_registry_user }}"
+    password: "{{ container_registry_pass }}"
+    reauthorize: yes
+    debug: yes
+  changed_when: no
+  register: docker_login_res
+  until: "docker_login_res is not failed"
+  retries: 5
+  delay: 10

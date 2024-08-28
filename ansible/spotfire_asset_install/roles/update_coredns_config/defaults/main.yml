@@ -1,0 +1,4 @@
+---
+configmap_export: '{{ project_work_dir }}/core_dns_exported.configmap'
+configmap_work: '{{ project_work_dir }}/core_dns_work.configmap'
+configmap_new: '{{ project_work_dir }}/core_dns_new.configmap'

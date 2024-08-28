@@ -1,0 +1,11 @@
+---
+- name: EEA4 ELK hardening
+  hosts: elk
+  vars_files:
+    - ../../roles/elk/defaults/main.yml
+    - ../../roles/elk/vars/main.yml
+    - vars/main.yml
+  tasks:
+    - include_tasks: tasks/hardening.yml
+  handlers:
+    - include: handlers/main.yml

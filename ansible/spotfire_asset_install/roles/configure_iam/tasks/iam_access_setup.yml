@@ -1,0 +1,45 @@
+---
+- include_role:
+    name: configure_iam
+    tasks_from: iam_get_ip_and_fqdn.yml
+
+- name: "Add IAM and Spotfire GUI URL resolution to /etc/hosts file on Ansible Controller"
+  command: "{{ item }}"
+  loop:
+    - "hostsman -r {{ iam_proxy_fqdn }}"
+    - "hostsman -i {{ iam_proxy_fqdn }}:{{ iam_proxy_lb_ingress_ip }}"
+    - "hostsman -r {{ spotfire.public_address }}"
+    - "hostsman -i {{ spotfire.public_address }}:{{ sf_haproxy_lb_ip }}"
+  become: yes
+
+- name: 'Retrieve eric-sec-access-mgmt-creds secret'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: eric-sec-access-mgmt-creds
+    namespace: '{{ eea_namespace }}'
+  register: iam_secret
+
+- name: Store IAM admin user and password
+  set_fact:
+    iam_admin_user: "{{ iam_secret.resources[0].data.kcadminid | b64decode }}"
+    iam_admin_password: "{{ iam_secret.resources[0].data.kcpasswd | b64decode }}"
+
+# useful wiki: https://eteamspace.internal.ericsson.com/display/EEAInV/How+to+do+IAM+authenticationin+EEA4+via+REST+API
+- name: Get IAM admin-cli token
+  uri:
+    url: "https://{{ iam_proxy_fqdn }}/auth/realms/master/protocol/openid-connect/token"
+    body: "username={{ iam_admin_user }}&password={{ iam_admin_password }}&grant_type=password&client_id=admin-cli"
+    method: POST
+    status_code: [200]
+    validate_certs: no
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+  register: iam_response_token
+  until: "iam_response_token is not failed"
+  retries: 5
+  delay: 10
+
+- name: Store IAM admin access token
+  set_fact:
+    iam_admin_token: "{{ iam_response_token.json.access_token }}"

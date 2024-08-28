@@ -1,0 +1,16 @@
+node.name: "{{ ansible_hostname }}"
+path.data: "{{ logstash_data_path }}"
+path.logs: "{{ logstash_logs_path }}"
+#log.level: debug
+pipeline.separate_logs: true
+
+# SSL
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.username: "{{ elastic_monitoring_user }}"
+xpack.monitoring.elasticsearch.password: "{{ elastic_monitoring_passwd }}"
+xpack.monitoring.elasticsearch.hosts: [ {{logstash_target}} ]
+xpack.monitoring.elasticsearch.ssl.verification_mode: none
+xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/certs/ca/ca.crt
+#xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/ca-bundle-ericsson-internal.crt
+
+#xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/ca-bundle-ericsson-external.crt

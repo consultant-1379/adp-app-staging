@@ -1,0 +1,73 @@
+input {
+  beats {
+    port => "{{ security_and_cluster_info }}"
+  }
+}
+
+filter {
+  if [fields][log_tag] == "TENABLE_RIPORT_CSV" {
+    grok {
+      keep_empty_captures => true
+      match => { "message" => ["(\"%{NUMBER:Plugin}\",\"%{DATA:PluginName}\",\"%{DATA:Family}\",\"%{DATA:Severity}\",\"(?<VPR>()|(%{NUMBER}))\",\"%{DATA:IP Address}\",\"(?<NetBIOSName>()|(%{DATA}))\",\"%{DATA:DNSName}\",\"(?<MACAddress>()|(%{DATA}))\",\"(?<AgentID>()|(%{DATA}))\",\"%{DATA:Repository}\")"]
+      }
+    }
+    mutate { add_field => { "[@metadata][index_name]" => "rv-security-tenable-riport-%{+YYYY.MM.dd}" } }
+  }
+  if [fields][log_tag] in [ "CI_NODE_INFO_CSV", "CI_KUBE_POD_CONTAINER_INFO_CSV"] {
+    if [fields][log_tag] == "CI_NODE_INFO_CSV" {
+      grok {
+        match => { "message" => ["(%{GREEDYDATA:node},%{WORD:ts},(%{NUMBER:kube_node_status_capacity_cpu_cores:int})?,%{NUMBER:kube_node_status_capacity_pods:int},%{NUMBER:kube_node_status_capacity_memory_bytes:int},%{NUMBER:kube_node_status_allocatable_cpu_cores:int},%{NUMBER:kube_node_status_allocatable_pods:int},%{NUMBER:kube_node_status_allocatable_memory_bytes:int},%{GREEDYDATA:container_runtime_version},%{GREEDYDATA:kernel_version},%{GREEDYDATA:kubelet_version},%{GREEDYDATA:kubeproxy_version},%{GREEDYDATA:os_image},%{GREEDYDATA:role},%{GREEDYDATA:label_ccd_version},%{GREEDYDATA:clusterName},%{GREEDYDATA:buildId})"]
+        }
+      }
+    }
+    if [fields][log_tag] == "CI_KUBE_POD_CONTAINER_INFO_CSV" {
+      grok {
+        match => { "message" => ["(%{GREEDYDATA:pod},%{GREEDYDATA:namespace},(?<microservice>()|(%{GREEDYDATA})),(?<container_name>()|(%{GREEDYDATA})),(?<node>()|(%{GREEDYDATA})),(?<image>()|(%{GREEDYDATA})),(?<image_id>()|(%{GREEDYDATA})),(?<kube_pod_container_status_restarts_total>()|(%{NUMBER})),%{NUMBER:container_memory_failcnt:int},(?<container_cpu_cfs_throttled_seconds_total>()|(%{NUMBER})),%{NUMBER:max_memory_workingset_per_limit:float},%{NUMBER:max_memory_workingset_per_request:float},%{NUMBER:max_memory_usage_per_limit:float},%{NUMBER:max_memory_usage_per_request:float},%{NUMBER:max_memory_usage:int},%{NUMBER:min_memory_usage:int},%{NUMBER:max_memory_working_set:int},%{NUMBER:min_memory_working_set:int},(%{NUMBER:max_cpu_usage:float})?,(%{NUMBER:min_cpu_usage:float})?,%{NUMBER:max_cpu_usage_per_limit:float},%{NUMBER:max_cpu_usage_per_request:float},%{WORD:ts},(?<kube_pod_container_resource_limits_cpu_cores>()|(%{NUMBER:float})),(?<kube_pod_container_resource_limits_memory_bytes>()|(%{NUMBER:int})),(?<kube_pod_container_resource_requests_cpu_cores>()|(%{NUMBER:float})),(?<kube_pod_container_resource_requests_memory_bytes>()|(%{NUMBER:int})),(?<kube_pod_container_status_running>()|(%{NUMBER:int})),(?<kube_pod_container_status_ready>()|(%{NUMBER:int})),(?<kube_pod_container_status_terminated>()|(%{NUMBER:int})),(?<kube_pod_container_status_waiting>()|(%{NUMBER:int})),%{GREEDYDATA:kube_pod_container_status_terminated_reason},%{GREEDYDATA:clusterName},%{GREEDYDATA:buildId})"]
+        }
+      }
+      mutate {
+        convert => {
+          "kube_pod_container_status_restarts_total" => "integer"
+          "kube_pod_container_resource_limits_cpu_cores"  => "float"
+          "kube_pod_container_resource_limits_memory_bytes" => "integer"
+          "kube_pod_container_resource_requests_cpu_cores"  => "float"
+          "kube_pod_container_resource_requests_memory_bytes" => "integer"
+          "kube_pod_container_status_running" => "integer"
+          "kube_pod_container_status_ready" => "integer"
+          "kube_pod_container_status_terminated"  => "integer"
+          "kube_pod_container_status_waiting"  => "integer"
+        }
+      }
+   }
+
+    date {
+      match => [ "ts", "UNIX" ]
+      target => "Timestamp"
+    }
+
+
+  }
+  if [fields][log_tag] == "CI_NODE_INFO_CSV" {
+    mutate { add_field => { "[@metadata][index_name]" => "ci_node_info" } }
+  }
+  if [fields][log_tag] == "CI_KUBE_POD_CONTAINER_INFO_CSV" {
+    mutate { add_field => { "[@metadata][index_name]" => "ci_kube_pod_container_info" } }
+  }
+}
+
+
+output {
+  if [fields][log_tag] in [ "TENABLE_RIPORT_CSV" , "CI_NODE_INFO_CSV", "CI_KUBE_POD_CONTAINER_INFO_CSV"] {
+    elasticsearch {
+      index => "%{[@metadata][index_name]}"
+      hosts => [ {{logstash_target}} ]
+      user => "{{ elastic_user }}"
+      password => "{{ elastic_passwd }}"
+      ssl => true
+      ssl_certificate_verification => false
+      cacert => "/etc/logstash/certs/ca/ca.crt"
+    }
+  }
+  #file { path => "/data/logstash/logs/logstash-to-file-no-ssl.log" }
+  stdout { codec => rubydebug }
+}

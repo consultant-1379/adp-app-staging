@@ -1,0 +1,4 @@
+---
+arm_url_prefix: 'https://arm.seli.gic.ericsson.se/artifactory/'
+download_destination_on_jenkins: '{{ project_work_dir }}/{{ arm_url_postfix | basename }}'
+targz_to_container_destination: "/tmp/{{ arm_url_postfix | basename }}"

@@ -1,0 +1,48 @@
+---
+- name: include variables
+  include_vars:
+    file: ../../vars.yml
+
+- name: download metricbeat
+  get_url:
+    url: "{{ metricbeat_url }}{{ metricbeat_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: install metricbeat
+  become: yes
+  yum:
+    name: "{{ download }}/{{ metricbeat_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: metricbeat config remove
+  become: yes
+  file:
+    path: /etc/metricbeat/metricbeat.yml
+    state: absent
+
+- name: add empty metricbeat config
+  become: yes
+  file:
+      path: /etc/metricbeat/metricbeat.yml
+      state: touch
+
+- name: update metricbeat config
+  become: yes
+  blockinfile:
+      path: /etc/metricbeat/metricbeat.yml
+      marker: ""
+      block: |
+        metricbeat.inputs:
+        - type: log
+          paths:
+          - /var/log/*.log
+        output.logstash:
+          hosts: ["localhost:5044"]
+
+- name: start metricbeat
+  become: yes
+  service:
+    name: metricbeat
+    state: started

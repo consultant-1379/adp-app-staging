@@ -1,0 +1,10 @@
+---
+- name: 'LoadBalancer service for PSQL DB'
+  kubernetes.core.k8s:
+    namespace: '{{ spotfire.namespace }}'
+    src: eric-ts-platform-data-document-database-pg-ext.yaml
+    state: "{{ psql_lb_svc_state | default('present') }}"
+    wait: yes
+    # Note: cannot add wait condition for any Service, because
+    # service does not have condition list.
+    # https://github.com/kubernetes/kubernetes/issues/80828#issuecomment-517555879

@@ -1,0 +1,20 @@
+---
+# Helm Version and Supported Kubernetes Versions
+# https://helm.sh/docs/topics/version_skew/
+# NOTE THAT THE VALUES ARE STORED AS STRING
+helm_to_kubernetes:
+  "3.15":
+    - "1.30"
+    - "1.29"
+    - "1.28"
+    - "1.27"
+  "3.14":
+    - "1.29"
+    - "1.28"
+    - "1.27"
+    - "1.26"
+  "3.13":
+    - "1.28"
+    - "1.27"
+    - "1.26"
+    - "1.25"

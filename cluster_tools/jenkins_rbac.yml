@@ -1,0 +1,1487 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-machinery
+rules:
+- apiGroups:
+  - com.ericsson.sec.tls
+  resources:
+  - certificateauthorities
+  - clientcertificates
+  - servercertificates
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - siptls.sec.ericsson.com
+  resources:
+  - internalcertificates
+  - internalusercas
+  verbs:
+  - get
+  - delete
+  - list
+  - watch
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - delete
+  - create
+  - patch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - get
+  - delete
+  - create
+  - patch
+  - list
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - delete
+  - create
+  - patch
+  - list
+  - bind
+  - escalate
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  - pods/exec
+  - pods/portforward
+  - endpoints
+  - endpoints/restricted
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+  - deletecollection
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - secrets
+  - configmaps
+  - persistentvolumeclaims
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+  - patch
+  - update
+  - deletecollection
+- apiGroups:
+  - apps
+  resources:
+  - deployments/scale
+  - deployments/finalizers
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+  - patch
+  - update
+  - deletecollection
+- apiGroups:
+  - networking.x-k8s.io
+  resources:
+  - gateways
+  - httproutes
+  - httproutes/status
+  - tlsroutes
+  - tlsroutes/status
+  - backendpolicies
+  - backendpolicies/status
+  - udproutes
+  - udproutes/status
+  - tcproutes
+  - tcproutes/status
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - networking.k8s.io
+  - extensions
+  resources:
+  - ingresses
+  - networkpolicies
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - '*'
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses/status
+  verbs:
+  - '*'
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - list
+  - get
+  - delete
+  - create
+  - patch
+  - update
+  - watch
+  - deletecollection
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets/scale
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - nodes/proxy
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  - services/status
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets/status
+  - statefulsets/status
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods/eviction
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - list
+  - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces/status
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - ""
+  resourceNames:
+  - eric-eea-ns
+  - utf-service
+  - eric-crd-ns
+  - dashboard-it
+  - dashboard-deploy
+  - dashboard-functional-test
+  - spotfire-platform
+  resources:
+  - namespaces
+  verbs:
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - patch
+- apiGroups:
+  - kvdbag.data.ericsson.com
+  resources:
+  - '*'
+  - geodeclusters
+  verbs:
+  - '*'
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - list
+  - get
+  - watch
+  - patch
+  - create
+  - delete
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - watch
+  - list
+  - delete
+  - update
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/status
+  verbs:
+  - get
+  - watch
+  - list
+  - delete
+  - update
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list
+  - watch
+  - get
+  - create
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - serviceaccounts
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments/status
+  verbs:
+  - patch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - list
+  - get
+  - watch
+  - patch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  - csinodes
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csistoragecapacities
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshots
+  - volumesnapshotcontents
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - com.ericsson.sec.certm
+  resources:
+  - externalcertificates
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - certm.sec.ericsson.com
+  resources:
+  - externalcertificates
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - projectcontour.io
+  resources:
+  - httpproxies
+  - tlscertificatedelegations
+  - extensionservices
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - projectcontour.io
+  resources:
+  - extensionservices/status
+  - httpproxies/status
+  verbs:
+  - create
+  - get
+  - update
+  - patch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  - configmaps
+  verbs:
+  - create
+  - list
+  - watch
+  - patch
+  - delete
+  - get
+  - update
+  - list
+- apiGroups:
+  - eea4.ericsson.com
+  resources:
+  - aggregatorconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - streamaggregator.eea.ericsson.com
+  resources:
+  - processorconfigs
+  verbs:
+  - list
+  - get
+  - create
+  - update
+  - watch
+  - patch
+- apiGroups:
+  - config.istio.io
+  resources:
+  - adapters
+  - attributemanifests
+  - handlers
+  - httpapispecbindings
+  - httpapispecs
+  - instances
+  - quotaspecbindings
+  - quotaspecs
+  - templates
+  - rules
+  verbs:
+  - list
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - envoyfilters
+  - sidecars
+  verbs:
+  - list
+  - get
+  - create
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - gateways
+  verbs:
+  - list
+  - get
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - serviceentries
+  verbs:
+  - list
+  - get
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - workloadentries
+  verbs:
+  - list
+  - get
+  - watch
+  - update
+  - patch
+  - create
+  - delete
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - workloadentries/status
+  verbs:
+  - list
+  - get
+  - watch
+  - update
+  - patch
+  - create
+  - delete
+- apiGroups:
+  - rbac.istio.io
+  resources:
+  - rbacconfigs
+  - servicerolebindings
+  - serviceroles
+  verbs:
+  - list
+- apiGroups:
+  - security.istio.io
+  resources:
+  - authorizationpolicies
+  - requestauthentications
+  verbs:
+  - list
+  - get
+  - delete
+  - create
+- apiGroups:
+  - security.istio.io
+  resources:
+  - peerauthentications
+  verbs:
+  - list
+  - get
+  - delete
+  - create
+  - patch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - create
+  - delete
+  - patch
+  - deletecollection
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
+  - patch
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - applications
+  - rollouts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - deployments
+  - ingressclasses
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - getambassador.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - networking.internal.knative.dev
+  resources:
+  - clusteringresses
+  - ingresses
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - networking.internal.knative.dev
+  resources:
+  - clusteringresses/status
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - networking.x-k8s.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - authentication.istio.io
+  resources:
+  - '*'
+  verbs:
+  - list
+  - get
+  - watch
+  - update
+- apiGroups:
+  - config.istio.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - '*'
+  verbs:
+  - list
+  - get
+  - watch
+  - update
+- apiGroups:
+  - security.istio.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - keda.sh
+  resources:
+  - scaledobjects
+  - scaledobjects/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - keda.sh
+  resources:
+  - scaledobjects/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - virtualservices
+  - envoyfilters
+  verbs:
+  - list
+  - get
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - destinationrules
+  verbs:
+  - list
+  - get
+  - create
+  - delete
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - destinationrules/status
+  - virtualservices/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - v1
+  resources:
+  - namespaces
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - v1
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - list
+  - get
+  - watch
+  - patch
+  - update
+- apiGroups:
+  - v1
+  resources:
+  - services/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - extensions
+  resources:
+  - cronjobs
+  - daemonsets
+  - jobs
+  - replicasets
+  - statefulsets
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gatewayclasses
+  - gateways
+  - httproutes
+  - referencepolicies
+  - tlsroutes
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gatewayclasses/status
+  - gateways/status
+  - httproutes/status
+  - tlsroutes/status
+  verbs:
+  - update
+- apiGroups:
+  - projectcontour.io
+  resources:
+  - contourconfigurations
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - projectcontour.io
+  resources:
+  - contourconfigurations/status
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - iam.sec.ericsson.com
+  resources:
+  - internaloauth2identities
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - patch
+- apiGroups:
+  - vertica.com
+  resources:
+  - verticaautoscalers
+  - eventtriggers
+  - verticadbs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - vertica.com
+  resources:
+  - eventtriggers/finalizers
+  - verticaautoscalers/finalizers
+  - verticadbs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - vertica.com
+  resources:
+  - eventtriggers/status
+  - verticaautoscalers/status
+  - verticadbs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - batch
+  resources:
+  - jobs/status
+  verbs:
+  - get
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac.istio.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - serviceimports
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - serviceexports
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - update
+  - create
+  - get
+  - delete
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/approval
+  verbs:
+  - update
+  - create
+  - get
+  - delete
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/status
+  verbs:
+  - update
+  - create
+  - get
+  - delete
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resourceNames:
+  - kubernetes.io/legacy-unknown
+  resources:
+  - signers
+  verbs:
+  - approve
+- apiGroups:
+  - extensions.istio.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - '*'
+  verbs:
+  - list
+  - get
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gatewayclasses
+  verbs:
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - telemetry.istio.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+- apiGroups:
+    - metrics.k8s.io
+  resources:
+    - '*'
+  verbs:
+    - get
+    - list
+- apiGroups:
+    - metallb.io
+  resources:
+    - ipaddresspools
+  verbs:
+    - get
+    - list
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions/finalizers
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - argoproj.io
+  resources:
+  - clusterworkflowtemplates
+  - clusterworkflowtemplates/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - eventsources
+  - sensors
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowtasksets
+  - workflowtasksets/finalizers
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflows
+  - workflows/finalizers
+  - workflowtemplates
+  - workflowtemplates/finalizers
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workfloweventbindings
+  - workfloweventbindings/finalizers
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - argoproj.io
+  resources:
+  - cronworkflows
+  - cronworkflows/finalizers
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/finalizers
+  verbs:
+  - create
+  - update
+  - delete
+  - get
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowtaskresults
+  verbs:
+  - list
+  - watch
+  - deletecollection
+  - create
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowtaskresults/finalizers
+  verbs:
+  - list
+  - watch
+  - deletecollection
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - seldondeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - seldondeployments/finalizers
+  - seldondeployments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowtasksets/status
+  verbs:
+  - patch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - namespaces
+  resourceNames:
+  - eric-eea-ns
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - patch
+  - watch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - pods
+  resourceNames:
+  - eric-sec-access-mgmt-0
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - argoproj.io
+  resources:
+  - pods
+  verbs:
+  - get
+  - delete
+  - list
+  - watch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - pods/exec
+  resourceNames:
+  - eric-sec-access-mgmt-0
+  verbs:
+  - create
+- apiGroups:
+  - argoproj.io
+  resources:
+  - pods/exec
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - pods/log
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - argoproj.io
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - argoproj.io
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - patch
+  - watch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - events
+  verbs:
+  - get
+  - watch
+  - list
+  - watch
+  - create
+  - patch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - update
+  - delete
+  - get
+- apiGroups:
+  - argoproj.io
+  resources:
+  - persistentvolumeclaims/finalizers
+  verbs:
+  - create
+  - update
+  - delete
+  - get
+- apiGroups:
+  - sparkoperator.k8s.io
+  resources:
+  - sparkapplications
+  - scheduledsparkapplications
+  verbs:
+  - get
+  - patch
+  - watch
+  - create
+  - update
+  - delete
+  - list
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowartifactgctasks
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+  - deletecollection
+- apiGroups:
+  - ""
+  resources:
+  - resourcequotas
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - limitranges
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - docdb.data.ericsson.com
+  resources:
+  - operatorconfigurations
+  - postgresteams
+  - postgresqls
+  verbs:
+  - list
+  - get
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ci-entitlement
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ci-machinery
+subjects:
+- kind: ServiceAccount
+  name: jenkins
+  namespace: default

@@ -1,0 +1,17 @@
+---
+- name: include variables
+  include_vars:
+    file: ../../vars.yml
+
+- name: download elasticsearch
+  get_url:
+    url: "{{ elastic_url }}{{ elastic_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: install elasticsearch
+  become: yes
+  yum:
+    name: "{{ download }}/{{ elastic_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"

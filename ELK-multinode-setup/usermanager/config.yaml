@@ -1,0 +1,77 @@
+elk_user: 'auto_user_mgr'
+ldap_user: 'ecealdap'
+ldap_addr: 'ldaps://ldap-egad.internal.ericsson.com:3269'
+smtp_addr: 'smtp.internal.ericsson.com'
+smtp_port: 25
+pdls:
+  - PDLETHXFET
+  - PDLEEAMSDE
+  - PDLPDGEEAE
+  - PDLEATEAMG
+  - PDLATEAMGL
+  - PDLEEA4PRO
+roles:
+  default:
+    - 'kibana_user'
+    - 'eea_developer'
+  technical:
+    - 'product-ci-technical-user'
+users_to_keep:
+  - 'auto_user_mgr'
+  - 'elastic'
+  - 'kibana'
+  - 'logstash_system'
+  - 'beats_system'
+  - 'apm_system'
+  - 'remote_monitoring_user'
+  - 'logstash_writer'
+  - 'productci'
+  - 'logger1592'
+  - 'logger1601'
+  - 'logger1602'
+  - 'logger1593'
+  - 'logger1600'
+  - 'logger130'
+  - 'eeaelkutf'    # EEA ELK user for UTF logs
+  - 'elk_cleaner'  # EEA ELK user Curator
+  # External users (not members of the mailing lists), e.g. from GlobalLogic
+  - 'epadrno'
+  - 'zfeddar'
+  - 'zfulgab'
+  - 'zstovit'
+  - 'zsloboh'
+  - 'ezdobar'
+  - 'ekltplx'
+logger:
+  version: 1
+  formatters:
+    brief:
+      format: '%(levelname)-8s %(message)s'
+    default:
+      format: '%(asctime)s %(levelname)-8s %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: brief
+      stream: ext://sys.stdout
+    file:
+      class: logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: default
+      filename: /tmp/elkusrmgr.log
+      maxBytes: 10485760
+      encoding: utf8
+    email:
+      class: logging.handlers.SMTPHandler
+      mailhost: smtp.internal.ericsson.com
+      fromaddr: elkusermgr@ericsson.com
+      toaddrs:
+        - PDLEEA4PRO@pdl.internal.ericsson.com
+      subject: Important message from ELK user manager script!
+      level: CRITICAL
+      formatter: default
+  root:
+    level: DEBUG
+    handlers: [console, file, email]

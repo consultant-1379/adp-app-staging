@@ -1,0 +1,54 @@
+---
+- name: ensure parted is available
+  package:
+    name: parted
+
+- name: create persistence store device
+  parted:
+    device: "{{ data_device }}"
+    number: 1
+    state: present
+    label: "{{ can_be_msdos | ternary(omit, 'gpt') }}"
+    name: "{{ can_be_msdos | ternary(omit, data_vg ~ '_' ~ data_device | basename ~ '1') }}"
+  vars:
+    device_sector_size: "{{ ansible_devices[data_device | basename].sectorsize }}"
+    device_sectors: "{{ ansible_devices[data_device | basename].sectors }}"
+    device_size: "{{ device_sector_size | int * device_sectors | int }}"
+    dos_limit: "{{ 2**32 }}"
+    size_limit: "{{ device_sector_size | int * dos_limit | int }}"
+    can_be_msdos: "{{ device_size < size_limit }}"
+
+- name: create volume group
+  lvg:
+    vg: "{{ data_vg }}"
+    pvs: "{{ data_device }}1"
+
+- name: create logical volumes
+  lvol:
+    vg: "{{ data_vg }}"
+    lv: "{{ volume.name }}"
+    size: "{{ volume.size }}"
+  loop: "{{ data_volumes }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ data_vg }}/{{ volume.name }}"
+
+- name: create filesystems
+  filesystem:
+    device: "/dev/{{ data_vg }}/{{ volume.name }}"
+    fstype: "{{ volume.fs }}"
+  loop: "{{ data_volumes }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.name }} -> {{ volume.fs }}"
+
+- name: mount filesystems
+  mount:
+    path: "{{ volume.mountpoint }}"
+    src: "/dev/{{ data_vg }}/{{ volume.name }}"
+    fstype: "{{ volume.fs }}"
+    state: mounted
+  loop: "{{ data_volumes }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.name }} -> {{ volume.mountpoint }}"

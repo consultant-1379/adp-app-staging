@@ -1,0 +1,21 @@
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: eric-data-loader-eric-schema-registry-sr-client-cert
+  namespace: eric-eea-ns
+spec:
+  certificate:
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+    issuer:
+      reference: eric-schema-registry-sr-client-ca
+    subject:
+      cn: eric-data-loader
+    subjectAlternativeName:
+      populateKubernetesDns: false
+    validity:
+      overrideTtl: 15778800
+  kubernetes:
+    generatedSecretName: eric-data-loader-eric-schema-registry-sr-client-cert
+    secretType: tls

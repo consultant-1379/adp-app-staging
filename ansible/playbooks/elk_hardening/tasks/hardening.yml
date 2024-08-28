@@ -1,0 +1,162 @@
+---
+- name: copy TLS certificates
+  copy:
+    src: "files/{{ certificate }}"
+    dest: "{{ tls.path }}/{{ certificate.endswith('.key') | ternary('private', 'certs') }}"
+    mode: 0640
+    owner: root
+    group: root
+  loop: "{{ tls.certificates }}"
+  loop_control:
+    loop_var: certificate
+
+- name: ensure certificates are accessible
+  acl:
+    path: "{{ tls.path }}/{{ combo[1].endswith('.key') | ternary('private', 'certs') }}/{{ combo[1] }}"
+    entity: "{{ combo[0] }}"
+    etype: group
+    permissions: r
+    state: present
+  loop: "{{ elk_services | product(tls.certificates) | list }}"
+  loop_control:
+    loop_var: combo
+    label: "{{ combo[0] }} -> {{ combo[1] }}"
+
+- name: check CA certificate bundle
+  stat:
+    path: "{{ tls.path }}/certs/ca-bundle-ericsson-internal.crt"
+  register: cacert_bundle
+
+- name: build CA certificate bundle
+  block:
+    - name: obtain CA certificates
+      get_url:
+        url: "{{ pki.url }}/EGAD{{ certificate }}.crt"
+        dest: /tmp/
+      loop: "{{ pki.ca_certificates }}"
+      loop_control:
+        loop_var: certificate
+
+    - name: build CA certificate bundle
+      assemble:
+        src: /tmp/
+        regexp: '^EGAD.*\.crt$'
+        dest: "{{ tls.path }}/certs/ca-bundle-ericsson-internal.crt"
+        owner: root
+        group: root
+        mode: 0644
+  when: not cacert_bundle.stat.exists
+
+- name: link system-wide TLS into application components
+  file:
+    path: "/etc/{{ component }}/tls"
+    src: "{{ tls.path }}"
+    state: link
+  loop: "{{ elk_services }}"
+  loop_control:
+    loop_var: component
+
+- name: ensure Elasticsearch is configured for TLS
+  template:
+    src: templates/elasticsearch_tls.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+  notify: restart Elasticsearch
+
+- name: check for secure marker
+  stat:
+    path: /etc/elasticsearch/.secure
+  register: secure_marker
+
+- name: ensure Elasticsearch was restarted if it was reconfigured
+  meta: flush_handlers
+
+- name: secure Elasticsearch
+  block:
+    - name: wait for Elasticsearch
+      wait_for:
+        port: 9200
+
+    - name: have passwords generated for the built-in users
+      shell: "/usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto -u https://{{ inventory_hostname }}:9200"
+      args:
+        stdin: y
+      register: password_generation
+
+    - name: collect passwords, adding one for logstash_writer
+      set_fact:
+        es_passwords: "{{ dict( password_generation.stdout_lines | select('contains', '=') | map('regex_search', pattern, '\\1','\\2') ) | combine({'logstash_writer': lookup('password', '/dev/null length=21 chars=ascii_letters,digits,hexdigits,punctuation') })   }}"
+      vars:
+        pattern: '(\w+)\ =\ (\w+)'
+
+    - name: dump passwords to file
+      copy:
+        dest: /etc/elasticsearch/.passwords
+        content: "{{ es_passwords | to_nice_yaml(indent=2) }}"
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: place secure marker
+      file:
+        path: /etc/elasticsearch/.secure
+        state: touch
+
+  when: not secure_marker.stat.exists
+
+- name: obtain passwords
+  block:
+    - name: read password file
+      slurp:
+        src: /etc/elasticsearch/.passwords
+      register: password_file
+
+    - name: mark passwords
+      set_fact:
+        es_passwords: "{{ password_file.content | b64decode | from_yaml }}"
+
+  when: secure_marker.stat.exists
+
+- name: ensure Kibana uses TLS
+  template:
+    src: templates/kibana_tls.yml.j2
+    dest: /etc/kibana/kibana.yml
+  notify: restart Kibana
+
+- name: mark Elasticsearch API credentials and logstash_writer password
+  set_fact:
+    api: "{{ api | combine({'auth': {'password': es_passwords.elastic }}, recursive=True) }}"
+    es_security_entities: "{{ es_security_entities[:1]  + [logstash_user_entry] }}"
+  vars:
+    logstash_user_query: "[?name=='logstash_writer']"
+    logstash_user_entry: "{{ es_security_entities | json_query(logstash_user_query) | first | combine({'request': {'password': es_passwords.logstash_writer }}, recursive=True) }}"
+
+- name: create Logstash role and user
+  include_tasks: tasks/es_security_entity.yml
+  loop: "{{ es_security_entities }}"
+  loop_control:
+    loop_var: entity
+
+- name: ensure Logstash uses TLS
+  template:
+    src: templates/logstash_tls.yml.j2
+    dest: /etc/logstash/logstash.yml
+  notify: restart Logstash
+
+- name: convert private key for the pipeline's output plugin
+  command: "openssl pkcs8 -in /etc/logstash/tls/private/{{ ansible_hostname }}.key -topk8 -nocrypt -out /etc/pki/tls/private/{{ ansible_hostname }}.pkcs8.key"
+  args:
+    creates: "/etc/logstash/tls/private/{{ ansible_hostname }}.pkcs8.key"
+
+- name: secure converted private key
+  file:
+    path: "/etc/logstash/tls/private/{{ ansible_hostname }}.pkcs8.key"
+    group: logstash
+    mode: 0640
+
+- name: ensure Logstash pipeline uses TLS
+  template:
+    src: templates/logstash_pipeline_tls.conf.j2
+    dest: /etc/logstash/conf.d/beats_to_elastic.conf
+    owner: logstash
+    mode: 0600
+  notify: restart Logstash

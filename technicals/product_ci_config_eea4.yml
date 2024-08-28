@@ -1,0 +1,101 @@
+---
+ansible_inventories:
+  path: './cluster_inventories'
+  hosts_file: hosts
+  gerrit_url: 'https://gerrit.ericsson.se/plugins/gitiles/EEA/inv_test/+/master/eea4/cluster_inventories/'
+
+#
+# NOTE: the commands will be executed on the 'master' node only
+#
+collectibles:
+
+- name: Nodes
+  type: command
+  path: "echo -n \"<pre>\"; kubectl get nodes"
+
+- name: CPU
+  type: command
+  path: >-
+    total_core=$(kubectl resource-capacity --no-taint -a |awk '/^\*/ {print $2}' |cut -d/ -f2|tr -d [:alpha:]) ;
+    total_core=$((total_core/1000)) ;
+    echo "$total_core"
+
+- name: FreeCPU
+  type: command
+  path: >-
+    for ns in $(kubectl get ns | awk '{print $1}' | tail -n +2 | sed '/eric-eea-ns/d') ; do out=$(kubectl resource-capacity -n $ns --node-labels node-role.kubernetes.io/worker=worker | grep '*' | awk '{print $2}' | tr -d m) ;
+    if [[ "$out" != "0Mi" ]] ; then sum=$(( $sum + $out )); fi; done ;
+    cpu=$(kubectl resource-capacity --no-taint -a |awk '/^\*/ {print $2}' |cut -d/ -f2|tr -d [:alpha:]) ;
+    echo $((cpu/1000-sum/1000))
+
+- name: 'Memory[GB]'
+  type: command
+  path: >-
+    total_memory=$(kubectl resource-capacity --no-taint -a |awk '/^\*/ {print $4}' |cut -d/ -f2|tr -d [:alpha:]) ;
+    total_memory=$((total_memory/1024)) ;
+    echo "$total_memory"
+
+- name: 'FreeMemory[GB]'
+  type: command
+  path: >-
+    for ns in $(kubectl get ns | awk '{print $1}' | tail -n +2 | sed '/eric-eea-ns/d') ; do out=$(kubectl resource-capacity -n $ns --node-labels node-role.kubernetes.io/worker=worker | grep '*' | awk '{print $6}' | tr -d Mi) ;
+    if [[ "$out" != "0Mi" ]] ; then sum=$(( $sum + $out )); fi; done ;
+    mem=$(kubectl resource-capacity --no-taint -a |awk '/^\*/ {print $4}' |cut -d/ -f2|tr -d [:alpha:]) ;
+    mem=$((mem/1024)) ;
+    sum=$((sum/1024)) ;
+    echo $((mem-sum))
+
+- name: CCD
+  type: command
+  path: "kubectl get nodes -o=jsonpath='{.items[0].metadata.labels.ccd/version}'"
+
+- name: Kubernetes
+  type: command
+  path: >-
+    kubectl version -o yaml | yq '.serverVersion.gitVersion'
+
+- name: OS
+  type: command
+  path: >-
+    cat /etc/os-release  | grep PRETTY_NAME | awk -F '=' '{print $2}'
+
+- name: Max Pods
+  type: command
+  path: "kubectl describe nodes $(kubectl get nodes | grep worker | awk '{print $1}' | tail -1) | grep 'pods:' | awk '{print $2}' | head -n 1"
+
+- name: eea-helm
+  type: command
+  path: >-
+    helm list -n eric-eea-ns -o=yaml
+    | awk -F: '/eric-eea-int-helm-chart-[1-9]/ {print $2}'
+    | sed  's/^ eric-eea-int-helm-chart-//' | grep . || echo 'Not installed'
+
+- name: rook
+  type: command
+  path: >-
+    kubectl get pods -n rook-ceph -o jsonpath='{.items[0].spec.containers[*].image}' --selector=app=rook-ceph-operator
+    | awk -F: '{print $2}' | grep .
+
+- name: ceph
+  type: command
+  path: >-
+    kubectl get pods -n rook-ceph -o jsonpath='{.items[0].spec.containers[*].image}' --selector=app=rook-ceph-osd
+    | awk -F: '{print $2}' | grep .
+
+- name: ceph health
+  type: command
+  path: >-
+    kubectl exec deploy/rook-ceph-tools -n rook-ceph -- ceph health
+    | grep .
+
+- name: ceph df
+  type: command
+  path: "echo -n \"<pre>\"; kubectl exec deploy/rook-ceph-tools -n rook-ceph -- ceph df"
+
+- name: Grafana
+  type: command
+  path: "grafana_ip=$(kubectl get svc -n eea4-monitoring -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}'); grafana_port=$(kubectl get svc -n eea4-monitoring -o jsonpath='{.items[0].spec.ports[0].port}'); echo \"<a href=\\\"http://${grafana_ip}:${grafana_port}\\\">http://${grafana_ip}:${grafana_port}</a>\""
+
+- name: interfaces  # show active interfaces
+  type: command
+  path: "ip link show | awk -F: '/LOWER_UP/ && / ens|eth|em|p1p|p2p/ {print $2}' | grep ."

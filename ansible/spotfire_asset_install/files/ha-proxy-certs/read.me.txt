@@ -1,0 +1,39 @@
+Create self-signed TLS certificate secret for Spotfire HAproxy service:
+NOTE, customer provided certificates can be used as well but the haproxy server certificate and the key have to be combined in to single "tss-haproxy.pem" file the same way as in case of using self-signed certificate below.
+cd /path/to/spotfire-platform-asset-12.2.0-1.2.0/haproxy
+mkdir -p certs
+
+- Create haproxy.cnf according to your DNS records/alt_names/external IP
+  The DNS.X entries are the FQDN where the End-users connects to Spotfire GUI.
+  The IP.X entry is the external IP assigned to "haproxy" service.
+  The CN is the k8s service name for the "haproxy" inform of <spotfire-platform-helm-release-name>-haproxy, e.g. eric-ts-platform-haproxy.
+
+cat << EOF > haproxy.cnf
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+
+[dn]
+CN = eric-ts-platform-haproxy
+
+[alt_names]
+DNS.1 = eric-ts-platform-haproxy
+DNS.2 = eric-ts-platform-haproxy.spotfire-platform.svc.cluster.local
+DNS.3 = spotfire.eea.company-domain.com
+IP.1 = 10.117.43.46
+
+[v3_ext]
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+EOF
+
+openssl genrsa -out certs/tss-haproxy.key 2048
+openssl req -new -key certs/tss-haproxy.key -out certs/tss-haproxy.csr -config haproxy.cnf
+openssl x509 -req -days 365 -in certs/tss-haproxy.csr -signkey certs/tss-haproxy.key -out certs/tss-haproxy.crt -extfile haproxy.cnf -extensions v3_ext
+- Create a combined certificate/key file as "tss-haproxy.pem"
+cat certs/tss-haproxy.crt certs/tss-haproxy.key > certs/tss-haproxy.pem

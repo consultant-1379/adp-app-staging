@@ -1,0 +1,17 @@
+node.name: NODE_HOSTNAME
+path.data: /data/logstash
+path.logs: /data/logstash/logs
+#log.level: debug
+pipeline.separate_logs: true
+
+# SSL
+xpack.monitoring.enabled: false
+xpack.monitoring.elasticsearch.username: logstash_system
+xpack.monitoring.elasticsearch.password: "ELASTICSEARCH_PASSWORD"
+xpack.monitoring.elasticsearch.hosts: [ "https://seliics00309.ete.ka.sw.ericsson.se:9200", "https://seliics00310.ete.ka.sw.ericsson.se:9200", "https://seliics00311.ete.ka.sw.ericsson.se:9200" ]
+xpack.monitoring.elasticsearch.ssl.verification_mode: none
+#xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/certs/ca/ca.crt
+xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/seliics00311.pem
+#xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/ca-bundle-ericsson-internal.crt
+
+#xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/ca-bundle-ericsson-external.crt

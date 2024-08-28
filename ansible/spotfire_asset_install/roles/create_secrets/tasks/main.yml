@@ -1,0 +1,150 @@
+---
+- name: "Create {{ spotfire.namespace }} namespace"
+  kubernetes.core.k8s:
+    name: '{{ spotfire.namespace }}'
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create temporary file for pullsecret
+  tempfile:
+    state: file
+    suffix: temp
+  register: _tmp
+
+- name: Save docker auth content to temp file
+  copy:
+    dest: "{{ _tmp.path }}"
+    content: >
+      {
+        "auths": {
+          "{{ container_registry_url_with_port }}": {
+             "auth": "{{ auth | b64encode }}"
+          }
+        }
+      }
+  vars:
+    auth: "{{ container_registry_user }}:{{ container_registry_pass }}"
+
+- name: "Create {{ spotfire.pull_secret }} pull-secret"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: '{{ spotfire.pull_secret }}'
+        namespace: '{{ spotfire.namespace }}'
+      data:
+        .dockerconfigjson: "{{ configjson | tojson | b64encode }}"
+      type: kubernetes.io/dockerconfigjson
+  vars:
+    configjson: "{{ lookup('file', _tmp.path) }}"
+
+- name: Remove temporary file
+  file:
+    path: "{{ _tmp.path }}"
+    state: absent
+
+- name: "Patch the default ServiceAccount with the imagepull secret"
+  kubernetes.core.k8s:
+    state: patched
+    kind: ServiceAccount
+    name: default
+    namespace: '{{ spotfire.namespace }}'
+    resource_definition:
+      imagePullSecrets:
+        - name: '{{ spotfire.pull_secret }}'
+
+- name: 'Create secret "haproxy-certs"'
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: haproxy-certs
+        namespace: '{{ spotfire.namespace }}'
+      data:
+        "tss-haproxy.pem": "{{ haproxy_pem | b64encode }}"
+      type: Opaque
+  vars:
+    haproxy_pem: "{{ lookup('file', 'files/ha-proxy-certs/tss-haproxy.pem') }}"
+
+- name: 'Create "spotfire-platform-secret" secret with Spotfire database and admin user passwords'
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: spotfire-platform-secret
+        namespace: '{{ spotfire.namespace }}'
+      data:
+        SPOTFIREADMIN_PASSWORD:  '{{ spotfire.admin_password | b64encode }}'
+        DBSERVER_ADMIN_PASSWORD: '{{ psql.admin_password | b64encode }}'
+        SPOTFIREDB_PASSWORD:     '{{ spotfire.db_password | b64encode }}'
+      type: Opaque
+
+- name: 'Create "posgresusersecrets" secret for the eric-data-document-database DB'
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: posgresusersecrets
+        namespace: '{{ spotfire.namespace }}'
+      data:
+        "custom-user":  "{{ 'customname' | b64encode }}"
+        "custom-pwd":   "{{ 'custompwd' | b64encode }}"
+        "super-pwd":    "{{ psql.admin_password | b64encode }}"
+        "metrics-pwd":  "{{ 'metricspwd' | b64encode }}"
+        "replica-user": "{{ 'replicauser' | b64encode }}"
+        "replica-pwd":  "{{ 'replicapwd' | b64encode }}"
+      type: Opaque
+
+- name: Create new secret containing CA certs
+  block:
+    - name: Create temporary directory for CA certificate files
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: '-sf-job-certs'
+      register: _tmp_cacert_dir
+
+    - set_fact:
+        custom_ca_crt: '{{ _tmp_cacert_dir }}/concatenated_cas.crt'
+
+    - name: Copy the .crt files to temp dir
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: '{{ _tmp_cacert_dir }}/'
+        remote_src: no
+      loop:
+        - '{{ asset_work_dir }}/custom-ca-certificates/ca-certificates.crt'
+        - '{{ root_ca_cert }}'
+        - 'files/ha-proxy-certs/tss-haproxy.crt'
+
+    - name: Concatenate CA cert files to one file
+      ansible.builtin.assemble:
+        src: '{{ _tmp_cacert_dir }}'
+        dest: '{{ custom_ca_crt }}'
+
+    # kubectl create secret generic custom-ca-certificates -n spotfire-platform --from-file=ca-certificates.crt=/root/concatenated_ca_certs.crt
+    - name: 'Create secret "custom-ca-certificates"'
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: custom-ca-certificates
+            namespace: '{{ spotfire.namespace }}'
+          data:
+            "ca-certificates.crt": "{{ custom_ca_cert_content | b64encode }}"
+          type: Opaque
+      vars:
+        custom_ca_cert_content: "{{ lookup('file', '{{ custom_ca_crt }}') }}"
+  always:
+    - name: Delete temporary files and dir
+      ansible.builtin.file:
+        state: absent
+        path: '{{ _tmp_cacert_dir }}/'
+  # TODO EEAEPP-100468: remove the when clause, this is here only for keeping backward compatibility
+  when:
+    - asset_version == 'spotfire-platform-asset-12.5.0-1.5.4'

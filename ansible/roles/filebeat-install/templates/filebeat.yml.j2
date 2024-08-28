@@ -1,0 +1,25 @@
+filebeat:
+  inputs:
+    {{ filebeat_inputs | to_json }}
+  modules:
+    path:
+      - ${path.config}/modules.d/*.yml
+    reload:
+      enabled: false
+
+setup:
+  template:
+    settings:
+      index:
+        number_of_shards: 1
+
+output:
+  logstash:
+    hosts: {{ filebeat_output_logstash_hosts | to_json }}
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~

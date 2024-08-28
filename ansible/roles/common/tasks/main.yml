@@ -1,0 +1,13 @@
+- name: Set authorized key for ansible user
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ansible_pub_key}}"
+
+- name: Configure pip
+  copy:
+    src: "{{ role_path }}/files/pip.conf"
+    dest: /etc/pip.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r

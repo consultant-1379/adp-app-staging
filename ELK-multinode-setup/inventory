@@ -1,0 +1,28 @@
+[all:children]
+elastic
+logstash
+kibana
+
+[all:vars]
+ansible_ssh_port=22
+
+[elastic:children]
+elastic_master
+elastic_slave
+
+[elastic_master]
+seliics00309 ansible_ssh_host=10.61.197.96
+seliics00310 ansible_ssh_host=10.61.197.97
+
+[elastic_slave]
+seliics00311 ansible_ssh_host=10.61.197.98
+
+[kibana]
+seliics00309 ansible_ssh_host=10.61.197.96
+seliics00310 ansible_ssh_host=10.61.197.97
+seliics00311 ansible_ssh_host=10.61.197.98
+
+[logstash]
+seliics00311 ansible_ssh_host=10.61.197.98
+
+[nfs]

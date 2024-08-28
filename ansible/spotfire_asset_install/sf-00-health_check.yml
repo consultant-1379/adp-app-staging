@@ -1,0 +1,11 @@
+---
+- name: Health check
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars/sf_vars.yml
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig }}"
+  roles:
+    - check_deployment_state

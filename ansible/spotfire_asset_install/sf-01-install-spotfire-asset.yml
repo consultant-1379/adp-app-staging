@@ -1,0 +1,38 @@
+---
+- name: "Fresh install: Update platform.yaml file and call helm"
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars/sf_vars.yml
+  vars:
+    container_registry_url:  "{{ cr_url  | default('auto') }}"
+    container_registry_ip:   "{{ cr_ip   | default('auto') }}"
+    container_registry_port: "{{ cr_port | default('auto') }}"
+    container_registry_user: "{{ cr_user }}"
+    container_registry_pass: "{{ cr_pass }}"
+    container_registry_ca_cert: "{{ cr_cacert }}"
+
+    asset_work_dir:  "{{ asset_extracted_root_dir }}/{{ asset_version }}"
+    asset_chart_dir: "{{ asset_extracted_root_dir }}/{{ asset_version }}/charts/spotfire-platform"
+    platform_yaml_file: "{{ project_work_dir }}/platform.yaml"
+    sf_dim_yaml_file: "{{ project_work_dir }}/dimensioning.yaml"
+    security_yaml_file: "{{ project_work_dir }}/security_hardened.yaml"
+
+  environment:
+    K8S_AUTH_KUBECONFIG : "{{ kubeconfig }}"
+
+  roles:
+    - collect_environment_versions  # Pre-check for environment
+    - configure_docker_registry_access
+    - push_images_to_registry  # re-tag also
+    - create_secrets
+    - kwoodson.yedit  # needed if using yedit module
+    - edit_platform_yaml_for_install
+    - role: call_helm
+      is_new_deployment: yes
+    - role: create_postgresql_lb_service
+      when:
+        - enable_optional_features | default(false) | bool
+    - check_deployment_state
+    - configure_datasources  # WA for config job issue, described in EEARVA-19593 ticket

@@ -1,0 +1,60 @@
+{
+    "template": {
+        "parameters": {
+            "additionalParameters": {
+                "value": {
+                    "dataSet": "notset"
+                }
+            },
+            "cucumberFeatures": {
+                "value": "classpath:/features/"
+            },
+            "productNamespace": {
+                "value": "eric-eea-ns"
+            },
+            "testNgThreadCount": {
+                "value": "12"
+            }
+        }
+    },
+    "configurations": {
+        "sendLogsToSearchEngine": true
+    },
+    "ciPayload": {
+        "test_exec_metadata": {
+            "spinnaker_id": "notset",
+            "jenkins": {
+                "job": {
+                    "name": "notset",
+                    "build_num": "notset"
+                }
+            },
+            "cluster_ID": {
+                "name": "notset"
+            },
+            "eea4_namespace": {
+                "name": "eric-eea-ns"
+            }
+        },
+        "metabaseline_chart": {
+            "name": "notset",
+            "version": "notset"
+        },
+        "product_integration_chart": {
+            "name": "notset",
+            "version": "notset"
+        },
+        "csar_package": {
+            "name": "notset",
+            "version": "notset"
+        },
+        "elk": {
+            "host": "seliics00309.ete.ka.sw.ericsson.se",
+            "port": "9200"
+        },
+        "microservice_list": [
+        ]
+    },
+    "nfsDir": "notset",
+    "jenkinsURL": "notset"
+}

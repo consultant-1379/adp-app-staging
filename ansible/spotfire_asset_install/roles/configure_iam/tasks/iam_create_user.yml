@@ -1,0 +1,109 @@
+---
+- name: "IAM: create {{ item.name }} user for Spotfire"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/users"
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ iam_admin_token }}"
+    body_format: json
+    body:
+      username: "{{ item.name }}"
+      enabled: true
+    method: POST
+    status_code: [201, 409]  # 409: already exists
+  register: iam_create_user_response
+  until: "iam_create_user_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: "IAM: get {{ item.name }} user parameters"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/users?username={{ item.name }}"
+    headers:
+      Authorization: "Bearer {{ iam_admin_token }}"
+    method: GET
+    status_code: [200]
+  register: iam_user_get_response
+  until: "iam_user_get_response is not failed"
+  retries: 5
+  delay: 10
+
+- debug:
+    var: iam_user_get_response
+
+- name: "Store user id of {{ item.name }}"
+  set_fact:
+    iam_sf_user_id: "{{ iam_user_get_response.json[0].id }}"
+    iam_sf_user_createtimestamp: "{{ iam_user_get_response.json[0].attributes.createTimestamp }}"
+    iam_sf_user_modifytimestamp: "{{ iam_user_get_response.json[0].attributes.modifyTimestamp }}"
+    iam_sf_user_uid_number: "{{ iam_user_get_response.json[0].attributes.uidNumber[0] }}"
+
+- name: "IAM: reset {{ item.name }} user password"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/users/{{ iam_sf_user_id }}/reset-password"
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ iam_admin_token }}"
+    body_format: json
+    body:
+      type: password
+      temporary: false
+      value: "{{ item.password }}"
+    method: PUT
+    status_code: [204]  # 204 is for reset
+  when: iam_sf_user_createtimestamp == iam_sf_user_modifytimestamp
+  register: iam_user_reset_response
+  until: "iam_user_reset_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: "IAM: reset {{ item.name }} user password is SKIPPED"
+  debug:
+    msg: 'Skipping password reset, because user modifyTimestamp and createTimestamp differ, so password is set previously'
+  when: iam_sf_user_createtimestamp != iam_sf_user_modifytimestamp
+
+- name: 'Delete assignment of {{ iam.role }} role for {{ item.name }} user'
+  community.general.keycloak_user:
+    auth_client_id: admin-cli
+    auth_keycloak_url: "https://{{ iam_proxy_fqdn }}/auth"
+    realm: local-ldap3
+    token: '{{ iam_admin_token }}'
+    validate_certs: no
+    username: '{{ item.name }}'
+    attributes:
+      - name: roles
+        values:
+          - '{{ iam.role }}'
+        state: absent
+  register: iam_user_role_del_response
+  until: "iam_user_role_del_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: 'Wait 5 seconds'
+  wait_for:
+    timeout: 5
+
+- name: 'Re-assign {{ iam.role }} role for {{ item.name }} user'
+  community.general.keycloak_user:
+    auth_client_id: admin-cli
+    auth_keycloak_url: "https://{{ iam_proxy_fqdn }}/auth"
+    realm: local-ldap3
+    token: '{{ iam_admin_token }}'
+    validate_certs: no
+    username: '{{ item.name }}'
+    attributes:
+      - name: roles
+        values:
+          - '{{ iam.role }}'
+        state: present
+  register: iam_user_role_add_response
+  until: "iam_user_role_add_response is not failed"
+  retries: 5
+  delay: 10

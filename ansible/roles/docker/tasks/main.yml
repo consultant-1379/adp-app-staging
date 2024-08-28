@@ -1,0 +1,126 @@
+---
+
+- name: Add Virtualization:containers (SLE_15_SP5) repo
+  zypper_repository:
+    repo: https://download.opensuse.org/repositories/Virtualization:/containers/15.5/
+    name: Virtualization:containers (SLE_15_SP5)
+    state: present
+    runrefresh: yes
+    auto_import_keys: yes
+
+- name: install lvm package
+  package: name=lvm state=present
+
+- name: install parted package
+  package: name=parted state=present
+
+- import_tasks: docker_pool_setup.yml
+  tags: docker_pool_setup
+
+- import_tasks: docker_volume_setup.yml
+  tags: docker_volume_setup
+
+- name: install docker package
+  package: name={{ docker_version }} state=present
+
+- name: download docker-compose
+  get_url:
+    url: "https://eceaart:{{ artifactory_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/docker/compose/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: "/usr/local/bin/docker-compose"
+    mode: 0755
+    checksum: "{{ docker_compose_checksum }}"
+
+- name: cofigure docker
+  group:
+    name: docker
+    state: present
+    system: yes
+
+- name: Create /etc/docker/ directory if it does not exist
+  file:
+    path: /etc/docker/
+    state: directory
+    mode: '0755'
+
+- name: copy docker/daemon.json
+  template:
+    src: "{{ role_path }}/templates/docker_daemon.json.j2"
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: "add eceabuild to group docker"
+  user:
+    name: eceabuild
+    append: yes
+    groups: docker
+
+- name: start docker service
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    state: started
+    name: docker
+
+- name: Uninstall docker python module
+  pip:
+    name: docker
+    state: absent
+    executable: pip3
+
+- name: Install docker python module
+  pip:
+    name: docker
+    state: present
+    executable: pip3
+
+- name: Reboot machine to avoid docker socket error
+  reboot:
+
+- name: log into docker selidocker.lmera.ericsson.se registry
+  docker_login:
+    username: eeaprodart
+    password: "{{ arm_seli_eeaprodart_token }}"
+    registry_url: selidocker.lmera.ericsson.se
+  become: yes
+  become_user: eceabuild
+  tags: docker_login
+
+- name: log into docker armdocker.rnd.ericsson.se registry
+  docker_login:
+    username: eeaprodart
+    password: "{{ arm_seli_eeaprodart_token }}"
+    registry_url: armdocker.rnd.ericsson.se
+  become: yes
+  become_user: eceabuild
+  tags: docker_login
+
+- name: log into docker selndocker.mo.sw.ericsson.se registry
+  docker_login:
+    username: eeaprodart
+    password: "{{ arm_sero_eeaprodart_token }}"
+    registry_url: selndocker.mo.sw.ericsson.se
+  become: yes
+  become_user: eceabuild
+  tags: docker_login
+
+- name: log into docker serodocker.sero.gic.ericsson.se registry
+  docker_login:
+    username: eeaprodart
+    password: "{{ arm_sero_eeaprodart_token }}"
+    registry_url: serodocker.sero.gic.ericsson.se
+  become: yes
+  become_user: eceabuild
+  tags: docker_login
+
+- name: Enable IPv4 forwarding related kernel parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+  with_items:
+    - { name: 'net.ipv4.ip_forward', value: '1' }
+    - { name: 'net.ipv4.conf.all.forwarding', value: '1' }
+
+- meta: flush_handlers

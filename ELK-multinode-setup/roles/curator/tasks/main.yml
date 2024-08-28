@@ -1,0 +1,75 @@
+---
+- name: include variables
+  include_vars:
+    file: ../vars/main.yml
+
+- name: configure curator repository
+  yum_repository:
+    name: curator-5
+    description: CentOS/RHEL 7 repository for Elasticsearch Curator 5.x packages
+    baseurl: https://packages.elastic.co/curator/5/centos/7
+    gpgcheck: yes
+    gpgkey: https://packages.elastic.co/GPG-KEY-elasticsearch
+    enabled: yes
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: install curator from repo
+  yum:
+    name: elasticsearch-curator
+    enablerepo: curator
+    state: present
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: add empty curator configuration
+  become: yes
+  file:
+      path: /etc/curator/curator.yml
+      state: touch
+
+- name: update curator configuration
+  become: yes
+  blockinfile:
+      path: /etc/curator/curator.yml
+      marker: ""
+      block: |
+        ---
+        client:
+          hosts:
+            - "{{currator_settings.elkconfig.elkhosts[0]}}"
+            - "{{currator_settings.elkconfig.elkhosts[1]}}"
+            - "{{currator_settings.elkconfig.elkhosts[2]}}"
+          port: "{{currator_settings.elkconfig.elkport}}"
+          url_prefix:
+          use_ssl: True
+          certificate: /etc/elasticsearch/certs/ca/ca.crt
+          client_cert:
+          client_key:
+          ssl_no_validate: False
+          username: "{{currator_settings.user.clusername}}"
+          password: "{{currator_settings.user.clpassword}}"
+          timeout: 30
+          master_only: False
+
+        logging:
+          loglevel: INFO
+          logfile: '/var/log/curator.log'
+          logformat: default
+          blacklist: ['elasticsearch', 'urllib3']
+
+- name: copy action configuration to te target node
+  become: yes
+  copy:
+    src: ../preconfig/action.yml
+    dest: /etc/curator/action.yml
+    owner: root
+    group: root
+    mode: 644
+
+- name: Install crontab setting
+  cron:
+    name: "Remove old logstash output files."
+    minute: "0"
+    hour: "2"
+    weekday: "*"
+    job: "/usr/bin/curator --config /etc/curator/curator.yml --dry-run /etc/curator/action.yml"
+    disabled: "no"

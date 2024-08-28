@@ -1,0 +1,15 @@
+{
+  "registry-mirrors": ["https://registry.docker.eea:5000"],
+  "storage-driver": "devicemapper",
+  "storage-opts": [
+      "dm.fs=xfs",
+      "dm.thinpooldev=/dev/mapper/VolDocker-docker--pool",
+      "dm.use_deferred_removal=true",
+      "dm.use_deferred_deletion=true"
+  ],
+  "log-driver": "syslog",
+  "log-opts": {
+      "syslog-address": "udp://{{ docker_log_syslog_address_host }}:{{ docker_log_syslog_address_port }}",
+      "tag": "docker-{% raw %}{{.Name}}-{{.ID}}{% endraw %}"
+  }
+}

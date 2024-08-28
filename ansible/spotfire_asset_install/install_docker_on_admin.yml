@@ -1,0 +1,64 @@
+---
+- name: "Install latest docker on Ansible Controller node (runnig on RHEL7.6)"
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    docker_work_dir: /data/docker-dir
+  tasks:
+    - assert:
+        that:
+          - ansible_distribution == "RedHat"
+          - ansible_distribution_release == "Maipo"  # Maipo is RHEL7
+
+    - name: "Add centos7 docker-ce repository"
+      yum_repository:
+        name: docker-ce
+        description: docker-ce repo
+        baseurl: https://download.docker.com/linux/centos/7/x86_64/stable  # note: it is for RHEL7
+        #https://download.docker.com/linux/centos/docker-ce.repo
+        gpgkey: "https://download.docker.com/linux/centos/gpg"
+        gpgcheck: yes
+        enabled: yes
+
+    - name: "Update repo and install docker-ce"
+      yum:
+        name: docker-ce
+        state: latest
+        update_cache: yes
+      vars:
+        ansible_python_interpreter: /usr/bin/python2  # W/A for rhel7 yum module: it requires Python2
+
+    - name: Stop docker
+      service:
+        name: docker
+        state: stopped
+
+    - name: Create custom docker work directory if it does not exist
+      file:
+        path: '{{ docker_work_dir }}'
+        state: directory
+        mode: '0710'
+
+    - name: Creating new docker config
+      copy:
+        dest: "/etc/docker/daemon.json"
+        content: |
+          {
+            "data-root": "{{ docker_work_dir }}"
+          }
+
+    - name: Force systemd to reread configs
+      systemd:
+        daemon_reload: yes
+
+    - name: "Re-start docker"
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+
+    - name: Remove default docker work dir
+      file:
+        path: /var/lib/docker
+        state: absent

@@ -1,0 +1,78 @@
+validations:
+  non_pra_whitelist:
+    services:
+  non_pra_upgrade_whitelist:
+    services:
+    - eric-eea-analysis-system-overview-install
+  non_pra_with_helm_whitelist:
+    services:
+  non_pra_upgrade_with_helm_whitelist:
+    services:
+    - eric-eea-analysis-system-overview-install
+  documentation_deliverables_whitelist:
+    services:
+  input_sanity_check_for_helm_chart_and_docker_images_whitelist:
+    services:
+  image_repo_check_whitelist:
+    services:
+  cbo_age_report_whitelist:
+    services:
+    - eric-eea-mxe
+    - eric-eea-analytical-processing-database
+    - eric-eea-db-loader
+  owasp_zap_report_whitelist:
+    services:
+    - eric-csm-st
+  xray_report_whitelist:
+    services:
+  trivy_report_whitelist:
+    services:
+  grype_report_whitelist:
+    services:
+  details_report_whitelist:
+    services:
+  nmap_report_whitelist:
+    services:
+  release_documentation_validation_whitelist:
+    services:
+  sonarqube_report_config_whitelist:
+    services:
+    - eric-eea-analysis-system-overview-install
+    - eric-eea-stream-aggregator-connector
+    - eric-eea-analytics-open-api
+    - eric-eea-mxe
+  coverage_report_config_whitelist:
+    services:
+    - eric-oss-stream-exporter
+    - eric-eea-stream-aggregator
+    - eric-eea-db-manager
+    - eric-eea-analytical-processing-database
+    - eric-eea-db-loader
+    - eric-oss-correlator
+    - eric-eea-refdata-fetch
+    - eric-eea-scoring-proxy
+    - eric-eea-analysis-system-overview-install
+    - eric-eea-incident-ratio-calculator
+    - eric-eea-post-processor
+    - eric-oss-4g-pm-event-parser
+    - eric-oss-4g-pm-event-termination
+    - eric-oss-5g-pm-event-termination
+    - eric-oss-mobility-mgmt-ebm-parser
+    - eric-oss-mobility-mgmt-ebm-termination
+    - eric-oss-session-mgmt-ebm-parser
+    - eric-oss-session-mgmt-ebm-termination
+    - eric-oss-user-plane-ebm-parser
+    - eric-oss-user-plane-ebm-termination
+    - eric-eea-ctum-parser
+    - eric-eea-analytics-open-api
+    - eric-eea-mxe
+    - eric-eea-cm-analytics
+  service_level_CI_test_report_whitelist:
+    services:
+    - eric-eea-analytical-processing-database
+  crd_check_in_service_helm_charts_whitelist:
+    services:
+  3pp_list_check_whitelist:
+    services:
+  check_3pps_whitelist:
+    services:

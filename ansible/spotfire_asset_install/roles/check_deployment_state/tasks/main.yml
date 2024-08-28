@@ -1,0 +1,110 @@
+---
+- name: "List existing namespaces"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+  register: ns_list
+
+- name: "Validate that namespace for spotfire exists"
+  assert:
+    that:
+      - spotfire.namespace in namespaces
+    fail_msg: "The {{ spotfire.namespace }} namespace does not exist!"
+  vars:
+    namespaces: "{{ ns_list | json_query('resources[*].metadata.name') }}"
+
+- name: "Wait for pods to be Ready"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ spotfire.namespace }}"
+    label_selectors:
+      - app.kubernetes.io/instance = eric-ts-platform
+    wait: yes
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+
+- name: Collect Jobs
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Job
+    namespace: "{{ spotfire.namespace }}"
+  register: job_list
+
+- name: List the jobs
+  debug:
+    var: job_list
+
+- name: "Wait for jobs to be Completed"
+  kubernetes.core.k8s_info:
+    kind: Job
+    name: '{{ item.metadata.name }}'
+    namespace: "{{ spotfire.namespace }}"
+    wait: yes
+    wait_condition:
+      type: Complete
+      status: "True"
+    wait_timeout: 300
+  loop: "{{ job_list.resources }}"
+
+#
+# extra config checks
+#
+- name: "Check that security-filter.xml file contains EEA related settings"
+  block:
+    - name: Collect sf-server pod name
+      include_role:
+        name: collect_server_pod_details
+
+    - name: "Fetch security-filter.xml from {{ sf_server_pod_name }} pod"
+      kubernetes.core.k8s_cp:
+        namespace: "{{ spotfire.namespace }}"
+        pod: "{{ sf_server_pod_name }}"
+        container: spotfire-server
+        remote_path: /opt/tibco/tss/tomcat/webapps/spotfire/WEB-INF/security-filter.xml
+        local_path: "{{ secu_filter_xml_local }}"
+        state: from_pod
+      changed_when: no
+
+    - name: "Check security-filter.xml file content"
+      xml:
+        path: "{{ secu_filter_xml_local }}"
+        xpath: /security-filter-config/security-config[./id = 'public.web-resources']/security-constraint/web-resource-collection/url-pattern[text()='/resources/eea/*']
+        count: true
+      register: xml_hits
+      changed_when: no
+
+    - debug:
+        var: xml_hits
+
+    - name: "Assert that /resources/eea/* is present in security-filter.xml file"
+      assert:
+        that:
+          - xml_hits.count == 1
+  vars:
+    secu_filter_xml_local: "{{ project_work_dir }}/security-filter.xml"
+
+- name: "Check that PerformHtmlSanitation is set to FALSE"
+  block:
+    - include_role:
+        name: collect_cli_pod_details
+    - name: List local users in Spotfire cli pod
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_cli_pod_name }}'
+        container: spotfire-cli
+        command: >
+          /opt/tibco/spotfireconfigtool/config.sh
+          show-preference
+          -g Everyone -c TextArea --type=1.0###TextAreaPreferences -n PerformHtmlSanitation
+          --tool-password="{{ toolpasswd }}"
+          --bootstrap-config="{{ bootstrap_file }}"
+      changed_when: false
+      register: sanitation_res
+    - debug:
+        var: sanitation_res
+    - name: "Assert that PerformHtmlSanitation is set to false"
+      assert:
+        that:
+          - sanitation_res.stdout_lines[-1] == "false"

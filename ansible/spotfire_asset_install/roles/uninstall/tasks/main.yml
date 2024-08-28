@@ -1,0 +1,135 @@
+---
+- name: 'Uninstall LoadBalancer service for PSQL DB'
+  include_role:
+    name: create_postgresql_lb_service
+  vars:
+    psql_lb_svc_state: 'absent'
+
+- name: 'Uninstall eric-ts-platform helm chart'
+  kubernetes.core.helm:
+    binary_path: '{{ helm_bin }}'
+    release_name: eric-ts-platform
+    release_namespace: '{{ spotfire.namespace }}'
+    release_state: absent
+    wait: yes
+    timeout: 10m0s
+
+- block:
+    - name: 'Wait max. {{ max_mins_to_wait }} minutes until all the Pods are deleted'
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: '{{ spotfire.namespace }}'
+      register: pod_list
+      until: pod_list.resources | length == 0
+      delay: 60
+      retries: '{{ max_mins_to_wait | int }}'
+      vars:
+        max_mins_to_wait: 15
+  rescue:
+    # Add W/A steps for the following cases
+    # 1. handle that database-pg sometimes leaves hook pods there after the uninstall.
+    # 2. after a failed helm install the spotfire* pods can be reamin but, they are in Terminating state
+    - debug:
+        msg: 'Reaching RESCUE part, as not all the pods are deleted after helm uninstall'
+
+    - name: Collect remaining pods again
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: '{{ spotfire.namespace }}'
+      register: pod_list_b
+
+    - name: "Collect the eric-ts-platform-data-document-database-pg hook pods OR any terminating spotfire pods"
+      set_fact:
+        whitelisted_pods: "{{ whitelisted_pods | default([]) + [item.metadata.name] }}"
+      when: >
+        ((item.metadata.name is search("eric-ts-platform-data-document-database-pg")) and (item.metadata.name is search("hook"))) or
+        ((item.metadata.name is search("spotfire")) and ("'deletionTimestamp' in item.metadata"))
+      loop:
+        "{{ pod_list_b.resources }}"
+
+    - debug:
+        var: whitelisted_pods
+      when:
+        - whitelisted_pods is defined
+
+    - name: 'Make sure that only the white-listed pods remain, so we can safely remove those pods (as a W/A)'
+      assert:
+        that:
+          - whitelisted_pods is defined
+          - (pod_list_b.resources | length) == (whitelisted_pods | length)
+        fail_msg: 'Cannot continue, because not only the allowed pods remain! This case should be investigated!'
+
+    # Now we can safely remove all the pods, since all of those are in the white-list
+    - name: 'Remove the remaining pods in the {{ spotfire.namespace }}'
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ spotfire.namespace }}"
+        state: absent
+        delete_all: true
+        delete_options:
+          gracePeriodSeconds: 10
+        wait: yes
+        wait_timeout: 660  # unit is seconds
+        wait_sleep: 15  # unit is seconds, default value is 5
+
+# list #1
+- name: "Get a list of existing ServiceAccount that will be deleted"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ServiceAccount
+    namespace: '{{ spotfire.namespace }}'
+  register: sa_result
+
+# list #2
+- name: "Get a list of existing Roles that will be deleted"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Role
+    namespace: '{{ spotfire.namespace }}'
+  register: roles_result
+
+# list #3
+- name: "Get a list of existing PersistentVolumeClaims that will be deleted"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: PersistentVolumeClaim
+    namespace: '{{ spotfire.namespace }}'
+  register: pvc_result
+
+# list #4
+- name: "Get a list of existing Secrets that will be deleted"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    namespace: '{{ spotfire.namespace }}'
+  register: secret_result
+
+- name: "Delete the collected objects in {{ spotfire.namespace }}"
+  kubernetes.core.k8s:
+    api_version: '{{ item.apiVersion }}'
+    kind: '{{ item.kind }}'
+    name: '{{ item.metadata.name }}'
+    namespace: '{{ spotfire.namespace }}'
+    state: absent
+    wait: yes
+    wait_condition:
+      status: 'False'  # wait for status to be false
+    wait_sleep: 10  # check every 10 secs
+  loop: "{{ lists_merged }}"
+  vars:
+    lists_merged: "{{ sa_result.resources + roles_result.resources + pvc_result.resources + secret_result.resources }}"
+
+- name: "Delete {{ spotfire.namespace }} namespace"
+  kubernetes.core.k8s:
+    name: '{{ spotfire.namespace }}'
+    api_version: v1
+    kind: Namespace
+    state: absent
+    wait: yes
+    wait_condition:
+      status: 'False'
+    wait_sleep: 10
+    wait_timeout: 600

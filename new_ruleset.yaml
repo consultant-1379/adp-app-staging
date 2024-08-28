@@ -1,0 +1,10 @@
+modelVersion: 2.0
+
+import:
+  main: ruleset2.0.yaml
+
+rules:
+  test:
+    - task: test-echo
+      cmd:
+        - echo testing

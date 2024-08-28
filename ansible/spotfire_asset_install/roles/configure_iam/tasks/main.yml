@@ -1,0 +1,17 @@
+---
+- name: Setup access to IAM
+  import_tasks:
+    file: iam_access_setup.yml
+
+- name: Create Spotfire Client in IAM
+  include_tasks: iam_create_spotfire_client.yml
+
+- name: Modify adp-iam-aa-client client
+  include_tasks: iam_modify_adp_iam_client.yml
+
+- name: Create Call Analyzer composite role
+  include_tasks: iam_create_role_for_call_analyzer.yml
+
+- name: Create Spotfire User in IAM
+  include_tasks: iam_create_user.yml
+  loop: "{{ iam.users }}"

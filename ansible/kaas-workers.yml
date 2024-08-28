@@ -1,0 +1,11 @@
+---
+- name: configure KaaS worker nodes
+  hosts: kaas
+  gather_facts: no
+  become: yes
+  vars:
+    ansible_ssh_user: pdu # for cluster owner only, who needs to run this initially
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa_ews # its public half needs prior upload to EWS
+  roles:
+   - kaas-monitoring
+   - kaas-access

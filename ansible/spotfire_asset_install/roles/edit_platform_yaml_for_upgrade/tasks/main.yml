@@ -1,0 +1,23 @@
+---
+- name: List file
+  stat:
+    path: '{{ platform_yaml_file }}'
+  register: stat_result
+
+- name: "Fail if {{ platform_yaml_file }} does not exist"
+  assert:
+    that:
+      - stat_result.stat.exists
+      - not stat_result.stat.isdir
+
+- name: "Add key-values that should be always changed in platform.yml file before helm upgrade"
+  set_fact:
+    params_to_modify_upgrade: "{{ params_to_modify_upgrade | default([]) + [ {'key': item.key, 'value': item.value } ] }}"
+  loop:
+    - { 'key': 'spotfire-server.database.create-db.enabled',         'value': 'false' }
+    - { 'key': 'spotfire-server.database.upgrade',                   'value': 'false' }
+    - { 'key': 'spotfire-server.configuration.apply',                'value': 'never' }
+    - { 'key': 'spotfire-server.configuration.preferExistingConfig', 'value': 'true'  }
+
+- name: "Call the k-v replacer function"
+  include_tasks: modify_existing_values.yml

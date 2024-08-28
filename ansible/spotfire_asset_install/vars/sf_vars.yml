@@ -1,0 +1,41 @@
+---
+
+# on Ansible controller
+helm_bin: /usr/local/bin/helm
+asset_extracted_root_dir: /data/nfs/spotfire_cn
+
+# default CCD parameters
+container_registry:
+  release_name: eric-lcm-container-registry
+  namespace: kube-system
+  tls_secret: cr-registry-tls
+  ingress_svc: ingress-nginx
+  ingress_namespace: ingress-nginx
+
+spotfire:
+  toolpassword: configtoolpwd
+  encryption_password: encrpytionpwd
+  namespace: spotfire-platform     # DO NOT CHANGE IT! ha-proxy cert is already generated using this namespace
+  pull_secret: image-pull-secrets  # DO NOT CHANGE IT! platform.yaml contains this value by default
+  jks_keystore_pass: changeit      # DO NOT CHANGE IT! platform.yaml contains this value by default
+  admin_password: Admin123  # the Spotfire "Admin" user password, used e.g. to login to the GUI.
+  db_user: spotfire  # the psql will be bootstrapped with this user
+  db_password: spotfire12345  # the password for Spotfire Server database user (db_user)
+  db_name: spotfire_server  # IMPORTANT, ez a default az overview installnal
+  public_address: spotfire.eea.company-domain.com   # DO NOT CHANGE IT! ha-proxy cert is already generated using this namespace
+
+psql:
+  admin_password: 'spotfire12345'  # is the Spotfire database Super-user "postgres" password, the key super-pwd
+
+iam:
+  role: 'ca_dashboard_user'
+  client:
+    id: 'spotfire'
+    secret: 'Nwgx21goDAjuTvUCSj3DRjbF4wIeXR18'
+  users:
+    - name: 'admin-sf'
+      password: 'Adm1ni$tRat0r!'
+      is_admin: yes
+    - name: 'nonadmin-sf'
+      password: 'EEAuSeR4Pa$$w0rd!'
+      is_admin: no

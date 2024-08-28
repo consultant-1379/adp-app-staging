@@ -1,0 +1,305 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "xray_report_schema_v3.json",
+  "type": "object",
+  "title": "The xray report schema",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "vulnerabilities": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "string"
+                    },
+                    "cves": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "cvss_v2": {
+                            },
+                            "cvss_v3": {
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "cvss_v3": {
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "images": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "impact_path": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "issue_id": {
+                      "type": "string"
+                    },
+                    "issue_type": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "mitigations": {
+                      "type": "object",
+                      "properties": {
+                        "TR": {
+                          "type": "array",
+                          "items": {}
+                        },
+                        "mitigation": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "sce": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "expires": {
+                                  "type": "string"
+                                },
+                                "sce_id": {
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "expires",
+                                "sce_id",
+                                "status"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "TR",
+                        "mitigation",
+                        "sce"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "severity": {
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "tool": {
+                      "type": "string"
+                    },
+                    "xray_severity": {
+                    }
+                  },
+                  "required": [
+                    "created",
+                    "cves",
+                    "description",
+                    "images",
+                    "impact_path",
+                    "issue_id",
+                    "issue_type",
+                    "key",
+                    "mitigations",
+                    "name",
+                    "provider",
+                    "severity",
+                    "summary",
+                    "tool",
+                    "xray_severity"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "string"
+                    },
+                    "cves": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "cvss_v2": {
+                            },
+                            "cvss_v3": {
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "images": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "impact_path": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "issue_id": {
+                      "type": "string"
+                    },
+                    "issue_type": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "mitigations": {
+                      "type": "object",
+                      "properties": {
+                        "TR": {
+                          "type": "array",
+                          "items": {}
+                        },
+                        "mitigation": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "sce": {
+                          "type": "array",
+                          "items": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "expires": {
+                                  "type": "string"
+                                },
+                                "sce_id": {
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "expires",
+                                "sce_id",
+                                "status"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "TR",
+                        "mitigation",
+                        "sce"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "tool": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "created",
+                    "cves",
+                    "description",
+                    "images",
+                    "impact_path",
+                    "issue_id",
+                    "issue_type",
+                    "key",
+                    "mitigations",
+                    "name",
+                    "provider",
+                    "severity",
+                    "summary",
+                    "tool",
+                    "xray_severity"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "vulnerabilities"
+          ]
+        }
+      ]
+    },
+    "xray": {
+      "type": "object",
+      "properties": {
+        "xray_revision": {
+          "type": "string"
+        },
+        "xray_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "xray_revision",
+        "xray_version"
+      ]
+    }
+  },
+  "required": [
+    "images",
+    "xray"
+  ]
+}

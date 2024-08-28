@@ -1,0 +1,20 @@
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: spotfire-server-client-cert
+spec:
+  certificate:
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+    issuer:
+      reference: eric-lm-combined-server-client-ca
+    subject:
+      cn: spotfire-server
+    subjectAlternativeName:
+      populateKubernetesDns: false
+    validity:
+      overrideTtl: 15778800
+  kubernetes:
+    generatedSecretName: spotfire-server-client-cert
+    secretType: tls

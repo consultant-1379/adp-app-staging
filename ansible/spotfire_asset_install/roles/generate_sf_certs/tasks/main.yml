@@ -1,0 +1,139 @@
+---
+# 1. Fetch internal ca from Vertica pod
+- name: "Retrieve OLAP DB secret (from eric-eea-analytical-processing-database-internal-ca)"
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: eric-eea-analytical-processing-database-internal-ca
+    namespace: '{{ eea_namespace }}'
+  register: olap_secret
+
+- name: Validate that internal cert is returned
+  assert:
+    that:
+      - olap_secret.resources|length == 1
+    fail_msg: "Hmmm, no value returned for secret eric-eea-analytical-processing-database-internal-ca"
+
+- name: Store decoded OLAP DB CA cert content into a variable
+  set_fact:
+    internal_ca_cert_content: "{{ olap_secret.resources[0]['data']['client-cacertbundle.pem'] | b64decode }}"
+
+# 2. Transfer certs to sf-pod
+- name: Collect sf-server pod name
+  include_role:
+    name: collect_server_pod_details
+
+- name: "Save internal ca pem to /tmp/ in {{ sf_server_pod_name }} pod"
+  kubernetes.core.k8s_cp:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    content: '{{ internal_ca_cert_content }}'
+    remote_path: "{{ internal_ca_pem }}"
+    no_preserve: yes  # The copied file/directory's ownership and permissions will not be preserved in the container
+    state: to_pod
+
+- name: "Copy external cert & key files to into {{ sf_server_pod_name }} pod"
+  kubernetes.core.k8s_cp:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    local_path: "{{ item.src }}"
+    remote_path: "{{ item.dest }}"
+    no_preserve: yes  # The copied file/directory's ownership and permissions will not be preserved in the container
+    state: to_pod
+  loop:
+    - { src: '{{ root_ca_cert }}', dest: '{{ external_ca_pem }}' }
+    - { src: '{{ root_ca_key }}', dest: '{{ external_ca_key }}' }
+
+#
+# Keystore #1 & #2: import external CA and internal CA to the spotfire_keystore.jks file
+#
+- name: "Import external CA and internal CA (Vertica cert) to the spotfire_keystore.jks file"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    command: "{{ item }}"
+  loop:
+    - 'rm -rf {{ sf_keystore_jks }}'  # delete old file if exists
+    - '{{ sf_keytool }} -importcert -alias spotfire-ca -keystore {{ sf_keystore_jks }} -file {{ external_ca_pem }} --storepass {{ spotfire.jks_keystore_pass }} -noprompt'
+    - '{{ sf_keytool }} -importcert -alias vertica-ca  -keystore {{ sf_keystore_jks }} -file {{ internal_ca_pem }} --storepass {{ spotfire.jks_keystore_pass }} -noprompt'
+
+#
+# Keystore #3: generate spotfire client cert and import to the spotfire_keystore.jks file
+#
+- name: "Create password file needed for openssl command"
+  kubernetes.core.k8s_cp:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    content: '{{ spotfire.jks_keystore_pass }}'
+    remote_path: '{{ password_file }}'
+    no_preserve: yes
+    state: to_pod
+
+- name: "Generate a Spotfire client key which can be used towards Vertica, then load it to keystore"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    command: "{{ item }}"
+  loop:
+    # Generate a Spotfire client key which can be used towards the OLAP Database
+    - openssl genrsa -out client_certificate.key 2048
+    # Create client certificate request
+    - openssl req -new -key client_certificate.key -out client_certificate.csr -subj /CN=bitoolreader
+    #Sign the client certificate request
+    - >-
+        openssl x509 -req -in client_certificate.csr
+        -CA {{ external_ca_pem }} -CAkey {{ external_ca_key }} -CAcreateserial
+        -out client_certificate.crt
+        -days 333 -sha256 -outform PEM -set_serial 101 -extensions client
+    #Convert the X.509 certificate and key to a PKCS12 file
+    #Set a password, do not leave it blank
+    - >-
+        openssl pkcs12 -export -in client_certificate.crt
+        -inkey client_certificate.key -out client_certificate.p12
+        -name client_certificate -CAfile {{ external_ca_pem }} -caname root
+        -password file:{{ password_file }}
+    # Use the PKCS12 file to load the client certificate and key to the Java keystore
+    - >-
+        {{ sf_keytool }} -importkeystore
+        -deststorepass {{ spotfire.jks_keystore_pass }}
+        -destkeypass {{ spotfire.jks_keystore_pass }}
+        -destkeystore {{ sf_keystore_jks }}
+        -srckeystore client_certificate.p12
+        -srcstoretype PKCS12
+        -srcstorepass {{ spotfire.jks_keystore_pass }}
+        -alias client_certificate
+
+############################################################
+# Import IAM Server Certificate to Spotfire Server Keystore
+############################################################
+- name: 'Retrieve IAM proxy secret'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: eric-sec-access-mgmt-ingress-external-tls-secret
+    namespace: '{{ eea_namespace }}'
+  register: iam_httpproxy_secret
+
+- name: "Save IAM external server cert to /tmp/ in {{ sf_server_pod_name }} pod"
+  kubernetes.core.k8s_cp:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    content: '{{ iam_external_server_cert_content }}'
+    remote_path: "{{ iam_external_server_cert }}"
+    no_preserve: yes
+    state: to_pod
+  vars:
+    iam_external_server_cert_content: "{{ iam_httpproxy_secret.resources[0]['data']['tls.crt'] | b64decode }}"
+
+- name: 'Import alias IAM_EXTERNAL_CERT to keystore'
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_server_pod_name }}'
+    container: spotfire-server
+    command: '{{ sf_keytool }} -importcert -alias IAM_EXTERNAL_CERT -keystore {{ sf_keystore_jks }} -file {{ iam_external_server_cert }} --storepass {{ spotfire.jks_keystore_pass }} -noprompt'

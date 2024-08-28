@@ -1,0 +1,21 @@
+---
+- name: "Enable capacity reporter"
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars/sf_vars.yml
+  vars:
+    asset_chart_dir: "{{ asset_extracted_root_dir }}/{{ asset_version }}/charts/spotfire-platform"
+    platform_yaml_file: "{{ project_work_dir }}/platform.yaml"
+    sf_dim_yaml_file: "{{ project_work_dir }}/dimensioning.yaml"
+    security_yaml_file: "{{ project_work_dir }}/security_hardened.yaml"
+
+  environment:
+    K8S_AUTH_KUBECONFIG : "{{ kubeconfig }}"
+
+  roles:
+    - kwoodson.yedit  # needed if using yedit module
+    - enable_capacity_reporter
+    - role: call_helm
+      is_new_deployment: no  # for helm upgrade on existing deployment set this to no!

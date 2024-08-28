@@ -1,0 +1,50 @@
+---
+- name: "Identify eric-ts-platform-cli pod name"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: '{{ spotfire.namespace }}'
+    label_selectors:
+      - app.kubernetes.io/component=cli
+      - app.kubernetes.io/name=spotfire-server
+  register: sf_cli_pod_list
+  changed_when: no
+
+- name: "Validate number of eric-ts-platform-cli pods detected"
+  assert:
+    that:
+      - sf_cli_pod_list.resources is defined
+      - sf_cli_pod_list.resources|length == 1
+    fail_msg: "There should be exactly 1 platform-cli pod"
+
+- name: Extract and save eric-ts-platform-cli pod name
+  set_fact:
+    sf_cli_pod_name: "{{ sf_cli_pod_list.resources[0].metadata.name }}"
+
+- name: Collect cli pod info
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    name: '{{ sf_cli_pod_name }}'
+    namespace: '{{ spotfire.namespace }}'
+  register: cli_pod_info
+
+- name: "Save all the environment variables of spotfire-server-cli container"
+  set_fact:
+    cli_pod_env_vars: "{{ cli_pod_info.resources[0] | json_query(container_name_query) | first }}"
+  vars:
+    container_name_query: "spec.containers[?name=='spotfire-cli'].env"
+
+- name: "Save the necessary env var values for later usage"
+  set_fact:
+    toolpasswd: "{{ cli_pod_env_vars | json_query('[?name == `TOOL_PASSWORD`].value') | first }}"
+    bootstrap_file: "{{ cli_pod_env_vars | json_query('[?name == `BOOTSTRAP_FILE`].value') | first }}"
+    configuration_file: "{{ cli_pod_env_vars | json_query('[?name == `CONFIGURATION_FILE`].value') | first }}"
+
+- name: "Bootstrap Spotfire"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: /opt/tibco/bootstrap.sh
+    # bootstrap.sh is an original Spotfire script, and bootstrap action is performed
+    # only once, does not matter how many times the bootstrap.sh script is called.

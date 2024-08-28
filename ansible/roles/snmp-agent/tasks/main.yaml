@@ -1,0 +1,19 @@
+---
+- name: add net-snmp package
+  zypper:
+    name: net-snmp
+    state: present
+    update_cache: true
+- name: create snmp agent config
+  template:
+    src: templates/snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+
+- name: start snmp agent
+  systemd:
+    name: snmpd
+    enabled: yes
+    state: started
+
+- name: check if snmp agent works correctly
+  command: "snmpwalk -v2c -c ceaget localhost .1.3.6.1.2.1.1.5.0"

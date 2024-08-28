@@ -1,0 +1,29 @@
+---
+filebeat_create_config: true
+filebeat_template: "filebeat.yml.j2"
+filebeat_version: 7.16.1
+filebeat_folder: "/etc/filebeat"
+
+filebeat_inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /home/eceabuild/seliius27190/ci_resource_usage/node_info*.csv
+    exclude_lines: ['^node,ts,.*']
+    fields:
+      log_tag: CI_NODE_INFO_CSV
+      time_stamp: TIMESTAMP_ISO8601
+      fields_under_root: true
+
+  - type: filestream
+    enabled: true
+    paths:
+      - /home/eceabuild/seliius27190/ci_resource_usage/container_info_*.csv
+    exclude_lines: ['^pod,namespace.*']
+    fields:
+      log_tag: CI_KUBE_POD_CONTAINER_INFO_CSV
+      time_stamp: TIMESTAMP_ISO8601
+      fields_under_root: true
+
+filebeat_output_logstash_hosts:
+  - "10.61.197.98:5041"

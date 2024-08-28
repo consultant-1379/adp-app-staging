@@ -1,0 +1,55 @@
+---
+- name: pre-flight sanity check
+  assert:
+    that:
+      - data_device is defined
+      - data_vg is defined
+      - data_volumes is defined
+      - data_volumes | type_debug == 'list'
+    msg: please check your variables
+
+- name: display variables and wait for interruption
+  pause:
+    prompt: "STOP NOW IF YOU DON'T EXPECT TO HAVE VG \"{{ data_vg }}\" ON DISK \"{{ data_device }}\""
+    seconds: 10
+
+- name: access secrets
+  include_vars: roles/elk/vars/vault.yml
+
+- name: ensure packages are available
+  include_role:
+    name: elk
+    tasks_from: repos
+
+- name: ensure packages are installed
+  package:
+    name: "{{ packages }}"
+  register: package_installation
+
+- name: ensure services are running
+  service:
+    name: "{{ service }}"
+    state: started
+    enabled: yes
+    daemon_reload: "{{ ( package_installation.changed and item_nr == 0 ) | ternary('yes', omit) }}"
+  loop: "{{ services }}"
+  loop_control:
+    loop_var: service
+    index_var: item_nr
+
+- name: ensure filesystems are in place
+  include_role:
+    name: elk
+    tasks_from: storage
+    vars_from: ../../nfs-server/vars/main
+
+- name: ensure exports are configured
+  template:
+    src: export.j2
+    dest: "/etc/exports.d/{{ filesystem.name }}.exports"
+  loop: "{{ data_volumes | selectattr('nfs.export') | list }}"
+  loop_control:
+    loop_var: filesystem
+    label: "{{ filesystem.mountpoint }}"
+  notify:
+    - refresh exports

@@ -1,0 +1,22 @@
+---
+- name: display request
+  debug:
+    var: entity.request
+    verbosity: 2
+
+- name: "ensure Elasticsearch {{ entity.type }} \"{{ entity.name }}\" exists"
+  uri:
+    url: "https://{{ api.host }}:9200/_security/{{ entity.type }}/{{ entity.name }}"
+    method: POST
+    user: "{{ api.auth.username }}"
+    password: "{{ api.auth.password }}"
+    validate_certs: "{{ ( ansible_python_version is version('2.7.9', 'lt') ) | ternary(false, omit) }}"
+    body: "{{ entity.request }}"
+    body_format: json
+  register: api_response
+  changed_when: ( entity.type == 'role' ) | ternary( api_response.json.role.created, api_response.json.created )
+
+- name: display API response
+  debug:
+    var: api_response
+    verbosity: 1

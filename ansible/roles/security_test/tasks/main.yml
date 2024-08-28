@@ -1,0 +1,7 @@
+---
+- name: install filebeat
+  zypper:
+    name:
+      - "{{ artifactory_url }}/filebeat/{{ filebeat_version }}/filebeat-{{ filebeat_version }}-x86_64.rpm"
+    state: present
+    disable_gpg_check: yes

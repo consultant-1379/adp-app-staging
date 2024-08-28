@@ -1,0 +1,7 @@
+#jinja2: trim__blocks: "False"
+{% set entries = [] %}
+{% for client in filesystem.nfs.clients %}
+{% set entry = client.host ~ '(' ~ client.options | join(',') ~ ')' %}
+{% set entries = entries.append(entry) %}
+{% endfor %}
+{{ filesystem.mountpoint }}    {{ entries | join(' ') }}

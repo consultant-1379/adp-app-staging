@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Select only Added, Copied, Modified, Renamed, and Type changed files which are binary
+BINARY_FILES=$(git diff-tree --numstat --no-commit-id -r HEAD --diff-filter=ACMRT | grep -e '^-' | awk '{print $3}')
+
+status=0
+# Check if there are any binary files
+if [ -n "${BINARY_FILES}" ]; then
+    echo "Only CPI images allowed in binary format"
+    echo -e "\\033[31mBinaries\\033[0m"
+    echo "${BINARY_FILES}"
+    status=1
+fi
+
+exit ${status}

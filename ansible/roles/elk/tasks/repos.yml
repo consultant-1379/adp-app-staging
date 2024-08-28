@@ -1,0 +1,11 @@
+---
+- name: configure RHEL DVD repository
+  yum_repository:
+    file: rhel-7.6-dvd
+    name: rhel-76-dvd
+    description: rhel-76-dvd
+    baseurl:
+      - http://yum.linux.ericsson.se/iso/rhel-server-7.6/rhel-server-7.6-x86_64-dvd
+      - "https://{{ artifactory_user }}:{{ api_keys.artifactory[artifactory_user][artifactory_host] }}@arm.seli.gic.ericsson.se/artifactory/list/proj-cea-yum-external-local/rhel-server-7.6-x86_64-dvd"
+    gpgcheck: no
+    enabled: yes

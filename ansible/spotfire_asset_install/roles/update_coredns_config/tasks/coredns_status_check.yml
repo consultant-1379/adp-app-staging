@@ -1,0 +1,13 @@
+---
+- name: 'Verify coredns deployment is ready'
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    wait: yes
+    name: 'coredns'
+    namespace: 'kube-system'
+    wait_timeout: 60
+    wait_sleep: 20
+  register: deployment_status
+  until: (deployment_status.resources[0].status.readyReplicas | default(0) == deployment_status.resources[0].spec.replicas)
+  retries: 5
+  delay: 30

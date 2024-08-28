@@ -1,0 +1,170 @@
+---
+
+#
+# STEP 1: collect the fqdn-ip duplets
+#
+# Host #1
+- name: Get eric-ts-platform-haproxy LB address
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: eric-ts-platform-haproxy
+    namespace: '{{ spotfire.namespace }}'
+  register: sf_haproxy_svc_info
+- name: 'Save LoadBalancer IP of eric-ts-platform-haproxy service'
+  set_fact:
+    sf_haproxy_lb_ip: '{{ sf_haproxy_svc_info.resources[0].status.loadBalancer.ingress[0].ip }}'
+    sf_haproxy_fqdn: '{{ spotfire.public_address }}'
+
+# host #2
+- name: "Retrieve eric-eea-analytics-open-api HTTP proxy object"
+  kubernetes.core.k8s_info:
+    api_version: projectcontour.io/v1
+    kind: HTTPProxy
+    name: eric-eea-analytics-open-api
+    namespace: '{{ eea_namespace }}'
+  register: open_api_ingress_properties
+- name: 'Save Ingress IP of eric-eea-analytics-open-api HTTP proxy'
+  set_fact:
+    openapi_lb_ingress_ip: '{{ open_api_ingress_properties.resources[0].status.loadBalancer.ingress[0].ip }}'
+    openapi_fqdn: '{{ open_api_ingress_properties.resources[0].spec.virtualhost.fqdn }}'
+
+# host #3
+- name: "Retrieve eric-sec-access-mgmt-authn HTTP proxy object"
+  kubernetes.core.k8s_info:
+    api_version: projectcontour.io/v1
+    kind: HTTPProxy
+    name: eric-sec-access-mgmt-authn
+    namespace: '{{ eea_namespace }}'
+  register: auth_proxy_ingress_properties
+- name: 'Save Ingress IP of eric-sec-access-mgmt-authn HTTP proxy'
+  set_fact:
+    auth_proxy_lb_ingress_ip: '{{ auth_proxy_ingress_properties.resources[0].status.loadBalancer.ingress[0].ip }}'
+    auth_proxy_fqdn: '{{ auth_proxy_ingress_properties.resources[0].spec.virtualhost.fqdn }}'
+
+# host #4
+- name: "Retrieve eric-eea-privacy-service-converter HTTP proxy object"
+  kubernetes.core.k8s_info:
+    api_version: projectcontour.io/v1
+    kind: HTTPProxy
+    name: eric-eea-privacy-service-converter
+    namespace: '{{ eea_namespace }}'
+  register: privacy_service_converter_properties
+- name: 'Save Ingress IP of eric-eea-privacy-service-converter HTTP proxy'
+  set_fact:
+    privacy_service_converter_lb_ingress_ip: '{{ privacy_service_converter_properties.resources[0].status.loadBalancer.ingress[0].ip }}'
+    privacy_service_converter_fqdn: '{{ privacy_service_converter_properties.resources[0].spec.virtualhost.fqdn }}'
+
+# host #5
+- name: "Retrieve eric-lm-combined-server-ingress HTTP proxy object"
+  kubernetes.core.k8s_info:
+    api_version: projectcontour.io/v1
+    kind: HTTPProxy
+    name: eric-lm-combined-server-ingress
+    namespace: '{{ eea_namespace }}'
+  register: lic_manager_properties
+- name: 'Save Ingress IP of eric-lm-combined-server-ingress HTTP proxy'
+  set_fact:
+    lic_manager_lb_ingress_ip: '{{ lic_manager_properties.resources[0].status.loadBalancer.ingress[0].ip }}'
+    lic_manager_fqdn: '{{ lic_manager_properties.resources[0].spec.virtualhost.fqdn }}'
+
+# host #6
+- include_role:
+    name: configure_iam
+    tasks_from: iam_get_ip_and_fqdn.yml
+
+- name: "Save collected FQDN-IP duplets to a variable"
+  set_fact:
+    hosts_to_resolve: "{{ hosts_to_resolve|default([]) + [ {'fqdn': item.fqdn, 'ip_address': item.ip } ] }}"
+  loop:
+    - { 'fqdn': '{{ sf_haproxy_fqdn }}',                'ip': '{{ sf_haproxy_lb_ip }}' }
+    - { 'fqdn': '{{ openapi_fqdn }}',                   'ip': '{{ openapi_lb_ingress_ip }}' }
+    - { 'fqdn': '{{ auth_proxy_fqdn }}',                'ip': '{{ auth_proxy_lb_ingress_ip }}' }
+    - { 'fqdn': '{{ privacy_service_converter_fqdn }}', 'ip': '{{ privacy_service_converter_lb_ingress_ip }}' }
+    - { 'fqdn': '{{ lic_manager_fqdn }}',               'ip': '{{ lic_manager_lb_ingress_ip }}' }
+    - { 'fqdn': '{{ iam_proxy_fqdn }}',                 'ip': '{{ iam_proxy_lb_ingress_ip }}' }
+
+- name: Print duplets that will be added to coredns configmap
+  debug:
+    var: hosts_to_resolve
+
+#
+# STEP 2: work with coredns and update its configmap
+#
+- include_tasks: coredns_status_check.yml
+
+- name: Fetch the coredns configmap
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    name: coredns
+    namespace: kube-system
+  register: coredns_configmap
+
+- name: Save coredns configmap snippet to file on Ansible controller
+  copy:
+    content: "{{ coredns_configmap.resources[0] }}"
+    dest: '{{ configmap_export }}'
+
+- name: "Post-process the file with jq and write to {{ configmap_work }}"
+  shell: |
+    cat {{ configmap_export }} | jq '.data."Corefile"' -r -e > {{ configmap_work }}
+
+- include_tasks: add_entry_to_configmap.yml
+  loop: "{{ hosts_to_resolve }}"
+
+- name: "Creating new complete configmap yaml: {{ configmap_new }}"
+  copy:
+    dest: "{{ configmap_new }}"
+    content: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns
+        namespace: kube-system
+      data:
+        Corefile: |
+      {{ lookup('ansible.builtin.file', configmap_work) | indent(width=4, blank=True, first=True) }}
+
+- name: Save start time
+  set_fact:
+    start_time: "{{ now(fmt='%Y-%m-%d %H:%M:%S') }}"  # 2024-05-16 11:26:25
+
+- name: 'Apply new coredns yaml config from file {{ configmap_new }}'
+  kubernetes.core.k8s:
+    state: present
+    src: '{{ configmap_new }}'
+    namespace: kube-system
+    wait: yes
+
+- name: 'Wait 120 seconds for coreDNS to reload the new config'
+  wait_for:
+    timeout: 120
+
+- name: 'Get elapsed time in seconds'
+  set_fact:
+    delta_seconds: "{{ ((now(fmt='%Y-%m-%d %H:%M:%S')|to_datetime) - (start_time|to_datetime)).total_seconds() | int }}"
+
+- name: 'Show elapsed seconds'
+  debug:
+    var: delta_seconds
+
+- name: 'Get delta log from coredns pod'
+  kubernetes.core.k8s_log:
+    kind: Pod
+    namespace: kube-system
+    label_selectors:
+      - k8s-app=kube-dns
+    container: coredns
+    since_seconds: "{{ delta_seconds }}"
+  register: coredns_log
+
+- debug:
+    var: coredns_log
+
+- name: 'Validate from coredns logs that config reload happened'
+  assert:
+    that:
+      - coredns_log.log is search("Reloading complete")
+
+- include_tasks: coredns_status_check.yml

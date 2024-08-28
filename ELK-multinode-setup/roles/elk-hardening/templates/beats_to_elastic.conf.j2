@@ -1,0 +1,289 @@
+input {
+  beats {
+    port => {{logstash_beats_port}}
+    ssl => true
+    ssl_key => "/etc/logstash/tls/private/{{ ansible_hostname }}.pkcs8.key"
+    ssl_certificate => "/etc/logstash/tls/certs/{{ ansible_hostname }}.crt"
+  }
+  tcp {
+    id => "syslog_txt"
+    port => {{syslog_ci_logplane_tcp}}
+    type => syslog
+    add_field => [ "logplane", "eea-log" ]
+#    ssl_enable => false
+    ssl_enable => true
+    ssl_certificate_authorities => "/etc/logstash/tls/ca/external-syslog-ca.crt"
+    ssl_cert => "/etc/logstash/tls/certs/instance/{{ ansible_hostname }}.crt"
+    ssl_key => "/etc/logstash/tls/certs/instance/{{ ansible_hostname }}.key"
+#    ssl_verify => false
+    ssl_verify => true
+  }
+  udp {
+    id => "syslog_udp"
+    port => {{syslog_ci_logplane_udp}}
+    type => syslog
+  }
+}
+
+filter {
+  if [type] == "readiness" {
+    drop {}
+  }
+  else if [type] == "syslog" {
+    grok {
+      break_on_match => true
+      match => [
+        "message", "%{SYSLOG5424LINE}",
+        "message", "%{SYSLOGLINE}"
+      ]
+    }
+    if [syslog5424_ts] {
+      # Handle RFC5424 formatted Syslog messages
+      if [syslog5424_host] {
+        if [syslog5424_msg]{
+          grok {
+            keep_empty_captures => true
+        break_on_match => true
+            match  => [
+          "syslog5424_msg", "%{GREEDYDATA:origmsg};cluster:%{GREEDYDATA:cluster};spinnaker:%{GREEDYDATA:spinnaker};pipeline:%{GREEDYDATA:pipeline}",
+              "syslog5424_msg", "%{GREEDYDATA:origmsg}"
+            ]
+          }
+        }
+
+        mutate {
+      rename => { "syslog5424_host" => "[kubernetes][node][name]" }
+    }
+      }
+      else {
+    mutate {
+          rename => { "host" => "[kubernetes][node][name]" }
+        }
+      }
+      mutate {
+        add_tag => [ "syslog5424" ]
+      }
+
+      mutate {
+        # Use a friendlier naming scheme
+        rename => {
+          "syslog5424_app"  => "service_id"
+          "syslog5424_proc" => "[metadata][proc_id]"
+          "syslog5424_msgid" => "[metadata][category]"
+        }
+        remove_field => [ "syslog5424_ver" ]
+      }
+      if [syslog5424_pri] {
+        # Calculate facility and severity from the syslog PRI value
+        ruby {
+          code => "
+          facility = [
+            'kernel',
+            'user-level',
+            'mail',
+            'daemon',
+            'security/authorization',
+            'syslogd',
+            'line printer',
+            'network news',
+            'uucp',
+            'clock',
+            'security/authorization',
+            'ftp',
+            'ntp',
+            'log audit',
+            'log alert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          severity = [
+            'emergency',
+            'alert',
+            'critical',
+            'error',
+            'warning',
+            'notice',
+            'informational',
+            'debug'
+          ]
+          event.set('facility', facility[(event.get('syslog5424_pri').to_i / 8).floor])
+          event.set('severity', severity[event.get('syslog5424_pri').to_i.modulo(8)])"
+        }
+        mutate {
+          remove_field => [ "syslog5424_pri" ]
+        }
+      }
+      if [syslog5424_sd] {
+        # Handling Structured data
+        ruby {
+          code => '
+            def extract_structured_data(syslog5424_sd)
+              sd = {}
+              syslog5424_sd.scan(/\[(?<element>.*?[^\\])\]/) do |element|
+                data = element[0].match(/(?<sd_id>[^\ ]+)(?<sd_params> .*)?/)
+                sd_id = data[:sd_id].split("@", 2)[0]
+                sd[sd_id] = {}
+                next if data.nil? || data[:sd_params].nil?
+                data[:sd_params].scan(/ (.*?[=](?:""|".*?[^\\]"))/) do |fields|
+                  fields = fields[0].match(/(?<param_name>.*?)[=]\"(?<param_value>.*)\"/)
+                  sd[sd_id][fields[:param_name]] = fields[:param_value]
+                end
+              end
+              sd.delete("timeQuality")
+              sd
+            end
+            event.set("[sd]", extract_structured_data(event.get("[message]")))
+          '
+          remove_field => "syslog5424_sd"
+        }
+        mutate {
+          rename => {
+            # move structured data under metadata
+            "sd"  => "[metadata][structured_data]"
+          }
+          remove_field => [ "sd" ]
+        }
+      }
+      date {
+        match => [ "syslog5424_ts", "ISO8601" ]
+        remove_field => [ "syslog5424_ts", "timestamp" ]
+      }
+      mutate {
+          rename => {
+            "syslog5424_msg"  => "message"
+          }
+          remove_field => [ "syslog5424_msg" ]
+      }
+    }
+    else {
+      # Handle RFC3164 formatted Syslog messages
+      grok {
+        break_on_match => true
+        match => [
+          "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{SYSLOGHOST:syslog_source} %{PROG:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_msg}",
+          "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{SYSLOGHOST:syslog_source}: %{GREEDYDATA:syslog_msg}",
+          "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:timestamp} %{SYSLOGHOST:syslog_source} %{PROG:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_msg}",
+          "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:timestamp} %{SYSLOGHOST:syslog_source}: %{GREEDYDATA:syslog_msg}",
+          "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp}.*$",
+          "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:timestamp}.*$",
+          "message", "<%{POSINT:syslog_pri}>.*$",
+          "message", "%{SYSLOGTIMESTAMP:timestamp} %{GREEDYDATA:syslog_msg}",
+          "message", "%{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:syslog_msg}",
+          "message", ".*$"
+        ]
+        overwrite => [ "timestamp", "syslog_msg" ]
+
+        add_tag => [ "syslog3164" ]
+        tag_on_failure => [""]
+      }
+      if [syslog_pri] {
+        # Calculate facility and severity from the syslog PRI value
+        ruby {
+          code => "
+          facility = [
+            'kernel',
+            'user-level',
+            'mail',
+            'daemon',
+            'security/authorization',
+            'syslogd',
+            'line printer',
+            'network news',
+            'uucp',
+            'clock',
+            'security/authorization',
+            'ftp',
+            'ntp',
+            'log audit',
+            'log alert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          severity = [
+            'emergency',
+            'alert',
+            'critical',
+            'error',
+            'warning',
+            'notice',
+            'informational',
+            'debug'
+          ]
+          event.set('facility', facility[(event.get('syslog_pri').to_i / 8).floor])
+          event.set('severity', severity[event.get('syslog_pri').to_i.modulo(8)])"
+        }
+        mutate {
+          remove_field => [ "syslog_pri" ]
+        }
+      }
+      if [syslog_source] {
+        mutate {
+          rename => {
+            "syslog_source" => "[kubernetes][node][name]"
+          }
+        }
+      }
+      else {
+        mutate {
+          rename => {
+            "host"  => "[kubernetes][node][name]"
+          }
+        }
+      }
+      mutate {
+        remove_field => [ "message" ]
+      }
+      mutate {
+        rename => {
+          # Use a friendlier naming scheme
+          "syslog_program"  => "service_id"
+          "syslog_msg" => "message"
+          "syslog_pri" => "[metadata][category]"
+          "syslog_pid" => "[metadata][proc_id]"
+        }
+        remove_field => [ "program", "pid", "pri" ]
+      }
+    }
+  }
+}
+
+filter {
+  if [facility] == "log audit" {
+    mutate {
+      replace => {"logplane" => "eea-auditlog"}
+    }
+  }
+}
+
+output {
+  elasticsearch {
+      hosts => [ {{logstash_target}} ]
+      #hosts => ["https://seliics00311.ete.ka.sw.ericsson.se:9200"]
+      #cacert => "/etc/logstash/tls/certs/ca-bundle-ericsson-internal.crt"
+      #cacert => "/etc/logstash/tls/certs/ca-bundle-ericsson-external.crt"
+      user => "{{ elastic_user }}"
+      password => "{{ elastic_passwd }}"
+      index => "product_ci-%{logplane}-%{+YYYY.MM.dd}"
+      ssl => true
+      ssl_certificate_verification => false
+      cacert => "/etc/logstash/certs/ca/ca.crt"
+  }
+  file {
+    path => "/data/logstash/archive/%{logplane}_logstash-backup_%{+YYYY.MM.dd.HH}.log"
+  }
+  stdout { codec => rubydebug }
+}

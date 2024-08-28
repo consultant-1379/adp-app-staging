@@ -1,0 +1,12 @@
+{% include 'elasticsearch.yml.j2' %}
+
+# SSL
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.http.ssl.key: /etc/elasticsearch/tls/private/{{ ansible_hostname }}.key
+xpack.security.http.ssl.certificate: /etc/elasticsearch/tls/certs/{{ ansible_hostname }}.crt
+xpack.security.http.ssl.certificate_authorities: /etc/elasticsearch/tls/certs/ca-bundle-ericsson-internal.crt
+xpack.security.transport.ssl.key: /etc/elasticsearch/tls/private/{{ ansible_hostname }}.key
+xpack.security.transport.ssl.certificate: /etc/elasticsearch/tls/certs/{{ ansible_hostname }}.crt
+xpack.security.transport.ssl.certificate_authorities: /etc/elasticsearch/tls/certs/ca-bundle-ericsson-internal.crt

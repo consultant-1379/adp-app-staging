@@ -1,0 +1,513 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "zap_report_schema_v2.json",
+    "type": "object",
+    "title": "The ZAP report schema",
+    "description": "The ZAP report schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "@version": "D-2021-05-31",
+            "@generated": "Thu, 3 Jun 2021 15:00:32",
+            "site": [
+                {
+                    "@name": "https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                    "@host": "eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                    "@port": "443",
+                    "@ssl": "true",
+                    "alerts": [
+                        {
+                            "pluginid": "10106",
+                            "alertRef": "10106",
+                            "alert": "HTTP Only Site",
+                            "name": "HTTP Only Site",
+                            "riskcode": "2",
+                            "confidence": "2",
+                            "riskdesc": "Medium (Medium)",
+                            "desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+                            "instances": [
+                                {
+                                    "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                    "method": "GET"
+                                }
+                            ],
+                            "count": "1",
+                            "solution": "<p>Configure your web or application server to use SSL (https).</p>",
+                            "otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>",
+                            "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+                            "cweid": "311",
+                            "wascid": "4",
+                            "sourceid": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "required": [
+        "@version",
+        "@generated",
+        "site"
+    ],
+    "properties": {
+        "@version": {
+            "$id": "#/properties/%40version",
+            "type": "string",
+            "title": "The @version schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "D-2021-05-31"
+            ]
+        },
+        "@generated": {
+            "$id": "#/properties/%40generated",
+            "type": "string",
+            "title": "The @generated schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Thu, 3 Jun 2021 15:00:32"
+            ]
+        },
+        "site": {
+            "$id": "#/properties/site",
+            "type": "array",
+            "title": "The site schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "@name": "https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                        "@host": "eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                        "@port": "443",
+                        "@ssl": "true",
+                        "alerts": [
+                            {
+                                "pluginid": "10106",
+                                "alertRef": "10106",
+                                "alert": "HTTP Only Site",
+                                "name": "HTTP Only Site",
+                                "riskcode": "2",
+                                "confidence": "2",
+                                "riskdesc": "Medium (Medium)",
+                                "desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+                                "instances": [
+                                    {
+                                        "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                        "method": "GET"
+                                    }
+                                ],
+                                "count": "1",
+                                "solution": "<p>Configure your web or application server to use SSL (https).</p>",
+                                "otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>",
+                                "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+                                "cweid": "311",
+                                "wascid": "4",
+                                "sourceid": "1"
+                            }
+                        ]
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/site/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/site/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "@name": "https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                                "@host": "eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc",
+                                "@port": "443",
+                                "@ssl": "true",
+                                "alerts": [
+                                    {
+                                        "pluginid": "10106",
+                                        "alertRef": "10106",
+                                        "alert": "HTTP Only Site",
+                                        "name": "HTTP Only Site",
+                                        "riskcode": "2",
+                                        "confidence": "2",
+                                        "riskdesc": "Medium (Medium)",
+                                        "desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+                                        "instances": [
+                                            {
+                                                "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                                "method": "GET"
+                                            }
+                                        ],
+                                        "count": "1",
+                                        "solution": "<p>Configure your web or application server to use SSL (https).</p>",
+                                        "otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>",
+                                        "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+                                        "cweid": "311",
+                                        "wascid": "4",
+                                        "sourceid": "1"
+                                    }
+                                ]
+                            }
+                        ],
+                        "required": [
+                            "@name",
+                            "@host",
+                            "@port",
+                            "@ssl",
+                            "alerts"
+                        ],
+                        "properties": {
+                            "@name": {
+                                "$id": "#/properties/site/items/anyOf/0/properties/%40name",
+                                "type": "string",
+                                "title": "The @name schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc"
+                                ]
+                            },
+                            "@host": {
+                                "$id": "#/properties/site/items/anyOf/0/properties/%40host",
+                                "type": "string",
+                                "title": "The @host schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc"
+                                ]
+                            },
+                            "@port": {
+                                "$id": "#/properties/site/items/anyOf/0/properties/%40port",
+                                "type": "string",
+                                "title": "The @port schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "443"
+                                ]
+                            },
+                            "@ssl": {
+                                "$id": "#/properties/site/items/anyOf/0/properties/%40ssl",
+                                "type": "string",
+                                "title": "The @ssl schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "true"
+                                ]
+                            },
+                            "alerts": {
+                                "$id": "#/properties/site/items/anyOf/0/properties/alerts",
+                                "type": "array",
+                                "title": "The alerts schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": [],
+                                "examples": [
+                                    [
+                                        {
+                                            "pluginid": "10106",
+                                            "alertRef": "10106",
+                                            "alert": "HTTP Only Site",
+                                            "name": "HTTP Only Site",
+                                            "riskcode": "2",
+                                            "confidence": "2",
+                                            "riskdesc": "Medium (Medium)",
+                                            "desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+                                            "instances": [
+                                                {
+                                                    "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                                    "method": "GET"
+                                                }
+                                            ],
+                                            "count": "1",
+                                            "solution": "<p>Configure your web or application server to use SSL (https).</p>",
+                                            "otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>",
+                                            "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+                                            "cweid": "311",
+                                            "wascid": "4",
+                                            "sourceid": "1"
+                                        }
+                                    ]
+                                ],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "The first anyOf schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "pluginid": "10106",
+                                                    "alertRef": "10106",
+                                                    "alert": "HTTP Only Site",
+                                                    "name": "HTTP Only Site",
+                                                    "riskcode": "2",
+                                                    "confidence": "2",
+                                                    "riskdesc": "Medium (Medium)",
+                                                    "desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+                                                    "instances": [
+                                                        {
+                                                            "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                                            "method": "GET"
+                                                        }
+                                                    ],
+                                                    "count": "1",
+                                                    "solution": "<p>Configure your web or application server to use SSL (https).</p>",
+                                                    "otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>",
+                                                    "reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+                                                    "cweid": "311",
+                                                    "wascid": "4",
+                                                    "sourceid": "1"
+                                                }
+                                            ],
+                                            "required": [
+                                                "pluginid",
+                                                "alert",
+                                                "name",
+                                                "riskcode",
+                                                "confidence",
+                                                "riskdesc",
+                                                "desc",
+                                                "instances",
+                                                "count",
+                                                "solution",
+                                                "reference",
+                                                "sourceid"
+                                            ],
+                                            "properties": {
+                                                "pluginid": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/pluginid",
+                                                    "type": "string",
+                                                    "title": "The pluginid schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "10106"
+                                                    ]
+                                                },
+                                                "alertRef": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/alertRef",
+                                                    "type": "string",
+                                                    "title": "The alertRef schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "10106"
+                                                    ]
+                                                },
+                                                "alert": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/alert",
+                                                    "type": "string",
+                                                    "title": "The alert schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "HTTP Only Site"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/name",
+                                                    "type": "string",
+                                                    "title": "The name schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "HTTP Only Site"
+                                                    ]
+                                                },
+                                                "riskcode": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/riskcode",
+                                                    "type": "string",
+                                                    "title": "The riskcode schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "2"
+                                                    ]
+                                                },
+                                                "confidence": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/confidence",
+                                                    "type": "string",
+                                                    "title": "The confidence schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "2"
+                                                    ]
+                                                },
+                                                "riskdesc": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/riskdesc",
+                                                    "type": "string",
+                                                    "title": "The riskdesc schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "Medium (Medium)"
+                                                    ]
+                                                },
+                                                "desc": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/desc",
+                                                    "type": "string",
+                                                    "title": "The desc schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "<p>The site is only served under HTTP and not HTTPS.</p>"
+                                                    ]
+                                                },
+                                                "instances": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/instances",
+                                                    "type": "array",
+                                                    "title": "The instances schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": [],
+                                                    "examples": [
+                                                        [
+                                                            {
+                                                                "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                                                "method": "GET"
+                                                            }
+                                                        ]
+                                                    ],
+                                                    "additionalItems": true,
+                                                    "items": {
+                                                        "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/instances/items",
+                                                        "anyOf": [
+                                                            {
+                                                                "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/instances/items/anyOf/0",
+                                                                "type": "object",
+                                                                "title": "The first anyOf schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": {},
+                                                                "examples": [
+                                                                    {
+                                                                        "uri": "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040",
+                                                                        "method": "GET"
+                                                                    }
+                                                                ],
+                                                                "required": [
+                                                                    "uri",
+                                                                    "method"
+                                                                ],
+                                                                "properties": {
+                                                                    "uri": {
+                                                                        "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/instances/items/anyOf/0/properties/uri",
+                                                                        "type": "string",
+                                                                        "title": "The uri schema",
+                                                                        "description": "An explanation about the purpose of this instance.",
+                                                                        "default": "",
+                                                                        "examples": [
+                                                                            "http://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:4040"
+                                                                        ]
+                                                                    },
+                                                                    "method": {
+                                                                        "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/instances/items/anyOf/0/properties/method",
+                                                                        "type": "string",
+                                                                        "title": "The method schema",
+                                                                        "description": "An explanation about the purpose of this instance.",
+                                                                        "default": "",
+                                                                        "examples": [
+                                                                            "GET"
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "additionalProperties": true
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "count": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/count",
+                                                    "type": "string",
+                                                    "title": "The count schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "1"
+                                                    ]
+                                                },
+                                                "solution": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/solution",
+                                                    "type": "string",
+                                                    "title": "The solution schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "<p>Configure your web or application server to use SSL (https).</p>"
+                                                    ]
+                                                },
+                                                "otherinfo": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/otherinfo",
+                                                    "type": "string",
+                                                    "title": "The otherinfo schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://eric-eea-stream-aggregator-1hour-528cb479d25c7331-driver-svc:443</p>"
+                                                    ]
+                                                },
+                                                "reference": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/reference",
+                                                    "type": "string",
+                                                    "title": "The reference schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>"
+                                                    ]
+                                                },
+                                                "cweid": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/cweid",
+                                                    "type": "string",
+                                                    "title": "The cweid schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "311"
+                                                    ]
+                                                },
+                                                "wascid": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/wascid",
+                                                    "type": "string",
+                                                    "title": "The wascid schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "4"
+                                                    ]
+                                                },
+                                                "sourceid": {
+                                                    "$id": "#/properties/site/items/anyOf/0/properties/alerts/items/anyOf/0/properties/sourceid",
+                                                    "type": "string",
+                                                    "title": "The sourceid schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "1"
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

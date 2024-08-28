@@ -1,0 +1,24 @@
+rules:
+- path: dataflow-configuration/
+  gerritGroup: "cnint-dataflow-configuration-reviewers"
+- path: helm-values/
+  gerritGroup: "cnint-helm-values-reviewers"
+- path: helm-values/custom_deployment_values.yaml
+  gerritGroup: "cnint-custom-deployment-values-reviewers"
+- path: helm-values/custom_dimensioning_values.yaml
+  gerritGroup: "cnint-custom-dimensioning-values-reviewers"
+- path: helm-values/custom_environment_values.yaml
+  gerritGroup: "cnint-custom-environment-values-reviewers"
+- path: helm-values/additional_csar_values.yaml
+  gerritGroup: "cnint-additional-csar-values-reviewers"
+- path: helm-values/dependency_chart_values.yaml
+  gerritGroup: "cnint-dependency-chart-values-reviewers"
+- path: bob-rulesets/dimtool_ruleset.yaml
+  gerritGroup: "cnint-dimtool-ruleset-reviewers"
+- path: dimensioning-tool/
+  gerritGroup: "cnint-dimensioning-tool-reviewers"
+- path: dimensioning-tool-ci/
+  gerritGroup: "cnint-dimensioning-tool-ci-reviewers"
+- path: spotfire_platform.yml
+  gerritGroup: "cnint-spotfire-configuration-reviewers"
+defaultrule: "cnint-manual-commit-reviewers"

@@ -1,0 +1,73 @@
+---
+- include_role:
+    name: configure_iam
+    tasks_from: iam_get_ip_and_fqdn.yml
+
+- include_role:
+    name: collect_cli_pod_details
+
+- name: "Exec commands in {{ sf_cli_pod_name }} pod"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: "{{ item }}"
+  loop:
+    - >-  # Export configuration from database
+        /opt/tibco/spotfireconfigtool/config.sh export-config --force
+        --tool-password="{{ toolpasswd }}"
+        --bootstrap-config="{{ bootstrap_file }}"
+        "{{ configuration_file }}"
+    - >-  # Change Spotfire authentication to web-based authentication
+       /opt/tibco/spotfireconfigtool/config.sh config-auth
+       --auth-method=WEB
+       --bootstrap-config="{{ bootstrap_file }}"
+    - >-  # Set the user directory configuration to database
+      /opt/tibco/spotfireconfigtool/config.sh config-userdir
+      --mode=database
+      --bootstrap-config="{{ bootstrap_file }}"
+    - >-  # Change authentication filter to autocreate
+      /opt/tibco/spotfireconfigtool/config.sh config-post-auth-filter
+      -d autocreate
+      --bootstrap-config="{{ bootstrap_file }}"
+    - >-  # Add keycloak (IAM) as the authentication provider
+        /opt/tibco/spotfireconfigtool/config.sh config-oidc
+        --bootstrap-config="{{ bootstrap_file }}"
+        --enabled=true
+        --third-party-login-init-enabled=true
+        --rp-initiated-logout-enabled=true
+        --back-channel-logout-enabled=true
+        --front-channel-logout-enabled=false
+        --front-channel-logout-session-required=true
+        --set-provider
+        --provider-name=keycloak
+        --provider-enabled=true
+        --provider-discovery-url=https://{{ iam_proxy_fqdn }}/auth/realms/local-ldap3/.well-known/openid-configuration
+        --provider-client-id={{ iam.client.id }}
+        --provider-client-secret={{ iam.client.secret }}
+        --provider-domain-option=use_domain_claim
+        --provider-email-claim=email
+        -Sroles
+        -Sopenid
+    - >-  # Import the configuration to the Spotfire Server database
+        /opt/tibco/spotfireconfigtool/config.sh import-config
+        --comment="Enable IAM connection"
+        --tool-password="{{ toolpasswd }}"
+        --bootstrap-config="{{ bootstrap_file }}"
+
+- name: "Trust Custom Scripts, Data Functions and Custom Queries"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: "{{ item }}"
+  loop:
+    - >-
+        /opt/tibco/spotfireconfigtool/config.sh find-analysis-scripts
+        --tool-password="{{ toolpasswd }}"
+        --bootstrap-config="{{ bootstrap_file }}"
+        --library-parent-path=/
+        --auto-trust-scripts=true
+        --auto-trust-custom-queries=true
+        --auto-trust-data-functions=true
+        --no-prompt

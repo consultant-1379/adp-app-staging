@@ -1,0 +1,752 @@
+{
+  "name": "all_in_one_external_config_v1",
+  "title": "All in one external config, v1",
+  "$schema": "http://json-schema.org/schema#",
+  "properties": {
+    "clientConfigId": {
+      "type": "string"
+    },
+    "clientTimeStamp": {
+      "type": "string"
+    },
+    "aggregatedMetricCubes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [ "cubeId" ],
+        "properties": {
+          "cubeId": {
+            "type": "string"
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "aggregations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "type": "string"
+                },
+                "olapDb": {
+                  "type": "object",
+                  "properties": {
+                    "retention": {
+                      "type": "string"
+                    },
+                    "tableName": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "streamExports": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "deploymentName": {
+                        "type": "string"
+                      },
+                      "replicas": {
+                        "type": "integer"
+                      },
+                      "loglevel": {
+                        "type": "string",
+                        "enum": [
+                          "info",
+                          "error",
+                          "debug"
+                        ]
+                      },
+                      "consumer": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "properties": {
+                          "topic": {
+                            "type": "string"
+                          },
+                          "properties": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "aggregatorName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "inputStream": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metricId": {
+                  "type": "string"
+                },
+                "aggregationMethod": {
+                  "type": "string",
+                  "enum": [
+                    "min",
+                    "max",
+                    "sum",
+                    "avg",
+                    "weighted_avg",
+                    "log_avg",
+                    "count",
+                    "approx_count",
+                    "count_true",
+                    "count_null",
+                    "count_both_null",
+                    "count_rows",
+                    "collect_set",
+                    "collect_list",
+                    "cpc_init"
+                  ]
+                },
+                "associatedCalculation": {
+                  "type": "object",
+                  "properties": {
+                    "dimensionId": {
+                      "type": "string"
+                    },
+                    "aggregationMethod": {
+                      "type": "string",
+                      "enum": [
+                        "min",
+                        "max",
+                        "sum",
+                        "avg",
+                        "weighted_avg",
+                        "log_avg",
+                        "count",
+                        "approx_count",
+                        "count_true",
+                        "count_null",
+                        "count_both_null",
+                        "count_rows",
+                        "collect_set",
+                        "collect_list",
+                        "cpc_init"
+                      ]
+                    },
+                    "outputNameSuffix": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "AGGREGATED_METRIC_CUBE",
+                    "RAW_INCIDENT_CUBE",
+                    "RAW_METRIC_CUBE",
+                    "ANOMALY_MODEL",
+                    "CALL_DATA_CUBE"
+                  ]
+                },
+                "filterValues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "dimensionId": {
+                  "type": "string"
+                },
+                "outputName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "experimental": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "rawIncidentCubes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cubeId": {
+            "type": "string"
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "olapDb": {
+            "type": "object",
+            "properties": {
+              "retention": {
+                "type": "string"
+              },
+              "tableName": {
+                "type": "string"
+              }
+            }
+          },
+          "streamExports": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "deploymentName": {
+                  "type": "string"
+                },
+                "replicas": {
+                  "type": "integer"
+                },
+                "loglevel": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "error",
+                    "debug"
+                  ]
+                },
+                "consumer": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string"
+                    },
+                    "properties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "inputStream": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "incidents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "incidentId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "AGGREGATED_METRIC_CUBE",
+                    "RAW_INCIDENT_CUBE",
+                    "RAW_METRIC_CUBE",
+                    "ANOMALY_MODEL",
+                    "CALL_DATA_CUBE"
+                  ]
+                },
+                "filterValues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "dimensionId": {
+                  "type": "string"
+                },
+                "outputName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "experimental": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "rawMetricCubes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cubeId": {
+            "type": "string"
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "streamExports": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "deploymentName": {
+                  "type": "string"
+                },
+                "replicas": {
+                  "type": "integer"
+                },
+                "loglevel": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "error",
+                    "debug"
+                  ]
+                },
+                "consumer": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string"
+                    },
+                    "properties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "inputStream": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "metricId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "AGGREGATED_METRIC_CUBE",
+                    "RAW_INCIDENT_CUBE",
+                    "RAW_METRIC_CUBE",
+                    "ANOMALY_MODEL",
+                    "CALL_DATA_CUBE"
+                  ]
+                },
+                "filterValues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "dimensionId": {
+                  "type": "string"
+                },
+                "outputName": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "experimental": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "callDataCubes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cubeId": {
+            "type": "string"
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "call_leg": {
+            "type": "object",
+            "properties": {
+              "inputStream": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "olapDb": {
+                "type": "object",
+                "properties": {
+                  "retention": {
+                    "type": "string"
+                  },
+                  "tableName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "experimental": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "anomalyData": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "olapDb": {
+          "type": "object",
+          "properties": {
+            "retention": {
+              "type": "string"
+            }
+          }
+        },
+        "streamExports": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "deploymentName": {
+                "type": "string"
+              },
+              "replicas": {
+                "type": "integer"
+              },
+              "loglevel": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "error",
+                  "debug"
+                ]
+              },
+              "consumer": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "topic": {
+                    "type": "string"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "biToolVisualization": {
+          "type": "object",
+          "properties": {
+            "incidentGroups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "groupName": {
+                    "type": "string"
+                  },
+                  "incidents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "incidentId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "tabs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tabName": {
+                    "type": "string"
+                  },
+                  "dimensions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "dimensionId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "globalMlModelTuningParameters": {
+          "type": "object",
+          "properties": {
+            "minNumOfIncidents": {
+              "type": "integer"
+            },
+            "minNumOfImpactedSubscribers": {
+              "type": "integer"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "step": {
+              "type": "string"
+            },
+            "fixThreshold": {
+              "type": "number"
+            },
+            "sensitivity": {
+              "type": "number"
+            },
+            "flappingPeriod": {
+              "type": "integer"
+            }
+          }
+        },
+        "anomalyModels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "inputMetricStream": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "inputIncidentStream": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "metricAggregatorName": {
+                "type": "string"
+              },
+              "incidentAggregatorName": {
+                "type": "string"
+              },
+              "ratioName": {
+                "type": "string"
+              },
+              "hierarchyLevel": {
+                "type": "integer"
+              },
+              "comment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "badDirection": {
+                "type": "string",
+                "enum": [
+                  "min",
+                  "max",
+                  "both"
+                ]
+              },
+              "thresholdDefault": {
+                "type": "number"
+              },
+              "sensitivity": {
+                "type": "number"
+              },
+              "mlModelType": {
+                "type": "string",
+                "enum": [
+                  "aiofixedthreshold",
+                  "aiostatistical",
+                  "aioadaptive"
+                ]
+              },
+              "resolution": {
+                "type": "string"
+              },
+              "step": {
+                "type": "string"
+              },
+              "baseIncidents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "incidentId": {
+                      "type": "string"
+                    },
+                    "threshold": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dimensionId": {
+                      "type": "string"
+                    },
+                    "outputName": {
+                      "type": "string"
+                    },
+                    "filterValues": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "hierarchyBinding": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dimension": {
+                            "type": "string"
+                          },
+                          "parentRatioName": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "flappingPeriod": {
+                "type": "integer"
+              },
+              "subscriberImpactEstimation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "extra_info": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "comment": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

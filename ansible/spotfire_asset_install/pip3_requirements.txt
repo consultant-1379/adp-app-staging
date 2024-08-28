@@ -1,0 +1,6 @@
+kubernetes
+docker
+jmespath
+hostsman==1.1.5
+selenium==4.16.0
+lxml

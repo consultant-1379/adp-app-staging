@@ -1,0 +1,50 @@
+---
+logstash_version: '7.6.2'
+kibana_version: '7.6.2'
+elasticsearch_version: '7.6.2'
+elk_services:
+  - elasticsearch
+  - logstash
+  - kibana
+elk_ports:
+  - 9200/tcp
+  - 5601/tcp
+  - 5044/tcp
+data_path: /data
+data_device: /dev/sdb
+data_vg: data
+data_volumes:
+  - name: elasticsearch-data
+    purpose: es_data
+    size: 100g
+    fs: ext4
+    mountpoint: /data/elasticsearch
+  - name: elasticsearch-logs
+    purpose: es_logs
+    size: 20g
+    fs: ext4
+    mountpoint: /data/elasticsearch/logs
+  - name: elasticsearch-repo
+    purpose: es_repo
+    size: 10g
+    fs: ext4
+    mountpoint: /data/elasticsearch/repo
+  - name: logstash-data
+    purpose: logstash_data
+    size: 20g
+    fs: ext4
+    mountpoint: /data/logstash
+  - name: logstash-logs
+    purpose: logstash_logs
+    size: 10g
+    fs: ext4
+    mountpoint: /data/logstash/logs
+
+data_path_query:
+  es: "[?purpose=='es_data'].mountpoint"
+  logstash: "[?purpose=='logstash_data'].mountpoint"
+log_path_query:
+  es: "[?purpose=='es_logs'].mountpoint"
+  logstash: "[?purpose=='logstash_logs'].mountpoint"
+repo_path_query:
+  es: "[?purpose=='es_repo'].mountpoint"

@@ -1,0 +1,66 @@
+modelVersion: 2.0
+
+docker-images:
+  - k8s-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:2.3.1-8
+
+env:
+  - KUBECONFIG
+  - NAMESPACE (default=eric-eea-ns)
+  - KUBECTL_VERSION (default=1.28.4)
+  - WORKSPACE
+  - ADP_APP_STAGING_DIR
+
+rules:
+  get-pvs:
+    - task: get
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pv | grep ${env.NAMESPACE}
+
+  cleanup-pvs:
+    - task: cleanup
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pv | tail -n+2 | grep ${env.NAMESPACE} | awk '{print $1}' | xargs -I{} kubectl patch pv {} -p '{"metadata":{"finalizers":null}}'
+        - kubectl get pv | tail -n+2 | grep ${env.NAMESPACE} | awk '{print $1}' | xargs -I{} kubectl delete pv {}
+
+  get-pvcs:
+    - task: get
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pvc --namespace ${env.NAMESPACE}
+
+  cleanup-pvcs:
+    - task: cleanup
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pvc -n ${env.NAMESPACE} | tail -n+2 | awk '{print $1}' | xargs -I{} kubectl patch pvc -n ${env.NAMESPACE} {} -p '{"metadata":{"finalizers":null}}'
+        - kubectl get pvc -n ${env.NAMESPACE} | tail -n+2 | awk '{print $1}' | xargs -I{} kubectl delete pvc -n ${env.NAMESPACE} {}
+
+  cleanup-stale-volume-attachments:
+    - task: cleanup
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.WORKSPACE}:${env.WORKSPACE}"
+        - "--workdir ${env.WORKSPACE}"
+      cmd:
+        - ${env.ADP_APP_STAGING_DIR}/technicals/shellscripts/cleanup_stale_volume_attachments.sh --k8_namespace ${env.NAMESPACE}

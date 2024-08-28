@@ -1,0 +1,9 @@
+artifact.properties
+.idea/
+.gradle/
+.project
+charts/
+requirements.lock
+helm/eric-eea-ci-code-helm-chart/templates/*pullsecret*
+*.tgz
+*.iml

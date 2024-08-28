@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Fetch the directory fo the Git repository
+GIT_REPO=$(git rev-parse --show-toplevel)
+# Maximum source code size is 10MB
+MAX_FILE_SIZE=$((10*1024*1024))
+
+# Collect the list of files changed by commit
+COMMIT_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD --diff-filter=ACMRT)
+# Loop through the list of changed files
+for COMMIT_FILE in ${COMMIT_FILES}
+do
+  echo "Execute pre_largefile for ${COMMIT_FILE}"
+  # Get full path of single file based on repository
+  FULL_PATH="${GIT_REPO}/${COMMIT_FILE}"
+  # Calculate file size
+  FILE_SIZE=$(stat --printf="%s" "${FULL_PATH}")
+  # Compare with maximum size, fail if it is greater than the maximum size
+  if [ "$FILE_SIZE" -gt "$MAX_FILE_SIZE" ]
+    then
+    # A big file is present, fail hook with error message
+    echo "Commit had been rejected due to file size limit."
+    echo "In order to preserve the speed and efficency of the source code repository, committing large files is not permitted."
+    echo "File ${COMMIT_FILE} in the commit is larger that the maximum allowed size of ${MAX_FILE_SIZE} (in bytes)."
+    exit 1
+  fi
+done
+
+# Check is OK, no big files are present, hook is passed
+exit 0

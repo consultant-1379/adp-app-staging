@@ -1,0 +1,5 @@
+---
+- name: ELK stack deployment
+  hosts: elk
+  roles:
+    - elk

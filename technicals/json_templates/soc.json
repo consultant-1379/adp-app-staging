@@ -1,0 +1,14 @@
+{
+  "microserviceName":"Name of the microservice",
+  "version":"number",
+  "socInfo":[
+    {
+      "functionalPurpose":"Functional Purpose",
+      "requirementNumber":"Requirement Number",
+      "requirementText":"Requirement Text",
+      "complianceValue":"Compliance Value",
+      "deviation":"Deviation",
+      "notes":"Notes"
+    }
+  ]
+}

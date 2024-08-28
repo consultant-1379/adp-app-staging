@@ -1,0 +1,68 @@
+---
+#
+# Generate client for spotfire in IAM system
+#
+- name: "IAM: Check if client {{ iam.client.id }} exists"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/clients?clientId={{ iam.client.id }}"
+    headers:
+      Authorization: "Bearer {{ iam_admin_token }}"
+    method: GET
+    status_code: [200]
+  register: iam_clients_get_response
+  until: "iam_clients_get_response is not failed"
+  retries: 5
+  delay: 10
+
+- debug:
+    var: iam_clients_get_response
+
+- name: "IAM: Delete existing Spotfire client named {{ iam.client.id }} (if exists)"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/clients/{{ client_id }}"
+    headers:
+      Authorization: "Bearer {{ iam_admin_token }}"
+    method: DELETE
+    status_code: [204]
+  when: iam_clients_get_response.json | length == 1
+  vars:
+    client_id: "{{ iam_clients_get_response.json[0].id }}"
+  register: iam_clients_delete_response
+  until: "iam_clients_delete_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: "IAM: Create {{ iam.client.id }} client for Spotfire"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/clients"
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ iam_admin_token }}"
+    body_format: json
+    body:
+      clientId: "{{ iam.client.id }}"
+      protocol: openid-connect
+      publicClient: false  # accesstype is Confidental
+      redirectUris:
+        - "{{ spotfire_base_url }}/spotfire/*"
+      webOrigins:
+        - "{{ spotfire_base_url }}"
+      secret: "{{ iam.client.secret }}"
+      enabled: true
+      attributes:
+        login_theme: ericsson-base-modified-theme
+        backchannel.logout.url: "{{ spotfire_base_url }}/spotfire/auth/oidc/v1/post_logout"
+    method: POST
+    status_code: [201]  # 409: client already exists
+  vars:
+    spotfire_base_url: "https://{{ spotfire.public_address }}"
+  register: iam_clients_create_response
+  until: "iam_clients_create_response is not failed"
+  retries: 5
+  delay: 10

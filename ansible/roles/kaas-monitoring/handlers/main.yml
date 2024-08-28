@@ -1,0 +1,10 @@
+---
+- name: restart netdata agent
+  service:
+    name: netdata
+    state: restarted
+
+- name: restart MTA
+  service:
+    name: postfix
+    state: restarted

@@ -1,0 +1,104 @@
+---
+actions:
+  1:
+    action: close
+    description: >-
+      Common configuration for non-defined
+      indices. Close indexes older than 180 days.
+    options:
+      delete_aliases: false
+      skip_flush: false
+      ignore_sync_failures: false
+      disable_action: false
+      ignore_empty_list: true
+      allow_ilm_indices: true
+    filters:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 60
+    - filtertype: pattern
+      kind: prefix
+      value: ci_result_compare
+      exclude: True
+
+  2:
+    action: delete_indices
+    description: >-
+      Common configuration for non-defined
+      indices. Remove logs older than 365 days.
+    options:
+      disable_action: false
+      ignore_empty_list: true
+      allow_ilm_indices: true
+    filters:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 180
+    - filtertype: pattern
+      kind: prefix
+      value: ci_result_compare
+      exclude: True
+
+  3:
+    action: delete_indices
+    description: "Set retention configuration for all time based logs."
+    options:
+      disable_action: false
+      ignore_empty_list: true
+      allow_ilm_indices: true
+    filters:
+      - filtertype: pattern
+        kind: regex
+        value: '^(product_ci-eea-log-|product_ci-eea-auditlog-|utf-logs-).*$'
+      - filtertype: age
+        #source: creation_date
+        source: name
+        direction: older
+        timestring: '%Y.%m.%d'
+        unit: days
+        unit_count: 30
+
+  4:
+    action: delete_indices
+    description: Set retention configuration for security scanning logs.
+    options:
+      disable_action: false
+      ignore_empty_list: true
+      allow_ilm_indices: true
+    filters:
+    - filtertype: pattern
+      kind: regex
+      value: '^(rv-security-tenable-riport-).*$'
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 180
+
+  5:
+    action: delete_indices
+    description: >-
+      Hard configuration for save the cluster - Remove
+      indices when accumulated indices reach 2900GB, avoid the
+      overuse of the elastic psyhical volume.
+    options:
+      disable_action: false
+      ignore_empty_list: true
+      allow_ilm_indices: true
+    filters:
+    - filtertype: space
+      disk_space: 4500
+      use_age: True
+      source: creation_date
+      reverse: True
+    - filtertype: pattern
+      kind: prefix
+      value: ci_result_compare
+      exclude: True

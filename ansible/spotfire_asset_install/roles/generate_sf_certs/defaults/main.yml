@@ -1,0 +1,10 @@
+---
+internal_ca_pem: /tmp/internal_ca.pem
+external_ca_pem: /tmp/external_ca.pem
+external_ca_key: /tmp/external_ca.key
+password_file: /tmp/store_pass.txt  # storing jks password in file
+
+sf_keytool: /usr/bin/keytool
+sf_keystore_jks: /opt/tibco/tss/tomcat/certs/spotfire_keystore.jks
+
+iam_external_server_cert: /tmp/iam-external-server-cert.pem

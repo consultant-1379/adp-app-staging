@@ -1,0 +1,9 @@
+Host *
+  ServerAliveInterval 60
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+  LogLevel ERROR
+
+Host gerrit.ericsson.se gerritmirror-ha.lmera.ericsson.se
+  User eceagit
+  IdentityFile ~/.ssh/id_rsa_eceagit

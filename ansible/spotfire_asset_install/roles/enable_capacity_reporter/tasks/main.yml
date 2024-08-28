@@ -1,0 +1,43 @@
+---
+- name: 'Identify configured LM address (ingress external or the internal) and based on that create the necessary secret'
+  block:
+    - name: Collect sf-server pod name
+      include_role:
+        name: collect_server_pod_details
+
+    - name: Collect server pod info
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        name: '{{ sf_server_pod_name }}'
+        namespace: '{{ spotfire.namespace }}'
+      register: server_pod_info
+
+    - name: "Save all the environment variables of spotfire-server container"
+      set_fact:
+        sf_server_pod_env_vars: "{{ server_pod_info.resources[0] | json_query(container_name_query) | first }}"
+      vars:
+        container_name_query: "spec.containers[?name=='spotfire-server'].env"
+
+    # if port is 443, then we use external LM ingress address
+    # otherwise the internal address is used
+    - name: "Get value of LM_PORT environment variable"
+      set_fact:
+        lm_port: "{{ sf_server_pod_env_vars | json_query('[?name == `LM_PORT`].value') | first }}"
+
+    - debug:
+        var: lm_port
+
+    - name: 'Creating tls secret based on the configured LM port'
+      include_tasks: 'create_secret_{{ lm_port }}.yml'
+
+- name: "Enable capacity reporter in platform.yml"
+  set_fact:
+    params_to_modify_upgrade: "{{ params_to_modify_upgrade | default([]) + [ {'key': item.key, 'value': item.value } ] }}"
+  loop:
+    - { 'key': 'spotfire-server.configuration.capacityReporter.enabled', 'value': 'true' }
+
+- include_role:
+    name: edit_platform_yaml_for_upgrade
+
+# call helm update deployment after this role

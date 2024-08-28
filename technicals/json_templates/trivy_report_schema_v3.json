@@ -1,0 +1,569 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "trivy_report_schema_v3.json",
+    "type": "object",
+    "title": "The trivy report schema",
+    "description": "The trivy report schema comprises the entire JSON document.",
+    "default": [],
+    "examples": [
+        [
+            {
+                "Target": "app/lib/jersey-common-2.32.jar",
+                "Type": "jar",
+                "Vulnerabilities": [
+                    {
+                        "VulnerabilityID": "CVE-2021-28168",
+                        "PkgName": "org.glassfish.jersey.core:jersey-common",
+                        "InstalledVersion": "2.32",
+                        "FixedVersion": "3.0.2, 2.34",
+                        "Layer": {
+                            "DiffID": "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                        },
+                        "SeveritySource": "nvd",
+                        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-28168",
+                        "Title": "jersey: Local information disclosure via system temporary directory",
+                        "Description": "Eclipse Jersey 2.28 to 2.33 and Eclipse Jersey 3.0.0 to 3.0.1 contains a local information disclosure vulnerability. This is due to the use of the File.createTempFile which creates a file inside of the system temporary directory with the permissions: -rw-r--r--. Thus the contents of this file are viewable by all other users locally on the system. As such, if the contents written is security sensitive, it can be disclosed to other local users.",
+                        "Severity": "MEDIUM",
+                        "CweIDs": [
+                            "CWE-732"
+                        ],
+                        "CVSS": {
+                            "nvd": {
+                                "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                "V2Score": 2.1,
+                                "V3Score": 5.5
+                            },
+                            "redhat": {
+                                "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "V3Score": 6.2
+                            }
+                        },
+                        "References": [
+                            "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                        ],
+                        "PublishedDate": "2021-04-22T18:15:00Z",
+                        "LastModifiedDate": "2021-05-07T16:15:00Z"
+                    }
+                ]
+            }
+        ]
+    ],
+    "additionalItems": true,
+    "items": {
+        "$id": "#/items",
+        "anyOf": [
+            {
+                "$id": "#/items/anyOf/0",
+                "type": "object",
+                "title": "The first anyOf schema",
+                "description": "An explanation about the purpose of this instance.",
+                "default": {},
+                "examples": [
+                    {
+                        "Target": "app/lib/jersey-common-2.32.jar",
+                        "Type": "jar",
+                        "Vulnerabilities": [
+                            {
+                                "VulnerabilityID": "CVE-2021-28168",
+                                "PkgName": "org.glassfish.jersey.core:jersey-common",
+                                "InstalledVersion": "2.32",
+                                "FixedVersion": "3.0.2, 2.34",
+                                "Layer": {
+                                    "DiffID": "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                                },
+                                "SeveritySource": "nvd",
+                                "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-28168",
+                                "Title": "jersey: Local information disclosure via system temporary directory",
+                                "Description": "Eclipse Jersey 2.28 to 2.33 and Eclipse Jersey 3.0.0 to 3.0.1 contains a local information disclosure vulnerability. This is due to the use of the File.createTempFile which creates a file inside of the system temporary directory with the permissions: -rw-r--r--. Thus the contents of this file are viewable by all other users locally on the system. As such, if the contents written is security sensitive, it can be disclosed to other local users.",
+                                "Severity": "MEDIUM",
+                                "CweIDs": [
+                                    "CWE-732"
+                                ],
+                                "CVSS": {
+                                    "nvd": {
+                                        "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                        "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                        "V2Score": 2.1,
+                                        "V3Score": 5.5
+                                    },
+                                    "redhat": {
+                                        "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                        "V3Score": 6.2
+                                    }
+                                },
+                                "References": [
+                                    "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                                ],
+                                "PublishedDate": "2021-04-22T18:15:00Z",
+                                "LastModifiedDate": "2021-05-07T16:15:00Z"
+                            }
+                        ]
+                    }
+                ],
+                "required": [
+                    "Target",
+                    "Type",
+                    "Vulnerabilities"
+                ],
+                "properties": {
+                    "Target": {
+                        "$id": "#/items/anyOf/0/properties/Target",
+                        "type": "string",
+                        "title": "The Target schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "app/lib/jersey-common-2.32.jar"
+                        ]
+                    },
+                    "Type": {
+                        "$id": "#/items/anyOf/0/properties/Type",
+                        "type": "string",
+                        "title": "The Type schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "jar"
+                        ]
+                    },
+                    "Vulnerabilities": {
+                        "$id": "#/items/anyOf/0/properties/Vulnerabilities",
+                        "type": ["array", "null"],
+                        "title": "The Vulnerabilities schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": [],
+                        "examples": [
+                            [
+                                {
+                                    "VulnerabilityID": "CVE-2021-28168",
+                                    "PkgName": "org.glassfish.jersey.core:jersey-common",
+                                    "InstalledVersion": "2.32",
+                                    "FixedVersion": "3.0.2, 2.34",
+                                    "Layer": {
+                                        "DiffID": "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                                    },
+                                    "SeveritySource": "nvd",
+                                    "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-28168",
+                                    "Title": "jersey: Local information disclosure via system temporary directory",
+                                    "Description": "Eclipse Jersey 2.28 to 2.33 and Eclipse Jersey 3.0.0 to 3.0.1 contains a local information disclosure vulnerability. This is due to the use of the File.createTempFile which creates a file inside of the system temporary directory with the permissions: -rw-r--r--. Thus the contents of this file are viewable by all other users locally on the system. As such, if the contents written is security sensitive, it can be disclosed to other local users.",
+                                    "Severity": "MEDIUM",
+                                    "CweIDs": [
+                                        "CWE-732"
+                                    ],
+                                    "CVSS": {
+                                        "nvd": {
+                                            "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                            "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                            "V2Score": 2.1,
+                                            "V3Score": 5.5
+                                        },
+                                        "redhat": {
+                                            "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                            "V3Score": 6.2
+                                        }
+                                    },
+                                    "References": [
+                                        "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                                    ],
+                                    "PublishedDate": "2021-04-22T18:15:00Z",
+                                    "LastModifiedDate": "2021-05-07T16:15:00Z"
+                                }
+                            ]
+                        ],
+                        "additionalItems": true,
+                        "items": {
+                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items",
+                            "anyOf": [
+                                {
+                                    "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0",
+                                    "type": "object",
+                                    "title": "The first anyOf schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": {},
+                                    "examples": [
+                                        {
+                                            "VulnerabilityID": "CVE-2021-28168",
+                                            "PkgName": "org.glassfish.jersey.core:jersey-common",
+                                            "InstalledVersion": "2.32",
+                                            "FixedVersion": "3.0.2, 2.34",
+                                            "Layer": {
+                                                "DiffID": "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                                            },
+                                            "SeveritySource": "nvd",
+                                            "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-28168",
+                                            "Title": "jersey: Local information disclosure via system temporary directory",
+                                            "Description": "Eclipse Jersey 2.28 to 2.33 and Eclipse Jersey 3.0.0 to 3.0.1 contains a local information disclosure vulnerability. This is due to the use of the File.createTempFile which creates a file inside of the system temporary directory with the permissions: -rw-r--r--. Thus the contents of this file are viewable by all other users locally on the system. As such, if the contents written is security sensitive, it can be disclosed to other local users.",
+                                            "Severity": "MEDIUM",
+                                            "CweIDs": [
+                                                "CWE-732"
+                                            ],
+                                            "CVSS": {
+                                                "nvd": {
+                                                    "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                                    "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                                    "V2Score": 2.1,
+                                                    "V3Score": 5.5
+                                                },
+                                                "redhat": {
+                                                    "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                                    "V3Score": 6.2
+                                                }
+                                            },
+                                            "References": [
+                                                "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                                            ],
+                                            "PublishedDate": "2021-04-22T18:15:00Z",
+                                            "LastModifiedDate": "2021-05-07T16:15:00Z"
+                                        }
+                                    ],
+                                    "required": [
+                                        "VulnerabilityID",
+                                        "PkgName",
+                                        "InstalledVersion",
+                                        "FixedVersion",
+                                        "Layer",
+                                        "Title",
+                                        "Description",
+                                        "Severity",
+                                        "References"
+                                    ],
+                                    "properties": {
+                                        "VulnerabilityID": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/VulnerabilityID",
+                                            "type": "string",
+                                            "title": "The VulnerabilityID schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "CVE-2021-28168"
+                                            ]
+                                        },
+                                        "PkgName": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/PkgName",
+                                            "type": "string",
+                                            "title": "The PkgName schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "org.glassfish.jersey.core:jersey-common"
+                                            ]
+                                        },
+                                        "InstalledVersion": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/InstalledVersion",
+                                            "type": "string",
+                                            "title": "The InstalledVersion schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2.32"
+                                            ]
+                                        },
+                                        "FixedVersion": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/FixedVersion",
+                                            "type": "string",
+                                            "title": "The FixedVersion schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "3.0.2, 2.34"
+                                            ]
+                                        },
+                                        "Layer": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Layer",
+                                            "type": "object",
+                                            "title": "The Layer schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "DiffID": "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                                                }
+                                            ],
+                                            "required": [
+                                                "DiffID"
+                                            ],
+                                            "properties": {
+                                                "DiffID": {
+                                                    "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Layer/properties/DiffID",
+                                                    "type": "string",
+                                                    "title": "The DiffID schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "sha256:6d6dcb4d6aa813eff3235fb7edf68293d8835173cfb7f2cd15ae543ddeeb255a"
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        },
+                                        "SeveritySource": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/SeveritySource",
+                                            "type": "string",
+                                            "title": "The SeveritySource schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "nvd"
+                                            ]
+                                        },
+                                        "PrimaryURL": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/PrimaryURL",
+                                            "type": "string",
+                                            "title": "The PrimaryURL schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "https://avd.aquasec.com/nvd/cve-2021-28168"
+                                            ]
+                                        },
+                                        "Title": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Title",
+                                            "type": "string",
+                                            "title": "The Title schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "jersey: Local information disclosure via system temporary directory"
+                                            ]
+                                        },
+                                        "Description": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Description",
+                                            "type": "string",
+                                            "title": "The Description schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "Eclipse Jersey 2.28 to 2.33 and Eclipse Jersey 3.0.0 to 3.0.1 contains a local information disclosure vulnerability. This is due to the use of the File.createTempFile which creates a file inside of the system temporary directory with the permissions: -rw-r--r--. Thus the contents of this file are viewable by all other users locally on the system. As such, if the contents written is security sensitive, it can be disclosed to other local users."
+                                            ]
+                                        },
+                                        "Severity": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Severity",
+                                            "type": "string",
+                                            "title": "The Severity schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "MEDIUM"
+                                            ]
+                                        },
+                                        "CweIDs": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CweIDs",
+                                            "type": "array",
+                                            "title": "The CweIDs schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": [],
+                                            "examples": [
+                                                [
+                                                    "CWE-732"
+                                                ]
+                                            ],
+                                            "additionalItems": true,
+                                            "items": {
+                                                "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CweIDs/items",
+                                                "anyOf": [
+                                                    {
+                                                        "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CweIDs/items/anyOf/0",
+                                                        "type": "string",
+                                                        "title": "The first anyOf schema",
+                                                        "description": "An explanation about the purpose of this instance.",
+                                                        "default": "",
+                                                        "examples": [
+                                                            "CWE-732"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "CVSS": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS",
+                                            "type": "object",
+                                            "title": "The CVSS schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "nvd": {
+                                                        "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                                        "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                                        "V2Score": 2.1,
+                                                        "V3Score": 5.5
+                                                    },
+                                                    "redhat": {
+                                                        "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                                        "V3Score": 6.2
+                                                    }
+                                                }
+                                            ],
+                                            "required": [
+                                                "nvd",
+                                                "redhat"
+                                            ],
+                                            "properties": {
+                                                "nvd": {
+                                                    "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/nvd",
+                                                    "type": "object",
+                                                    "title": "The nvd schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": {},
+                                                    "examples": [
+                                                        {
+                                                            "V2Vector": "AV:L/AC:L/Au:N/C:P/I:N/A:N",
+                                                            "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                                            "V2Score": 2.1,
+                                                            "V3Score": 5.5
+                                                        }
+                                                    ],
+                                                    "required": [
+                                                        "V2Vector",
+                                                        "V3Vector",
+                                                        "V2Score",
+                                                        "V3Score"
+                                                    ],
+                                                    "properties": {
+                                                        "V2Vector": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/nvd/properties/V2Vector",
+                                                            "type": "string",
+                                                            "title": "The V2Vector schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": "",
+                                                            "examples": [
+                                                                "AV:L/AC:L/Au:N/C:P/I:N/A:N"
+                                                            ]
+                                                        },
+                                                        "V3Vector": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/nvd/properties/V3Vector",
+                                                            "type": "string",
+                                                            "title": "The V3Vector schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": "",
+                                                            "examples": [
+                                                                "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N"
+                                                            ]
+                                                        },
+                                                        "V2Score": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/nvd/properties/V2Score",
+                                                            "type": "number",
+                                                            "title": "The V2Score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                2.1
+                                                            ]
+                                                        },
+                                                        "V3Score": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/nvd/properties/V3Score",
+                                                            "type": "number",
+                                                            "title": "The V3Score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                5.5
+                                                            ]
+                                                        }
+                                                    },
+                                                    "additionalProperties": true
+                                                },
+                                                "redhat": {
+                                                    "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/redhat",
+                                                    "type": "object",
+                                                    "title": "The redhat schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": {},
+                                                    "examples": [
+                                                        {
+                                                            "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                                            "V3Score": 6.2
+                                                        }
+                                                    ],
+                                                    "required": [
+                                                        "V3Vector",
+                                                        "V3Score"
+                                                    ],
+                                                    "properties": {
+                                                        "V3Vector": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/redhat/properties/V3Vector",
+                                                            "type": "string",
+                                                            "title": "The V3Vector schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": "",
+                                                            "examples": [
+                                                                "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+                                                            ]
+                                                        },
+                                                        "V3Score": {
+                                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/CVSS/properties/redhat/properties/V3Score",
+                                                            "type": "number",
+                                                            "title": "The V3Score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                6.2
+                                                            ]
+                                                        }
+                                                    },
+                                                    "additionalProperties": true
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        },
+                                        "References": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References",
+                                            "type": "array",
+                                            "title": "The References schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": [],
+                                            "examples": [
+                                                [
+                                                    "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                                                ]
+                                            ],
+                                            "additionalItems": true,
+                                            "items": {
+                                                "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References/items",
+                                                "anyOf": [
+                                                    {
+                                                        "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References/items/anyOf/0",
+                                                        "type": "string",
+                                                        "title": "The first anyOf schema",
+                                                        "description": "An explanation about the purpose of this instance.",
+                                                        "default": "",
+                                                        "examples": [
+                                                            "https://github.com/advisories/GHSA-c43q-5hpj-4crv"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "PublishedDate": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/PublishedDate",
+                                            "type": "string",
+                                            "title": "The PublishedDate schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2021-04-22T18:15:00Z"
+                                            ]
+                                        },
+                                        "LastModifiedDate": {
+                                            "$id": "#/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/LastModifiedDate",
+                                            "type": "string",
+                                            "title": "The LastModifiedDate schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2021-05-07T16:15:00Z"
+                                            ]
+                                        }
+                                    },
+                                    "additionalProperties": true
+                                }
+                            ]
+                        }
+                    }
+                },
+                "additionalProperties": true
+            }
+        ]
+    }
+}

@@ -1,0 +1,25 @@
+---
+- name: "Update string type values in platform.yaml"
+  block:
+    - name: "List the keys I want to modify"
+      yedit:
+        src: '{{ platform_yaml_file }}'
+        key: '{{ item.key }}'
+        state: list
+      loop: "{{ params_to_modify_upgrade }}"
+      register: list_existing_keys_result
+
+    - name: "Validate that all the keys to be modified exist"
+      assert:
+        that: "{{ item.result != None }}"
+        quiet: yes
+        fail_msg: "The Key {{ item.item.key }} does not exist!"
+      loop: '{{ list_existing_keys_result.results }}'
+
+    - name: "Update key -> values (string type) in platform.yaml"
+      yedit:
+        src: '{{ platform_yaml_file }}'
+        key: '{{ item.key }}'
+        value: '{{ item.value }}'
+        state: present
+      loop: "{{ params_to_modify_upgrade }}"

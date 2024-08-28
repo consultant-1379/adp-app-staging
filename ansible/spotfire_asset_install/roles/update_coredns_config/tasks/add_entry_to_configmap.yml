@@ -1,0 +1,30 @@
+---
+- name: "Check if hosts entry is already present"
+  lineinfile:
+    name: "{{ configmap_work }}"
+    regexp: '^\s+hosts\s*{$'
+    state: absent
+  check_mode: yes
+  register: add_hosts_needed
+
+- name: Insert hosts entry to coredns configmap file
+  lineinfile:
+    path: "{{ configmap_work }}"
+    regexp: '^(\s+)ready$'
+    line: '\1ready\n\1hosts {\n\1\1fallthrough\n\1}'
+    backrefs: yes
+  when: not add_hosts_needed.changed
+
+- name: 'Remove existing fqdn entry'
+  replace:
+    path: "{{ configmap_work }}"
+    regexp: '^(\s+)(.*)(\s+){{ item.fqdn }}$'
+
+- name: 'Add new IP:FQDN entry to the hosts entry'
+  lineinfile:
+    path: "{{ configmap_work }}"
+    backrefs: yes
+    regexp: '^(\s+)hosts(\s*){$'
+    line: '\1hosts\2{\n\1\g<1>{{ item.ip_address }} {{ item.fqdn }}'
+    # https://github.com/ansible/ansible/issues/42794
+    # \g<1> is the same as \1 , but need to use this form if followed by an ansible variable

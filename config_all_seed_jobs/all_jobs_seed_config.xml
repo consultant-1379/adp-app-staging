@@ -1,0 +1,198 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
+  <actions/>
+  <description/>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@1.2"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.1">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.8.0">
+      <gitLabConnection/>
+      <jobCredentialId/>
+      <useAlternativeCredential>false</useAlternativeCredential>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+    <org.bstick12.jenkinsci.plugins.leastload.LeastLoadDisabledProperty plugin="leastload@3.0.0">
+      <leastLoadDisabled>false</leastLoadDisabled>
+    </org.bstick12.jenkinsci.plugins.leastload.LeastLoadDisabledProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@332.va_1ee476d8f6d">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty plugin="throttle-concurrents@2.14">
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <categories class="java.util.concurrent.CopyOnWriteArrayList"/>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+      <limitOneJobWithMatchingParams>false</limitOneJobWithMatchingParams>
+      <paramsToUseForLimit/>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>adp-app-staging</name>
+        <url>https://eceagit@gerrit.ericsson.se/a/EEA/adp-app-staging</url>
+        <credentialsId>git-functional-http-user</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>${MAIN_BRANCH}</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+        <relativeTargetDir>adp-app-staging</relativeTargetDir>
+      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+    </extensions>
+  </scm>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(System)</jdk>
+  <authToken>kakukk</authToken>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <javaposse.jobdsl.plugin.ExecuteDslScripts plugin="job-dsl@1.87">
+      <targets>adp-app-staging/jobs/eea*/*.groovy
+adp-app-staging/jobs/csar*/*.groovy
+adp-app-staging/jobs/doc*/*.groovy
+adp-app-staging/technicals/**/*.groovy
+adp-app-staging/jobs/manual*/*.groovy
+adp-app-staging/jobs/jenkins*/*.groovy</targets>
+      <usingScriptText>false</usingScriptText>
+      <sandbox>false</sandbox>
+      <ignoreExisting>false</ignoreExisting>
+      <ignoreMissingFiles>false</ignoreMissingFiles>
+      <failOnMissingPlugin>false</failOnMissingPlugin>
+      <failOnSeedCollision>false</failOnSeedCollision>
+      <unstableOnDeprecation>false</unstableOnDeprecation>
+      <removedJobAction>IGNORE</removedJobAction>
+      <removedViewAction>IGNORE</removedViewAction>
+      <removedConfigFilesAction>IGNORE</removedConfigFilesAction>
+      <lookupStrategy>JENKINS_ROOT</lookupStrategy>
+    </javaposse.jobdsl.plugin.ExecuteDslScripts>
+  </builders>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@3.2.0-550.v88192b_d3e922">
+      <config>
+        <scriptFiles/>
+        <groovyScripts/>
+        <buildSteps>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>#!/bin/bash
+set -o errexit
+${WORKSPACE}/adp-app-staging/technicals/shellscripts/collect_job_names.sh  ${WORKSPACE}/adp-app-staging/</command>
+                <configuredLocalRules/>
+              </hudson.tasks.Shell>
+            </buildSteps>
+            <stopOnFailure>false</stopOnFailure>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <EnvInjectBuilder plugin="envinject@2.908.v66a_774b_31d93">
+                <info>
+                  <propertiesFilePath>env_inject_dsl</propertiesFilePath>
+                </info>
+              </EnvInjectBuilder>
+              <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@787.v665fcf2a_830b_">
+                <configs>
+                  <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+                    <configs>
+                      <hudson.plugins.parameterizedtrigger.BooleanParameters>
+                        <configs>
+                          <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                            <name>DRY_RUN</name>
+                            <value>true</value>
+                          </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                        </configs>
+                      </hudson.plugins.parameterizedtrigger.BooleanParameters>
+                    </configs>
+                    <projects>dry-runs-job</projects>
+                    <condition>ALWAYS</condition>
+                    <triggerWithNoParameters>false</triggerWithNoParameters>
+                    <triggerFromChildProjects>false</triggerFromChildProjects>
+                    <block>
+                      <buildStepFailureThreshold>
+                        <name>FAILURE</name>
+                        <ordinal>2</ordinal>
+                        <color>RED</color>
+                        <completeBuild>true</completeBuild>
+                      </buildStepFailureThreshold>
+                      <failureThreshold>
+                        <name>FAILURE</name>
+                        <ordinal>2</ordinal>
+                        <color>RED</color>
+                        <completeBuild>true</completeBuild>
+                      </failureThreshold>
+                    </block>
+                    <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+                  </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+                </configs>
+              </hudson.plugins.parameterizedtrigger.TriggerBuilder>
+              <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@787.v665fcf2a_830b_">
+                <configs>
+                  <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+                    <configs>
+                      <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+                        <properties>JOB_NAMES=${JOB_NAMES}</properties>
+                        <textParamValueOnNewLine>false</textParamValueOnNewLine>
+                      </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+                    </configs>
+                    <projects>dry-runs-job</projects>
+                    <condition>ALWAYS</condition>
+                    <triggerWithNoParameters>false</triggerWithNoParameters>
+                    <triggerFromChildProjects>false</triggerFromChildProjects>
+                    <block/>
+                    <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+                  </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+                </configs>
+              </hudson.plugins.parameterizedtrigger.TriggerBuilder>
+            </buildSteps>
+            <stopOnFailure>false</stopOnFailure>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+        </buildSteps>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>env_inject_dsl</artifacts>
+      <allowEmptyArchive>true</allowEmptyArchive>
+      <onlyIfSuccessful>true</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <followSymlinks>true</followSymlinks>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>

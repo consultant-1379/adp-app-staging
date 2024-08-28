@@ -1,0 +1,76 @@
+---
+- hosts: all
+  gather_facts: yes
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: yum cache update
+      become: yes
+      yum:
+        update_cache=yes
+      when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+  tasks:
+    - name: install JRE
+      become: yes
+      yum:
+       name: "{{ jre_version }}"
+       state: present
+      when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+    - name: open ports
+      become: yes
+      firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+      with_items:
+        - '9200/tcp'
+        - '5601/tcp'
+        - '5044/tcp'
+        - '5014/tcp'
+        - '5041/tcp'
+        - '5025/tcp'
+
+- hosts: all
+  roles:
+    - hosts_update
+    - snmp-agent
+
+- hosts: elastic
+  roles:
+    - elastic
+
+- hosts: elastic_master
+  roles:
+    - elastic_master
+
+- hosts: elastic_slave
+  roles:
+    - elastic_slave
+
+- hosts: kibana
+  roles:
+    - kibana
+
+- hosts: logstash
+  roles:
+    - logstash
+
+- name: EEA4 ELK hardening
+  hosts: all
+  vars_files:
+    - /roles/elk-hardening/defaults/main.yml
+    - /roles/elk-hardening/vars/main.yml
+    - vars/main.yml
+  tasks:
+    - include_tasks: tasks/hardening.yml
+  handlers:
+    - include: handlers/main.yml
+
+- name: deploy NFS server
+  hosts: nfs
+  roles:
+    - nfs-server

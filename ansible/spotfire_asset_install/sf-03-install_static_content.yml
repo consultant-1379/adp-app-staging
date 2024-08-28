@@ -1,0 +1,13 @@
+---
+- name: Deploy Static content
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars/sf_vars.yml
+  vars:
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig }}"
+  roles:
+    - install_static_content
+    - restart_sf_server

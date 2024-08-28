@@ -1,0 +1,13 @@
+server.port: 5601
+server.host: "0.0.0.0"
+server.name: "{{ ansible_hostname }}"
+
+# SSL
+server.ssl.enabled: true
+server.ssl.certificate: /etc/kibana/tls/certs/{{ ansible_hostname }}.crt
+server.ssl.key: /etc/kibana/tls/private/{{ ansible_hostname }}.key
+
+elasticsearch.hosts: ["https://{{ inventory_hostname }}:9200"]
+elasticsearch.username: "kibana"
+elasticsearch.password: "{{ es_passwords.kibana }}"
+elasticsearch.ssl.certificateAuthorities: [ "/etc/kibana/tls/certs/ca-bundle-ericsson-internal.crt" ]

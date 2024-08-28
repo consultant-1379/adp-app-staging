@@ -1,0 +1,5 @@
+---
+- name: deploy NFS server
+  hosts: nfs
+  roles:
+    - nfs-server

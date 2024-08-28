@@ -1,0 +1,85 @@
+---
+# option A) For fresh install we identify the chart TGZ file automatically,
+#           then store it in a file for later usage
+- block:
+    - name: "Collect chart tgz file name from {{ asset_chart_dir }}"
+      find:
+        paths: "{{ asset_chart_dir }}"
+        use_regex: yes
+        patterns:
+          - 'spotfire-platform-.*\.tgz$'
+        recurse: no
+      register: find_result
+
+    - name: "Validate that exactly 1 tgz chart file is found"
+      assert:
+        that:
+          - "{{ find_result.matched == 1 }}"
+
+    - name: "Store helm chart file path into variable"
+      set_fact:
+        sf_chart_file: '{{ find_result.files[0].path }}'
+
+    - name: "Store helm chart file path into {{ dest_file }} file, to use this at upgrades"
+      copy:
+        content: "{{ sf_chart_file }}"
+        dest: "{{ dest_file }}"
+      vars:
+        dest_file: "{{ project_work_dir }}/chart_file_path.txt"
+  when: is_new_deployment | default(true) | bool
+
+# option B) For helm upgrade we use the same chart that was used for installation
+- block:
+    - name: "Read SF chart from stored file {{ dest_file }}"
+      set_fact:
+        sf_chart_file: "{{ lookup('file', '{{ dest_file }}') }}"
+      vars:
+        dest_file: "{{ project_work_dir }}/chart_file_path.txt"
+  when: not is_new_deployment | default(true) | bool
+
+- debug:
+    var: sf_chart_file
+
+# maybe not needed??
+- name: Install Helm Diff
+  kubernetes.core.helm_plugin:
+    plugin_path: "https://github.com/databus23/helm-diff"
+    state: present
+
+# TODO EEAEPP-100468: remove the below ugly code and keep only one list
+- name: Ugly hack to support BWC temporarily
+  block:
+    # new asset version
+    - name: 'Identified the new asset version: {{ chart_file }} -> 3 values yaml files will be used'
+      set_fact:
+        values_files:
+          - '{{ platform_yaml_file }}'
+          - '{{ sf_dim_yaml_file }}'
+          - '{{ security_yaml_file }}'
+      when:
+        - chart_file != 'spotfire-platform-0.2.4.tgz'
+    # old SF version
+    - name: 'Identified the old asset version: {{ chart_file }} -> 2 values yaml files will be used'
+      set_fact:
+        values_files:
+          - '{{ platform_yaml_file }}'
+          - '{{ sf_dim_yaml_file }}'
+      when:
+        - chart_file == 'spotfire-platform-0.2.4.tgz'
+  vars:
+    chart_file: '{{ sf_chart_file | basename }}'
+
+- name: "Deploy spotfire platform helm chart: {{ sf_chart_file }}"
+  kubernetes.core.helm:
+    binary_path: '{{ helm_bin }}'
+    atomic: no  # default is no
+    create_namespace: no  # default
+    force: no  # default
+    chart_ref: '{{ sf_chart_file }}'
+    release_name: eric-ts-platform
+    release_namespace: '{{ spotfire.namespace }}'
+    release_state: present
+    replace: no  # default
+    timeout: 40m0s
+    wait: yes
+    values_files: '{{ values_files }}'

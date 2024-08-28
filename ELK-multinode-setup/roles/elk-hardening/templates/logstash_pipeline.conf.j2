@@ -1,0 +1,12 @@
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+- pipeline.id: main
+  path.config: "{{ logstash_configs_dir }}/beats_to_elastic.conf"
+  pipeline.workers: 20
+  pipeline.batch.size: 1024
+- pipeline.id: tenable
+  path.config: "{{ logstash_configs_dir }}/beats_to_elastic_nossl.conf"
+- pipeline.id: utf4_ci_logs
+  path.config: "{{ logstash_configs_dir }}/ci_payload_to_elastic.conf"

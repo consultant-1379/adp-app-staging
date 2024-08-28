@@ -1,0 +1,541 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "anchore_details_schema_v1.json",
+    "type": "array",
+    "title": "The Anchore details schema",
+    "description": "The Anchore details schema comprises the entire JSON document.",
+    "default": [],
+    "examples": [
+        [
+            {
+                "analysis_status": "analyzed",
+                "analyzed_at": "2021-05-10T13:42:59Z",
+                "annotations": {},
+                "created_at": "2021-05-10T13:41:13Z",
+                "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                "image_content": {
+                    "metadata": {
+                        "arch": "amd64",
+                        "distro": "sles",
+                        "distro_version": "15.2",
+                        "dockerfile_mode": "Guessed",
+                        "image_size": 363704320,
+                        "layer_count": 9
+                    }
+                },
+                "image_detail": [
+                    {
+                        "created_at": "2021-05-10T13:41:13Z",
+                        "digest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                        "dockerfile": "RlJPTSBzY3JhdGNoClJVTiB1bW9jaSByZXBhY2sKUlVOIHVtb2NpIGNvbmZpZwpBUkcgQkFTRV9PU19WRVJTSU9OCkFSRyBCQVNFX09TX1JFUE89YXJtLnJuZC5raS5zdy5lcmljc3Nvbi5zZS9hcnRpZmFjdG9yeS9wcm9qLWxkYy1yZXBvLXJwbS1sb2NhbC9jb21tb25fYmFzZV9vcy9zbGVzLwpBUkcgSkFWQV9WRVJTSU9OPTExCkFSRyBCVUlMRF9GT0xERVI9ZG9ja2VyLwpBUkcgRVhUUkFDVEVEX0pBUl9GT0xERVI9YnVpbGQvamFyCkFSRyBBUFBfRk9MREVSPS9hcHAKQVJHIFVTRVJfSUQ9MTkzMzAxClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgZWNobyAiJHtVU0VSX0lEfTp4OiR7VVNFUl9JRH06JHtVU0VSX0lEfTpBbiBJZGVudGl0eSBmb3IgZXJpYy1vc3Mtc3RyZWFtLWV4cG9ydGVyOi9ub25leGlzdGVudDovYmluL2ZhbHNlIiA+PiAvZXRjL3Bhc3N3ZApSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIGVjaG8gIiR7VVNFUl9JRH06ITo6MDo6Ojo6IiA+PiAvZXRjL3NoYWRvdwpSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIHp5cHBlciBhZGRyZXBvIC0tZ3BnY2hlY2stc3RyaWN0IC1mIGh0dHBzOi8vJHtCQVNFX09TX1JFUE99JHtCQVNFX09TX1ZFUlNJT059IENPTU1PTl9CQVNFX09TX1NMRVNfUkVQTyAgICAgJiYgenlwcGVyIC0tZ3BnLWF1dG8taW1wb3J0LWtleXMgcmVmcmVzaCAgICAgJiYgenlwcGVyIHVwZGF0ZSAteSAgICAgJiYgenlwcGVyIGluc3RhbGwgLWwgLXkgZmlsZSBmaWxlLW1hZ2ljIGphdmEtJHtKQVZBX1ZFUlNJT059LW9wZW5qZGstaGVhZGxlc3MgICAgICYmIHp5cHBlciBjbGVhbiAtLWFsbApXT1JLRElSIC9hcHAKQUREIGRpcjoxOWFkMDk4MzNhMGQ4NjU0MjMyMTIwOTEzYTM0MzEyYThhNWFmMDQxMmI3OTJhNTk0M2E3NjY1M2M1ZWJmNzViIGluIC9hcHAvbGliIApBREQgZGlyOmIzZTU0ZmNjZjNiY2EwNzdkMjA3Y2Q5YjMyYzU3ZTlmYzliMzVlNTZkODQ1NTQzMTQwNjBmZjRhY2QyMjk0ZDUgaW4gL2FwcC9NRVRBLUlORiAKQUREIG11bHRpOjZjOGI3OWJmOGU2N2Q4MTMyNmJhZTgwN2NhOTA1YmY1NTNkM2MyNGY4OGYzMGZlYTYxZWNiZTk3OTFkMmQ2MzAgaW4gL2FwcC8gClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgY2hvd24gLVIgJHtVU0VSX0lEfTowICR7QVBQX0ZPTERFUn0gJiYgY2htb2QgLVIgZz11ICR7QVBQX0ZPTERFUn0KVVNFUiAxOTMzMDEKRU5UUllQT0lOVCBbIi9iaW4vYmFzaCIgIi1lIiAiLi9lbnRyeXBvaW50LnNoIl0KTEFCRUwgY29tLmVyaWNzc29uLnByb2R1Y3QtbnVtYmVyPUNYVSAxMDEgMDEyOApMQUJFTCBjb20uZXJpY3Nzb24ucHJvZHVjdC1yZXZpc2lvbj1SMUIKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQ9MjAyMS0wNS0xMFQxMzoyMjoxNVoKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uPTA0MmQ3MTkKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnRpdGxlPU9TUyBTdHJlYW0tRXhwb3J0ZXItU2VydmljZQpMQUJFTCBvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVuZG9yPUVyaWNzc29uCkxBQkVMIG9yZy5vcGVuY29udGFpbmVycy5pbWFnZS52ZXJzaW9uPTEuMC4xLTE3NS1la3NiaWFnMTYyMDY1MjcxMwo=",
+                        "fulldigest": "localhost:5000/eric-oss-stream-exporter@sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                        "fulltag": "localhost:5000/eric-oss-stream-exporter:1.0.1-175-eksbiag1620652713",
+                        "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                        "imageId": "a2dc1efbd3f2c7d03fe49592e7bd2580a113b1cbb2a410267e771225147b7eef",
+                        "last_updated": "2021-05-10T13:42:59Z",
+                        "registry": "localhost:5000",
+                        "repo": "eric-oss-stream-exporter",
+                        "tag": "1.0.1-175-eksbiag1620652713",
+                        "tag_detected_at": "2021-05-10T13:41:13Z",
+                        "userId": "admin"
+                    }
+                ],
+                "image_status": "active",
+                "image_type": "docker",
+                "last_updated": "2021-05-10T13:42:59Z",
+                "parentDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                "userId": "admin"
+            }
+        ]
+    ],
+    "additionalItems": true,
+    "items": {
+        "$id": "#/items",
+        "anyOf": [
+            {
+                "$id": "#/items/anyOf/0",
+                "type": "object",
+                "title": "The first anyOf schema",
+                "description": "An explanation about the purpose of this instance.",
+                "default": {},
+                "examples": [
+                    {
+                        "analysis_status": "analyzed",
+                        "analyzed_at": "2021-05-10T13:42:59Z",
+                        "annotations": {},
+                        "created_at": "2021-05-10T13:41:13Z",
+                        "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                        "image_content": {
+                            "metadata": {
+                                "arch": "amd64",
+                                "distro": "sles",
+                                "distro_version": "15.2",
+                                "dockerfile_mode": "Guessed",
+                                "image_size": 363704320,
+                                "layer_count": 9
+                            }
+                        },
+                        "image_detail": [
+                            {
+                                "created_at": "2021-05-10T13:41:13Z",
+                                "digest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                "dockerfile": "RlJPTSBzY3JhdGNoClJVTiB1bW9jaSByZXBhY2sKUlVOIHVtb2NpIGNvbmZpZwpBUkcgQkFTRV9PU19WRVJTSU9OCkFSRyBCQVNFX09TX1JFUE89YXJtLnJuZC5raS5zdy5lcmljc3Nvbi5zZS9hcnRpZmFjdG9yeS9wcm9qLWxkYy1yZXBvLXJwbS1sb2NhbC9jb21tb25fYmFzZV9vcy9zbGVzLwpBUkcgSkFWQV9WRVJTSU9OPTExCkFSRyBCVUlMRF9GT0xERVI9ZG9ja2VyLwpBUkcgRVhUUkFDVEVEX0pBUl9GT0xERVI9YnVpbGQvamFyCkFSRyBBUFBfRk9MREVSPS9hcHAKQVJHIFVTRVJfSUQ9MTkzMzAxClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgZWNobyAiJHtVU0VSX0lEfTp4OiR7VVNFUl9JRH06JHtVU0VSX0lEfTpBbiBJZGVudGl0eSBmb3IgZXJpYy1vc3Mtc3RyZWFtLWV4cG9ydGVyOi9ub25leGlzdGVudDovYmluL2ZhbHNlIiA+PiAvZXRjL3Bhc3N3ZApSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIGVjaG8gIiR7VVNFUl9JRH06ITo6MDo6Ojo6IiA+PiAvZXRjL3NoYWRvdwpSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIHp5cHBlciBhZGRyZXBvIC0tZ3BnY2hlY2stc3RyaWN0IC1mIGh0dHBzOi8vJHtCQVNFX09TX1JFUE99JHtCQVNFX09TX1ZFUlNJT059IENPTU1PTl9CQVNFX09TX1NMRVNfUkVQTyAgICAgJiYgenlwcGVyIC0tZ3BnLWF1dG8taW1wb3J0LWtleXMgcmVmcmVzaCAgICAgJiYgenlwcGVyIHVwZGF0ZSAteSAgICAgJiYgenlwcGVyIGluc3RhbGwgLWwgLXkgZmlsZSBmaWxlLW1hZ2ljIGphdmEtJHtKQVZBX1ZFUlNJT059LW9wZW5qZGstaGVhZGxlc3MgICAgICYmIHp5cHBlciBjbGVhbiAtLWFsbApXT1JLRElSIC9hcHAKQUREIGRpcjoxOWFkMDk4MzNhMGQ4NjU0MjMyMTIwOTEzYTM0MzEyYThhNWFmMDQxMmI3OTJhNTk0M2E3NjY1M2M1ZWJmNzViIGluIC9hcHAvbGliIApBREQgZGlyOmIzZTU0ZmNjZjNiY2EwNzdkMjA3Y2Q5YjMyYzU3ZTlmYzliMzVlNTZkODQ1NTQzMTQwNjBmZjRhY2QyMjk0ZDUgaW4gL2FwcC9NRVRBLUlORiAKQUREIG11bHRpOjZjOGI3OWJmOGU2N2Q4MTMyNmJhZTgwN2NhOTA1YmY1NTNkM2MyNGY4OGYzMGZlYTYxZWNiZTk3OTFkMmQ2MzAgaW4gL2FwcC8gClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgY2hvd24gLVIgJHtVU0VSX0lEfTowICR7QVBQX0ZPTERFUn0gJiYgY2htb2QgLVIgZz11ICR7QVBQX0ZPTERFUn0KVVNFUiAxOTMzMDEKRU5UUllQT0lOVCBbIi9iaW4vYmFzaCIgIi1lIiAiLi9lbnRyeXBvaW50LnNoIl0KTEFCRUwgY29tLmVyaWNzc29uLnByb2R1Y3QtbnVtYmVyPUNYVSAxMDEgMDEyOApMQUJFTCBjb20uZXJpY3Nzb24ucHJvZHVjdC1yZXZpc2lvbj1SMUIKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQ9MjAyMS0wNS0xMFQxMzoyMjoxNVoKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uPTA0MmQ3MTkKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnRpdGxlPU9TUyBTdHJlYW0tRXhwb3J0ZXItU2VydmljZQpMQUJFTCBvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVuZG9yPUVyaWNzc29uCkxBQkVMIG9yZy5vcGVuY29udGFpbmVycy5pbWFnZS52ZXJzaW9uPTEuMC4xLTE3NS1la3NiaWFnMTYyMDY1MjcxMwo=",
+                                "fulldigest": "localhost:5000/eric-oss-stream-exporter@sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                "fulltag": "localhost:5000/eric-oss-stream-exporter:1.0.1-175-eksbiag1620652713",
+                                "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                "imageId": "a2dc1efbd3f2c7d03fe49592e7bd2580a113b1cbb2a410267e771225147b7eef",
+                                "last_updated": "2021-05-10T13:42:59Z",
+                                "registry": "localhost:5000",
+                                "repo": "eric-oss-stream-exporter",
+                                "tag": "1.0.1-175-eksbiag1620652713",
+                                "tag_detected_at": "2021-05-10T13:41:13Z",
+                                "userId": "admin"
+                            }
+                        ],
+                        "image_status": "active",
+                        "image_type": "docker",
+                        "last_updated": "2021-05-10T13:42:59Z",
+                        "parentDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                        "userId": "admin"
+                    }
+                ],
+                "required": [
+                    "analysis_status",
+                    "analyzed_at",
+                    "annotations",
+                    "created_at",
+                    "imageDigest",
+                    "image_content",
+                    "image_detail",
+                    "image_status",
+                    "image_type",
+                    "last_updated",
+                    "parentDigest",
+                    "userId"
+                ],
+                "properties": {
+                    "analysis_status": {
+                        "$id": "#/items/anyOf/0/properties/analysis_status",
+                        "type": "string",
+                        "title": "The analysis_status schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "analyzed"
+                        ]
+                    },
+                    "analyzed_at": {
+                        "$id": "#/items/anyOf/0/properties/analyzed_at",
+                        "type": "string",
+                        "title": "The analyzed_at schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "2021-05-10T13:42:59Z"
+                        ]
+                    },
+                    "annotations": {
+                        "$id": "#/items/anyOf/0/properties/annotations",
+                        "type": "object",
+                        "title": "The annotations schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {}
+                        ],
+                        "required": [],
+                        "additionalProperties": true
+                    },
+                    "created_at": {
+                        "$id": "#/items/anyOf/0/properties/created_at",
+                        "type": "string",
+                        "title": "The created_at schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "2021-05-10T13:41:13Z"
+                        ]
+                    },
+                    "imageDigest": {
+                        "$id": "#/items/anyOf/0/properties/imageDigest",
+                        "type": "string",
+                        "title": "The imageDigest schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+                        ]
+                    },
+                    "image_content": {
+                        "$id": "#/items/anyOf/0/properties/image_content",
+                        "type": "object",
+                        "title": "The image_content schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "metadata": {
+                                    "arch": "amd64",
+                                    "distro": "sles",
+                                    "distro_version": "15.2",
+                                    "dockerfile_mode": "Guessed",
+                                    "image_size": 363704320,
+                                    "layer_count": 9
+                                }
+                            }
+                        ],
+                        "required": [
+                            "metadata"
+                        ],
+                        "properties": {
+                            "metadata": {
+                                "$id": "#/items/anyOf/0/properties/image_content/properties/metadata",
+                                "type": "object",
+                                "title": "The metadata schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": {},
+                                "examples": [
+                                    {
+                                        "arch": "amd64",
+                                        "distro": "sles",
+                                        "distro_version": "15.2",
+                                        "dockerfile_mode": "Guessed",
+                                        "image_size": 363704320,
+                                        "layer_count": 9
+                                    }
+                                ],
+                                "required": [
+                                    "arch",
+                                    "distro",
+                                    "distro_version",
+                                    "dockerfile_mode",
+                                    "image_size",
+                                    "layer_count"
+                                ],
+                                "properties": {
+                                    "arch": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/arch",
+                                        "type": ["string","null"],
+                                        "title": "The arch schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": "",
+                                        "examples": [
+                                            "amd64"
+                                        ]
+                                    },
+                                    "distro": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/distro",
+                                        "type": ["string","null"],
+                                        "title": "The distro schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": "",
+                                        "examples": [
+                                            "sles"
+                                        ]
+                                    },
+                                    "distro_version": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/distro_version",
+                                        "type": ["string","null"],
+                                        "title": "The distro_version schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": "",
+                                        "examples": [
+                                            "15.2"
+                                        ]
+                                    },
+                                    "dockerfile_mode": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/dockerfile_mode",
+                                        "type": ["string","null"],
+                                        "title": "The dockerfile_mode schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": "",
+                                        "examples": [
+                                            "Guessed"
+                                        ]
+                                    },
+                                    "image_size": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/image_size",
+                                        "type": ["integer","null"],
+                                        "title": "The image_size schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": 0,
+                                        "examples": [
+                                            363704320
+                                        ]
+                                    },
+                                    "layer_count": {
+                                        "$id": "#/items/anyOf/0/properties/image_content/properties/metadata/properties/layer_count",
+                                        "type": ["integer","null"],
+                                        "title": "The layer_count schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": 0,
+                                        "examples": [
+                                            9
+                                        ]
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        },
+                        "additionalProperties": true
+                    },
+                    "image_detail": {
+                        "$id": "#/items/anyOf/0/properties/image_detail",
+                        "type": "array",
+                        "title": "The image_detail schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": [],
+                        "examples": [
+                            [
+                                {
+                                    "created_at": "2021-05-10T13:41:13Z",
+                                    "digest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                    "dockerfile": "RlJPTSBzY3JhdGNoClJVTiB1bW9jaSByZXBhY2sKUlVOIHVtb2NpIGNvbmZpZwpBUkcgQkFTRV9PU19WRVJTSU9OCkFSRyBCQVNFX09TX1JFUE89YXJtLnJuZC5raS5zdy5lcmljc3Nvbi5zZS9hcnRpZmFjdG9yeS9wcm9qLWxkYy1yZXBvLXJwbS1sb2NhbC9jb21tb25fYmFzZV9vcy9zbGVzLwpBUkcgSkFWQV9WRVJTSU9OPTExCkFSRyBCVUlMRF9GT0xERVI9ZG9ja2VyLwpBUkcgRVhUUkFDVEVEX0pBUl9GT0xERVI9YnVpbGQvamFyCkFSRyBBUFBfRk9MREVSPS9hcHAKQVJHIFVTRVJfSUQ9MTkzMzAxClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgZWNobyAiJHtVU0VSX0lEfTp4OiR7VVNFUl9JRH06JHtVU0VSX0lEfTpBbiBJZGVudGl0eSBmb3IgZXJpYy1vc3Mtc3RyZWFtLWV4cG9ydGVyOi9ub25leGlzdGVudDovYmluL2ZhbHNlIiA+PiAvZXRjL3Bhc3N3ZApSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIGVjaG8gIiR7VVNFUl9JRH06ITo6MDo6Ojo6IiA+PiAvZXRjL3NoYWRvdwpSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIHp5cHBlciBhZGRyZXBvIC0tZ3BnY2hlY2stc3RyaWN0IC1mIGh0dHBzOi8vJHtCQVNFX09TX1JFUE99JHtCQVNFX09TX1ZFUlNJT059IENPTU1PTl9CQVNFX09TX1NMRVNfUkVQTyAgICAgJiYgenlwcGVyIC0tZ3BnLWF1dG8taW1wb3J0LWtleXMgcmVmcmVzaCAgICAgJiYgenlwcGVyIHVwZGF0ZSAteSAgICAgJiYgenlwcGVyIGluc3RhbGwgLWwgLXkgZmlsZSBmaWxlLW1hZ2ljIGphdmEtJHtKQVZBX1ZFUlNJT059LW9wZW5qZGstaGVhZGxlc3MgICAgICYmIHp5cHBlciBjbGVhbiAtLWFsbApXT1JLRElSIC9hcHAKQUREIGRpcjoxOWFkMDk4MzNhMGQ4NjU0MjMyMTIwOTEzYTM0MzEyYThhNWFmMDQxMmI3OTJhNTk0M2E3NjY1M2M1ZWJmNzViIGluIC9hcHAvbGliIApBREQgZGlyOmIzZTU0ZmNjZjNiY2EwNzdkMjA3Y2Q5YjMyYzU3ZTlmYzliMzVlNTZkODQ1NTQzMTQwNjBmZjRhY2QyMjk0ZDUgaW4gL2FwcC9NRVRBLUlORiAKQUREIG11bHRpOjZjOGI3OWJmOGU2N2Q4MTMyNmJhZTgwN2NhOTA1YmY1NTNkM2MyNGY4OGYzMGZlYTYxZWNiZTk3OTFkMmQ2MzAgaW4gL2FwcC8gClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgY2hvd24gLVIgJHtVU0VSX0lEfTowICR7QVBQX0ZPTERFUn0gJiYgY2htb2QgLVIgZz11ICR7QVBQX0ZPTERFUn0KVVNFUiAxOTMzMDEKRU5UUllQT0lOVCBbIi9iaW4vYmFzaCIgIi1lIiAiLi9lbnRyeXBvaW50LnNoIl0KTEFCRUwgY29tLmVyaWNzc29uLnByb2R1Y3QtbnVtYmVyPUNYVSAxMDEgMDEyOApMQUJFTCBjb20uZXJpY3Nzb24ucHJvZHVjdC1yZXZpc2lvbj1SMUIKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQ9MjAyMS0wNS0xMFQxMzoyMjoxNVoKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uPTA0MmQ3MTkKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnRpdGxlPU9TUyBTdHJlYW0tRXhwb3J0ZXItU2VydmljZQpMQUJFTCBvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVuZG9yPUVyaWNzc29uCkxBQkVMIG9yZy5vcGVuY29udGFpbmVycy5pbWFnZS52ZXJzaW9uPTEuMC4xLTE3NS1la3NiaWFnMTYyMDY1MjcxMwo=",
+                                    "fulldigest": "localhost:5000/eric-oss-stream-exporter@sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                    "fulltag": "localhost:5000/eric-oss-stream-exporter:1.0.1-175-eksbiag1620652713",
+                                    "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                    "imageId": "a2dc1efbd3f2c7d03fe49592e7bd2580a113b1cbb2a410267e771225147b7eef",
+                                    "last_updated": "2021-05-10T13:42:59Z",
+                                    "registry": "localhost:5000",
+                                    "repo": "eric-oss-stream-exporter",
+                                    "tag": "1.0.1-175-eksbiag1620652713",
+                                    "tag_detected_at": "2021-05-10T13:41:13Z",
+                                    "userId": "admin"
+                                }
+                            ]
+                        ],
+                        "additionalItems": true,
+                        "items": {
+                            "$id": "#/items/anyOf/0/properties/image_detail/items",
+                            "anyOf": [
+                                {
+                                    "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0",
+                                    "type": "object",
+                                    "title": "The first anyOf schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": {},
+                                    "examples": [
+                                        {
+                                            "created_at": "2021-05-10T13:41:13Z",
+                                            "digest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                            "dockerfile": "RlJPTSBzY3JhdGNoClJVTiB1bW9jaSByZXBhY2sKUlVOIHVtb2NpIGNvbmZpZwpBUkcgQkFTRV9PU19WRVJTSU9OCkFSRyBCQVNFX09TX1JFUE89YXJtLnJuZC5raS5zdy5lcmljc3Nvbi5zZS9hcnRpZmFjdG9yeS9wcm9qLWxkYy1yZXBvLXJwbS1sb2NhbC9jb21tb25fYmFzZV9vcy9zbGVzLwpBUkcgSkFWQV9WRVJTSU9OPTExCkFSRyBCVUlMRF9GT0xERVI9ZG9ja2VyLwpBUkcgRVhUUkFDVEVEX0pBUl9GT0xERVI9YnVpbGQvamFyCkFSRyBBUFBfRk9MREVSPS9hcHAKQVJHIFVTRVJfSUQ9MTkzMzAxClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgZWNobyAiJHtVU0VSX0lEfTp4OiR7VVNFUl9JRH06JHtVU0VSX0lEfTpBbiBJZGVudGl0eSBmb3IgZXJpYy1vc3Mtc3RyZWFtLWV4cG9ydGVyOi9ub25leGlzdGVudDovYmluL2ZhbHNlIiA+PiAvZXRjL3Bhc3N3ZApSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIGVjaG8gIiR7VVNFUl9JRH06ITo6MDo6Ojo6IiA+PiAvZXRjL3NoYWRvdwpSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIHp5cHBlciBhZGRyZXBvIC0tZ3BnY2hlY2stc3RyaWN0IC1mIGh0dHBzOi8vJHtCQVNFX09TX1JFUE99JHtCQVNFX09TX1ZFUlNJT059IENPTU1PTl9CQVNFX09TX1NMRVNfUkVQTyAgICAgJiYgenlwcGVyIC0tZ3BnLWF1dG8taW1wb3J0LWtleXMgcmVmcmVzaCAgICAgJiYgenlwcGVyIHVwZGF0ZSAteSAgICAgJiYgenlwcGVyIGluc3RhbGwgLWwgLXkgZmlsZSBmaWxlLW1hZ2ljIGphdmEtJHtKQVZBX1ZFUlNJT059LW9wZW5qZGstaGVhZGxlc3MgICAgICYmIHp5cHBlciBjbGVhbiAtLWFsbApXT1JLRElSIC9hcHAKQUREIGRpcjoxOWFkMDk4MzNhMGQ4NjU0MjMyMTIwOTEzYTM0MzEyYThhNWFmMDQxMmI3OTJhNTk0M2E3NjY1M2M1ZWJmNzViIGluIC9hcHAvbGliIApBREQgZGlyOmIzZTU0ZmNjZjNiY2EwNzdkMjA3Y2Q5YjMyYzU3ZTlmYzliMzVlNTZkODQ1NTQzMTQwNjBmZjRhY2QyMjk0ZDUgaW4gL2FwcC9NRVRBLUlORiAKQUREIG11bHRpOjZjOGI3OWJmOGU2N2Q4MTMyNmJhZTgwN2NhOTA1YmY1NTNkM2MyNGY4OGYzMGZlYTYxZWNiZTk3OTFkMmQ2MzAgaW4gL2FwcC8gClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgY2hvd24gLVIgJHtVU0VSX0lEfTowICR7QVBQX0ZPTERFUn0gJiYgY2htb2QgLVIgZz11ICR7QVBQX0ZPTERFUn0KVVNFUiAxOTMzMDEKRU5UUllQT0lOVCBbIi9iaW4vYmFzaCIgIi1lIiAiLi9lbnRyeXBvaW50LnNoIl0KTEFCRUwgY29tLmVyaWNzc29uLnByb2R1Y3QtbnVtYmVyPUNYVSAxMDEgMDEyOApMQUJFTCBjb20uZXJpY3Nzb24ucHJvZHVjdC1yZXZpc2lvbj1SMUIKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQ9MjAyMS0wNS0xMFQxMzoyMjoxNVoKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uPTA0MmQ3MTkKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnRpdGxlPU9TUyBTdHJlYW0tRXhwb3J0ZXItU2VydmljZQpMQUJFTCBvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVuZG9yPUVyaWNzc29uCkxBQkVMIG9yZy5vcGVuY29udGFpbmVycy5pbWFnZS52ZXJzaW9uPTEuMC4xLTE3NS1la3NiaWFnMTYyMDY1MjcxMwo=",
+                                            "fulldigest": "localhost:5000/eric-oss-stream-exporter@sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                            "fulltag": "localhost:5000/eric-oss-stream-exporter:1.0.1-175-eksbiag1620652713",
+                                            "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+                                            "imageId": "a2dc1efbd3f2c7d03fe49592e7bd2580a113b1cbb2a410267e771225147b7eef",
+                                            "last_updated": "2021-05-10T13:42:59Z",
+                                            "registry": "localhost:5000",
+                                            "repo": "eric-oss-stream-exporter",
+                                            "tag": "1.0.1-175-eksbiag1620652713",
+                                            "tag_detected_at": "2021-05-10T13:41:13Z",
+                                            "userId": "admin"
+                                        }
+                                    ],
+                                    "required": [
+                                        "created_at",
+                                        "digest",
+                                        "dockerfile",
+                                        "fulldigest",
+                                        "fulltag",
+                                        "imageDigest",
+                                        "imageId",
+                                        "last_updated",
+                                        "registry",
+                                        "repo",
+                                        "tag",
+                                        "tag_detected_at",
+                                        "userId"
+                                    ],
+                                    "properties": {
+                                        "created_at": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/created_at",
+                                            "type": "string",
+                                            "title": "The created_at schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2021-05-10T13:41:13Z"
+                                            ]
+                                        },
+                                        "digest": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/digest",
+                                            "type": "string",
+                                            "title": "The digest schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+                                            ]
+                                        },
+                                        "dockerfile": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/dockerfile",
+                                            "type": ["string","null"],
+                                            "title": "The dockerfile schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "RlJPTSBzY3JhdGNoClJVTiB1bW9jaSByZXBhY2sKUlVOIHVtb2NpIGNvbmZpZwpBUkcgQkFTRV9PU19WRVJTSU9OCkFSRyBCQVNFX09TX1JFUE89YXJtLnJuZC5raS5zdy5lcmljc3Nvbi5zZS9hcnRpZmFjdG9yeS9wcm9qLWxkYy1yZXBvLXJwbS1sb2NhbC9jb21tb25fYmFzZV9vcy9zbGVzLwpBUkcgSkFWQV9WRVJTSU9OPTExCkFSRyBCVUlMRF9GT0xERVI9ZG9ja2VyLwpBUkcgRVhUUkFDVEVEX0pBUl9GT0xERVI9YnVpbGQvamFyCkFSRyBBUFBfRk9MREVSPS9hcHAKQVJHIFVTRVJfSUQ9MTkzMzAxClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgZWNobyAiJHtVU0VSX0lEfTp4OiR7VVNFUl9JRH06JHtVU0VSX0lEfTpBbiBJZGVudGl0eSBmb3IgZXJpYy1vc3Mtc3RyZWFtLWV4cG9ydGVyOi9ub25leGlzdGVudDovYmluL2ZhbHNlIiA+PiAvZXRjL3Bhc3N3ZApSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIGVjaG8gIiR7VVNFUl9JRH06ITo6MDo6Ojo6IiA+PiAvZXRjL3NoYWRvdwpSVU4gfDcgQVBQX0ZPTERFUj0vYXBwIEJBU0VfT1NfUkVQTz1hcm0ucm5kLmtpLnN3LmVyaWNzc29uLnNlL2FydGlmYWN0b3J5L3Byb2otbGRjLXJlcG8tcnBtLWxvY2FsL2NvbW1vbl9iYXNlX29zL3NsZXMvIEJBU0VfT1NfVkVSU0lPTj0zLjIwLjAtMjUgQlVJTERfRk9MREVSPWRvY2tlci8gRVhUUkFDVEVEX0pBUl9GT0xERVI9c3RyZWFtLWV4cG9ydGVyLWNvbnRyb2wtcGxhbmUvYnVpbGQvamFyIEpBVkFfVkVSU0lPTj0xMSBVU0VSX0lEPTE5MzMwMSAvYmluL3NoIC1jIHp5cHBlciBhZGRyZXBvIC0tZ3BnY2hlY2stc3RyaWN0IC1mIGh0dHBzOi8vJHtCQVNFX09TX1JFUE99JHtCQVNFX09TX1ZFUlNJT059IENPTU1PTl9CQVNFX09TX1NMRVNfUkVQTyAgICAgJiYgenlwcGVyIC0tZ3BnLWF1dG8taW1wb3J0LWtleXMgcmVmcmVzaCAgICAgJiYgenlwcGVyIHVwZGF0ZSAteSAgICAgJiYgenlwcGVyIGluc3RhbGwgLWwgLXkgZmlsZSBmaWxlLW1hZ2ljIGphdmEtJHtKQVZBX1ZFUlNJT059LW9wZW5qZGstaGVhZGxlc3MgICAgICYmIHp5cHBlciBjbGVhbiAtLWFsbApXT1JLRElSIC9hcHAKQUREIGRpcjoxOWFkMDk4MzNhMGQ4NjU0MjMyMTIwOTEzYTM0MzEyYThhNWFmMDQxMmI3OTJhNTk0M2E3NjY1M2M1ZWJmNzViIGluIC9hcHAvbGliIApBREQgZGlyOmIzZTU0ZmNjZjNiY2EwNzdkMjA3Y2Q5YjMyYzU3ZTlmYzliMzVlNTZkODQ1NTQzMTQwNjBmZjRhY2QyMjk0ZDUgaW4gL2FwcC9NRVRBLUlORiAKQUREIG11bHRpOjZjOGI3OWJmOGU2N2Q4MTMyNmJhZTgwN2NhOTA1YmY1NTNkM2MyNGY4OGYzMGZlYTYxZWNiZTk3OTFkMmQ2MzAgaW4gL2FwcC8gClJVTiB8NyBBUFBfRk9MREVSPS9hcHAgQkFTRV9PU19SRVBPPWFybS5ybmQua2kuc3cuZXJpY3Nzb24uc2UvYXJ0aWZhY3RvcnkvcHJvai1sZGMtcmVwby1ycG0tbG9jYWwvY29tbW9uX2Jhc2Vfb3Mvc2xlcy8gQkFTRV9PU19WRVJTSU9OPTMuMjAuMC0yNSBCVUlMRF9GT0xERVI9ZG9ja2VyLyBFWFRSQUNURURfSkFSX0ZPTERFUj1zdHJlYW0tZXhwb3J0ZXItY29udHJvbC1wbGFuZS9idWlsZC9qYXIgSkFWQV9WRVJTSU9OPTExIFVTRVJfSUQ9MTkzMzAxIC9iaW4vc2ggLWMgY2hvd24gLVIgJHtVU0VSX0lEfTowICR7QVBQX0ZPTERFUn0gJiYgY2htb2QgLVIgZz11ICR7QVBQX0ZPTERFUn0KVVNFUiAxOTMzMDEKRU5UUllQT0lOVCBbIi9iaW4vYmFzaCIgIi1lIiAiLi9lbnRyeXBvaW50LnNoIl0KTEFCRUwgY29tLmVyaWNzc29uLnByb2R1Y3QtbnVtYmVyPUNYVSAxMDEgMDEyOApMQUJFTCBjb20uZXJpY3Nzb24ucHJvZHVjdC1yZXZpc2lvbj1SMUIKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQ9MjAyMS0wNS0xMFQxMzoyMjoxNVoKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uPTA0MmQ3MTkKTEFCRUwgb3JnLm9wZW5jb250YWluZXJzLmltYWdlLnRpdGxlPU9TUyBTdHJlYW0tRXhwb3J0ZXItU2VydmljZQpMQUJFTCBvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVuZG9yPUVyaWNzc29uCkxBQkVMIG9yZy5vcGVuY29udGFpbmVycy5pbWFnZS52ZXJzaW9uPTEuMC4xLTE3NS1la3NiaWFnMTYyMDY1MjcxMwo="
+                                            ]
+                                        },
+                                        "fulldigest": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/fulldigest",
+                                            "type": "string",
+                                            "title": "The fulldigest schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "localhost:5000/eric-oss-stream-exporter@sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+                                            ]
+                                        },
+                                        "fulltag": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/fulltag",
+                                            "type": "string",
+                                            "title": "The fulltag schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "localhost:5000/eric-oss-stream-exporter:1.0.1-175-eksbiag1620652713"
+                                            ]
+                                        },
+                                        "imageDigest": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/imageDigest",
+                                            "type": "string",
+                                            "title": "The imageDigest schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+                                            ]
+                                        },
+                                        "imageId": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/imageId",
+                                            "type": "string",
+                                            "title": "The imageId schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "a2dc1efbd3f2c7d03fe49592e7bd2580a113b1cbb2a410267e771225147b7eef"
+                                            ]
+                                        },
+                                        "last_updated": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/last_updated",
+                                            "type": "string",
+                                            "title": "The last_updated schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2021-05-10T13:42:59Z"
+                                            ]
+                                        },
+                                        "registry": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/registry",
+                                            "type": "string",
+                                            "title": "The registry schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "localhost:5000"
+                                            ]
+                                        },
+                                        "repo": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/repo",
+                                            "type": "string",
+                                            "title": "The repo schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "eric-oss-stream-exporter"
+                                            ]
+                                        },
+                                        "tag": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/tag",
+                                            "type": "string",
+                                            "title": "The tag schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "1.0.1-175-eksbiag1620652713"
+                                            ]
+                                        },
+                                        "tag_detected_at": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/tag_detected_at",
+                                            "type": "string",
+                                            "title": "The tag_detected_at schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "2021-05-10T13:41:13Z"
+                                            ]
+                                        },
+                                        "userId": {
+                                            "$id": "#/items/anyOf/0/properties/image_detail/items/anyOf/0/properties/userId",
+                                            "type": "string",
+                                            "title": "The userId schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "admin"
+                                            ]
+                                        }
+                                    },
+                                    "additionalProperties": true
+                                }
+                            ]
+                        }
+                    },
+                    "image_status": {
+                        "$id": "#/items/anyOf/0/properties/image_status",
+                        "type": "string",
+                        "title": "The image_status schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "active"
+                        ]
+                    },
+                    "image_type": {
+                        "$id": "#/items/anyOf/0/properties/image_type",
+                        "type": "string",
+                        "title": "The image_type schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "docker"
+                        ]
+                    },
+                    "last_updated": {
+                        "$id": "#/items/anyOf/0/properties/last_updated",
+                        "type": "string",
+                        "title": "The last_updated schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "2021-05-10T13:42:59Z"
+                        ]
+                    },
+                    "parentDigest": {
+                        "$id": "#/items/anyOf/0/properties/parentDigest",
+                        "type": "string",
+                        "title": "The parentDigest schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+                        ]
+                    },
+                    "userId": {
+                        "$id": "#/items/anyOf/0/properties/userId",
+                        "type": "string",
+                        "title": "The userId schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "admin"
+                        ]
+                    }
+                },
+                "additionalProperties": true
+            }
+        ]
+    }
+}

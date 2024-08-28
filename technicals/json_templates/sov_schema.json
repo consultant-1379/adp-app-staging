@@ -1,0 +1,245 @@
+{
+    "$schema": "SOV schema",
+    "$id": "sov_schema.json",
+    "type": "object",
+    "title": "The SOV schema",
+    "description": "The SOV schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "microserviceName": "Name of the microservice",
+            "version": "number",
+            "sovInfo": [
+                {
+                    "functionalPurpose": "Functional Purpose",
+                    "requirementNumber": "Requirement Number",
+                    "requirementText": "Requirement Text",
+                    "verificationValue": "Verification Value",
+                    "testCases": [
+                        {
+                            "testCaseId": "test case ID",
+                            "testLog": "link to the test execution logs"
+                        }
+                    ],
+                    "deviation": "Deviation",
+                    "notes": "Notes"
+                }
+            ]
+        }
+    ],
+    "required": [
+        "microserviceName",
+        "version",
+        "sovInfo"
+    ],
+    "properties": {
+        "microserviceName": {
+            "$id": "#/properties/microserviceName",
+            "type": "string",
+            "title": "The microserviceName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Name of the microservice"
+            ]
+        },
+        "version": {
+            "$id": "#/properties/version",
+            "type": "string",
+            "title": "The version schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "number"
+            ]
+        },
+        "sovInfo": {
+            "$id": "#/properties/sovInfo",
+            "type": "array",
+            "title": "The sovInfo schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "functionalPurpose": "Functional Purpose",
+                        "requirementNumber": "Requirement Number",
+                        "requirementText": "Requirement Text",
+                        "verificationValue": "Verification Value",
+                        "testCases": [
+                            {
+                                "testCaseId": "test case ID",
+                                "testLog": "link to the test execution logs"
+                            }
+                        ],
+                        "deviation": "Deviation",
+                        "notes": "Notes"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/sovInfo/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/sovInfo/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "functionalPurpose": "Functional Purpose",
+                                "requirementNumber": "Requirement Number",
+                                "requirementText": "Requirement Text",
+                                "verificationValue": "Verification Value",
+                                "testCases": [
+                                    {
+                                        "testCaseId": "test case ID",
+                                        "testLog": "link to the test execution logs"
+                                    }
+                                ],
+                                "deviation": "Deviation",
+                                "notes": "Notes"
+                            }
+                        ],
+                        "required": [
+                            "functionalPurpose",
+                            "requirementNumber",
+                            "requirementText",
+                            "verificationValue",
+                            "testCases",
+                            "deviation",
+                            "notes"
+                        ],
+                        "properties": {
+                            "functionalPurpose": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/functionalPurpose",
+                                "type": "string",
+                                "title": "The functionalPurpose schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Functional Purpose"
+                                ]
+                            },
+                            "requirementNumber": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/requirementNumber",
+                                "type": "string",
+                                "title": "The requirementNumber schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Requirement Number"
+                                ]
+                            },
+                            "requirementText": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/requirementText",
+                                "type": "string",
+                                "title": "The requirementText schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Requirement Text"
+                                ]
+                            },
+                            "verificationValue": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/verificationValue",
+                                "type": "string",
+                                "title": "The verificationValue schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Verification Value"
+                                ]
+                            },
+                            "testCases": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/testCases",
+                                "type": "array",
+                                "title": "The testCases schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": [],
+                                "examples": [
+                                    [
+                                        {
+                                            "testCaseId": "test case ID",
+                                            "testLog": "link to the test execution logs"
+                                        }
+                                    ]
+                                ],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/sovInfo/items/anyOf/0/properties/testCases/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/sovInfo/items/anyOf/0/properties/testCases/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "The first anyOf schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "testCaseId": "test case ID",
+                                                    "testLog": "link to the test execution logs"
+                                                }
+                                            ],
+                                            "required": [
+                                                "testCaseId",
+                                                "testLog"
+                                            ],
+                                            "properties": {
+                                                "testCaseId": {
+                                                    "$id": "#/properties/sovInfo/items/anyOf/0/properties/testCases/items/anyOf/0/properties/testCaseId",
+                                                    "type": "string",
+                                                    "title": "The testCaseId schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "test case ID"
+                                                    ]
+                                                },
+                                                "testLog": {
+                                                    "$id": "#/properties/sovInfo/items/anyOf/0/properties/testCases/items/anyOf/0/properties/testLog",
+                                                    "type": "string",
+                                                    "title": "The testLog schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "link to the test execution logs"
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "deviation": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/deviation",
+                                "type": "string",
+                                "title": "The deviation schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Deviation"
+                                ]
+                            },
+                            "notes": {
+                                "$id": "#/properties/sovInfo/items/anyOf/0/properties/notes",
+                                "type": "string",
+                                "title": "The notes schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Notes"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

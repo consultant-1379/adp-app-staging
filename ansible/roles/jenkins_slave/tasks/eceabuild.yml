@@ -1,0 +1,143 @@
+---
+- include_vars: 'vars/ssh_keys.yml'
+
+- name: create eceabuild group
+  ansible.builtin.group:
+    name: eceabuild
+    state: present
+    gid: 1000
+
+- name: create eceabuild user
+  user:
+    name: eceabuild
+    uid: 1000
+    group: eceabuild
+    shell: /bin/bash
+    password: "{{eceabuild_hashed_password}}"
+
+- name: "add eceabuild to group users"
+  user:
+    name: eceabuild
+    append: yes
+    groups: users
+
+- name: allow 'eceabuild' user to have passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^eceabuild'
+    line: 'eceabuild ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- file:
+    path: /home/eceabuild/.ssh
+    owner: eceabuild
+    group: eceabuild
+    mode: 0755
+    state: directory
+
+- name: install ssh key
+  copy:
+    content: "{{ ssh_priv_key }}"
+    dest: /home/eceabuild/.ssh/id_rsa
+    owner: eceabuild
+    group: eceabuild
+    mode: u=r,g=,o=
+
+- name: install ssh pub key
+  copy:
+    src: "{{ role_path }}/files/id_rsa.pub"
+    dest: /home/eceabuild/.ssh/id_rsa.pub
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=r,o=r
+
+- name: install ssh key for eceagit
+  copy:
+    content: "{{ ssh_eceagit_priv_key }}"
+    dest: /home/eceabuild/.ssh/id_rsa_eceagit
+    owner: eceabuild
+    group: eceabuild
+    mode: u=r,g=,o=
+
+- name: install ssh pub key for eceagit
+  copy:
+    src: "{{ role_path }}/files/id_rsa_eceagit.pub"
+    dest: /home/eceabuild/.ssh/id_rsa_eceagit.pub
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=r,o=r
+
+- name: remove depracated keys
+  file:
+    path: /home/eceabuild/.ssh/{{ item }}
+    state: absent
+  with_items:
+    - id_rsa_tezone.pub
+    - id_rsa_tezone
+
+- name: install ssh config file
+  copy:
+    src: "{{ role_path }}/files/ssh_config"
+    dest: /home/eceabuild/.ssh/config
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=r,o=r
+  tags: ssh_config
+
+- name: set gerrit.ericsson.se ssh key
+  known_hosts:
+    path: /home/eceabuild/.ssh/known_hosts
+    name: '[gerrit.ericsson.se]:29418'
+    key: "{{ pub_key_gerrit }}"
+  become: yes
+  become_user: eceabuild
+
+- name: set gerritmirror-ha.lmera.ericsson.se ssh key
+  known_hosts:
+    path: /home/eceabuild/.ssh/known_hosts
+    name: '[gerritmirror-ha.lmera.ericsson.se]:29418'
+    key: "{{ pub_key_gerritmirrorha }}"
+  become: yes
+  become_user: eceabuild
+
+- name: set gerritmirror.lmera.ericsson.se ssh key
+  known_hosts:
+    path: /home/eceabuild/.ssh/known_hosts
+    name: '[gerritmirror.lmera.ericsson.se]:29418'
+    key: "{{ pub_key_gerritmirror }}"
+  become: yes
+  become_user: eceabuild
+
+- name: upload .netrc
+  template:
+    src: "{{ role_path }}/templates/.netrc.j2"
+    dest: /home/eceabuild/.netrc
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=,o=
+
+- name: create gitconfig
+  template:
+    src: "{{ role_path }}/templates/.gitconfig.j2"
+    dest: /home/eceabuild/.gitconfig
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=rw,o=r
+
+- name: create git credentials
+  template:
+    src: "{{ role_path }}/templates/.git-credentials.j2"
+    dest: /home/eceabuild/.git-credentials
+    owner: eceabuild
+    group: eceabuild
+    mode: u=rw,g=,o=
+
+- name: Add LESS_TERMCAP_so to eceabuild user bashrc
+  blockinfile:
+    dest: ~/.bashrc
+    block: |-
+      export LESS_TERMCAP_so=$'\E[30;43m'
+  become: yes
+  become_user: eceabuild
+  tags: LESS_TERMCAP_so

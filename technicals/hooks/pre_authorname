@@ -1,0 +1,64 @@
+#!/bin/bash
+
+readonly TIMEOUT=60
+readonly RCFILE="$HOME/.ecd-ldap.rc"
+
+command -v ldapsearch > /dev/null || exit 0
+[ -f "$RCFILE" ] || exit 0
+source "$RCFILE" || exit 0
+
+echo "Verifying author information"
+if ! AUTHOR_EMAIL=$(git show -s --format=format:%ae)
+then
+    echo "ERROR: Could not determine author e-mail address" >&2
+    exit 127
+fi
+
+if ! AUTHOR_NAME=$(git show -s --format=format:%an)
+then
+    echo "ERROR: Could not determine author name" >&2
+    exit 127
+fi
+
+if ! ECD_NAME=$(ldapsearch -H "$LDAP_URI" -LLL -l "$TIMEOUT" \
+    -D "$LDAP_BIND_DN" \
+    -w "$LDAP_PASSWORD" \
+    -b "$LDAP_BASE_DN" \
+    "(mail=${AUTHOR_EMAIL})" displayName | grep ^displayName)
+then
+    echo "WARNING: ${AUTHOR_EMAIL} could not be found in ECD" >&2
+    exit 0
+fi
+
+if [[ $ECD_NAME =~ ^displayName::\ +(.*) ]]
+then
+    ECD_NAME=$(base64 -d <<< "${BASH_REMATCH[1]}")
+elif [[ $ECD_NAME =~ ^displayName:\ +(.*) ]]
+then
+    ECD_NAME="${BASH_REMATCH[1]}"
+else
+    echo "WARNING: Display name not found for ${AUTHOR_EMAIL}" >&2
+    exit 0
+fi
+
+if [ "$ECD_NAME" != "$AUTHOR_NAME" ]
+then
+    cat << EOF
+
+Incorrect author name is provided in the commit.
+
+  Author e-mail address: $AUTHOR_EMAIL
+  Full name in ECD:      $ECD_NAME
+  Provided full name:    $AUTHOR_NAME
+
+Please correct your local git setup by issuing this command:
+
+  git config --global user.name "$ECD_NAME"
+
+After the correct setup, you can correct this commit:
+
+  git commit --amend --reset-author
+
+EOF
+    exit 1
+fi

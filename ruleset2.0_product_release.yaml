@@ -1,0 +1,168 @@
+modelVersion: 2.0
+
+docker-images:
+  - adp-release-auto: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-adp-release-auto:7.126.0
+  - adp-helm-chart-auto: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/adp-int-helm-chart-auto:0.27.4-2
+  - cihelm: serodocker.sero.gic.ericsson.se/proj-pc-tools-released/cihelm:0.6.2
+
+properties:
+  - repositories-yaml-path: .bob/repositories.yaml
+  - helm-chart-released-folder: ".bob/released-charts"
+  - helm-chart-released-repo: ${env.HELM_CHART_REPO_SERVER}/${env.HELM_CHART_REPO_PATH_RELEASED}/
+
+env:
+  - API_TOKEN_ADP (default=notset)
+  - API_TOKEN_EEA (default=notset)
+  - USER_ARM (default=notset)
+  - CHART_NAME
+  - CHART_REPO
+  - CHART_VERSION
+  - GERRIT_USERNAME
+  - GERRIT_PASSWORD
+  - GERRIT_HOST
+  - HELM_USER
+  - HELM_TOKEN
+  - VERSION_TYPE (default='MINOR')
+  - GIT_TAG_STRING
+  - HELM_VERSION (default=3.13.0)
+  - HELM_CHART_REPO_SERVER (default=https://arm.seli.gic.ericsson.se/artifactory)
+  - HELM_CHART_REPO_PATH_RELEASED (default=proj-eea-released-helm-local)
+  - NEW_BFU_GATE (default='')
+  - GERRIT_HOST (default=gerrit.ericsson.se)
+  - PUBLISH_DRY_RUN (default=false)
+  - GIT_REPO_URL (default=https://${env.GERRIT_HOST}/EEA/cnint.git)
+  - WORKSPACE
+
+var:
+  # The created + version
+  - released-version
+  # Full name of the plus version helm chart
+  - helmchart-file-name
+  # Full name with path of the plus version helm chart
+  - released-helmchart-file
+
+rules:
+  clean:
+    - task: rm
+      cmd:
+        - rm -rf .bob/
+        - mkdir .bob
+        - rm -f artifact.properties
+        - rm -f *.tgz
+
+  prepare-common:
+    - task: prepare-repositories-yaml
+      cmd:
+       - cp repositories.yaml.template ${repositories-yaml-path}
+       - sed -i "s/USERNAME/${env.USER_ARM}/" ${repositories-yaml-path}
+       - sed -i "s/API_TOKEN_ADP/${env.API_TOKEN_ADP}/" ${repositories-yaml-path}
+       - sed -i "s/API_TOKEN_EEA/${env.API_TOKEN_EEA}/" ${repositories-yaml-path}
+
+  init-released-version:
+    - task: generate-released-version
+      cmd: echo ${env.CHART_VERSION} | sed s/-/+/ > .bob/var.released-version
+    - task: generate-helmchart-file-name
+      cmd: echo ${env.CHART_NAME}-${var.released-version}.tgz > .bob/var.helmchart-file-name
+    - task: generate-released-helmchart-file
+      cmd: echo ${helm-chart-released-repo}${env.CHART_NAME}/${var.helmchart-file-name} > .bob/var.released-helmchart-file
+    - task: echo-released-helmchart-file
+      cmd: echo "released-helmchart-file - ${var.released-helmchart-file}"
+
+  publish-released-helm-chart:
+    - rule: prepare-common
+    - rule: init-released-version
+    - rule: generate-release-chart-with-cihelm
+    - task: release-helm-package
+      docker-image: adp-release-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+      cmd:
+        - upload_helm_package
+          --chart-filename ${helm-chart-released-folder}/${var.helmchart-file-name}
+          --chart-repo ${helm-chart-released-repo}
+          --helm-user ${env.HELM_USER}
+          --helm-token ${env.HELM_TOKEN}
+          --virtual-repo ${helm-chart-released-repo}
+          --dry-run ${env.PUBLISH_DRY_RUN}
+          --skip-existing-version
+    - task: get-next-version
+      docker-image: adp-helm-chart-auto
+      cmd:
+        - next-version --current-version ${var.released-version} --version-type ${env.VERSION_TYPE}
+          --release --output-file .bob/var.next-version
+
+  create-pra-git-tag:
+    - task: git-tag
+      docker-image: adp-release-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+        - "--env GERRIT_USERNAME"
+        - "--env GERRIT_PASSWORD"
+      cmd: version-handler create-git-tag
+        --tag ${env.GIT_TAG_STRING}
+        --message "${env.GIT_TAG_STRING}"
+        --git-repo-url "${env.GIT_REPO_URL}"
+        --commitid ${env.CHART_VERSION}
+        --dry-run ${env.PUBLISH_DRY_RUN}
+    - task: latest-release-tag
+      docker-image: adp-release-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+        - "--env GERRIT_USERNAME"
+        - "--env GERRIT_PASSWORD"
+      cmd: version-handler create-git-tag
+        --tag "latest_release"
+        --message "${env.GIT_TAG_STRING}"
+        --git-repo-url "${env.GIT_REPO_URL}"
+        --commitid ${env.CHART_VERSION}
+        --dry-run ${env.PUBLISH_DRY_RUN}
+
+  create-bfu-gate-git-tag:
+    - task: git-tag
+      docker-image: adp-release-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+        - "--env GERRIT_USERNAME"
+        - "--env GERRIT_PASSWORD"
+      cmd: version-handler create-git-tag
+        --tag 'latest_BFU_gate'
+        --message "${env.GIT_TAG_STRING}"
+        --git-repo-url "${env.GIT_REPO_URL}"
+        --commitid ${env.NEW_BFU_GATE}
+        --dry-run ${env.PUBLISH_DRY_RUN}
+
+  create-git-tag-rc:
+    - task: git-tag
+      docker-image: adp-release-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+        - "--env GERRIT_USERNAME"
+        - "--env GERRIT_PASSWORD"
+      cmd: version-handler create-git-tag
+        --tag "${env.GIT_TAG_STRING}"
+        --message "${env.GIT_TAG_STRING}"
+        --git-repo-url "${env.GIT_REPO_URL}"
+        --commitid ${env.CHART_VERSION}
+        --dry-run ${env.PUBLISH_DRY_RUN}
+
+  generate-release-chart-with-cihelm:
+    - task: download-and-extract-helm-chart
+      cmd:
+      - 'mkdir -p ${helm-chart-released-folder}'
+      - 'curl -H "X-JFrog-Art-Api: $API_TOKEN_EEA" ${env.CHART_REPO}/${env.CHART_NAME}/${env.CHART_NAME}-${env.CHART_VERSION}.tgz --fail -o ${helm-chart-released-folder}/${env.CHART_NAME}-${env.CHART_VERSION}.tgz'
+      - 'cd ${helm-chart-released-folder}; tar xf ${env.CHART_NAME}-${env.CHART_VERSION}.tgz'
+      - 'cd ${helm-chart-released-folder}; rm -rf ${env.CHART_NAME}/charts/*; rm -rf ${env.CHART_NAME}-${env.CHART_VERSION}.tgz'
+    - task: update-release-version
+      cmd:
+        - yq write ${helm-chart-released-folder}/${env.CHART_NAME}/Chart.yaml version ${var.released-version} -i
+    - task: package-int-helm-chart
+      docker-image: cihelm
+      docker-flags:
+        - "--volume ${env.WORKSPACE}:${env.WORKSPACE}"
+      cmd:
+        --helm-credentials ${repositories-yaml-path}
+        --retry-timeout 300
+        package ${helm-chart-released-folder}/${env.CHART_NAME}
+    - task: move-ihc-package-to-release-folder
+      cmd:
+        - mv ${var.helmchart-file-name} ${helm-chart-released-folder}

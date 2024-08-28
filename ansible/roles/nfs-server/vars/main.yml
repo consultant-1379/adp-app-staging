@@ -1,0 +1,16 @@
+---
+## please refer to ../README.md
+#
+# data_device: /dev/sdb
+# data_vg: nfs
+# data_volumes:
+#   - name: misc
+#     size: 100g
+#     fs: ext4
+#     mountpoint: /data/nfs/misc
+#     nfs:
+#       export: yes
+#       clients:
+#         - host: '*'
+#           options:
+#             - rw

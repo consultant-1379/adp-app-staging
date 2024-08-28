@@ -1,0 +1,147 @@
+{
+    "$schema": "EEA test report schema",
+    "$id": "test_report_schema.json",
+    "type": "object",
+    "title": "The test report schema",
+    "description": "The test report schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "microserviceName": "Name of the microservice",
+            "version": "version number of the microservice ",
+            "timestamp": "test execution date and time in human readable format, example: 2020-04-30T15:00:08+02:00",
+            "artifactsKey": [
+                {
+                    "testLevel": "unit|component|integration|contract|upgrade",
+                    "contentType": "logs|results",
+                    "artifactLink": "URL to the artifact"
+                },
+                {
+                    "testLevel": "unit|component|integration|contract|upgrade",
+                    "contentType": "logs|results",
+                    "artifactLink": "URL to the artifact"
+                }
+            ]
+        }
+    ],
+    "required": [
+        "microserviceName",
+        "version",
+        "timestamp",
+        "artifactsKey"
+    ],
+    "properties": {
+        "microserviceName": {
+            "$id": "#/properties/microserviceName",
+            "type": "string",
+            "title": "The microserviceName schema",
+            "description": "The name of the microservice",
+            "default": "",
+            "examples": [
+                "eric-eea-dummy-microservice"
+            ]
+        },
+        "version": {
+            "$id": "#/properties/version",
+            "type": "string",
+            "title": "The version schema",
+            "description": "The version of the microservice.",
+            "default": "",
+            "examples": [
+                "1.0.0-123 "
+            ]
+        },
+        "timestamp": {
+            "$id": "#/properties/timestamp",
+            "type": "string",
+            "title": "The timestamp schema",
+            "description": "test execution date and time in human readable format.",
+            "default": "",
+            "examples": [
+                "2020-04-30T15:00:08+02:00"
+            ]
+        },
+        "artifacts": {
+            "$id": "#/properties/artifacts",
+            "type": "array",
+            "title": "The artifactsKey schema",
+            "description": "The content of the test report.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "testLevel": "unit|component|integration|contract|upgrade",
+                        "contentType": "logs|results",
+                        "artifactLink": "URL to the artifact"
+                    },
+                    {
+                        "testLevel": "unit|component|integration|contract|upgrade",
+                        "contentType": "logs|results",
+                        "artifactLink": "URL to the artifact"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/artifacts/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/artifacts/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "",
+                        "default": {},
+                        "examples": [
+                            {
+                                "testLevel": "unit|component|integration|contract|upgrade",
+                                "contentType": "logs|results",
+                                "artifactLink": "URL to the artifact"
+                            }
+                        ],
+                        "required": [
+                            "testLevel",
+                            "contentType",
+                            "artifactLink"
+                        ],
+                        "properties": {
+                            "testLevel": {
+                                "$id": "#/properties/artifacts/items/anyOf/0/properties/testLevel",
+                                "type": "string",
+                                "enum": ["unit", "component", "integration", "contract","upgrade"],
+                                "title": "The testLevel schema",
+                                "description": "The test level where the tests ran.",
+                                "default": "",
+                                "examples": [
+                                    "component"
+                                ]
+                            },
+                            "contentType": {
+                                "$id": "#/properties/artifacts/items/anyOf/0/properties/contentType",
+                                "type": "string",
+                                "enum": ["logs", "results"],
+                                "title": "The contentType schema",
+                                "description": "Type of the content: test logs or results ",
+                                "default": "",
+                                "examples": [
+                                    "results"
+                                ]
+                            },
+                            "artifactLink": {
+                                "$id": "#/properties/artifacts/items/anyOf/0/properties/artifactLink",
+                                "type": "string",
+                                "title": "The artifactLink schema",
+                                "description": "URL to the artifact.",
+                                "default": "",
+                                "examples": [
+                                    "https://arm.seli.gic.ericsson.se/artifactory/proj-eea-reports-generic-local/eric-eea-dummy-microservice/eric-eea-dummy-microservice_1.0.0-123_component_test_results.tgz"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

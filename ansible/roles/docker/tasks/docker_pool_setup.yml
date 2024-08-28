@@ -1,0 +1,48 @@
+---
+
+- parted:
+    label: gpt
+    device: /dev/sdb
+    number: 1
+    state: present
+    flags: [ lvm ]
+    part_start: 0%
+    part_end: 100%
+
+- name: Docker - Create docker LVM PV and VG
+  lvg: vg=VolDocker pvs=/dev/sdb1
+  tags:
+    - docker
+
+- name: Docker - Create docker-pool logical volume
+  lvol:
+    vg: VolDocker
+    lv: docker-pool
+    size: 95%VG
+    opts: --wipesignatures y
+
+- name: Docker - Create thinpoolmeta logical volume
+  lvol:
+    vg: VolDocker
+    lv: thinpoolmeta
+    size: 1%VG
+    opts: --wipesignatures y
+
+- name: Get docker-pool segtype
+  command: lvs -o segtype VolDocker/docker-pool --noheadings
+  register: get_docker_pool_segtype
+
+- name: Save docker_pool_segtype value
+  set_fact:
+    docker_pool_segtype: "{{ get_docker_pool_segtype.stdout | trim }}"
+
+- name: Debug docker-pool_segtype
+  debug:
+    var: docker_pool_segtype
+
+- name: convert the pool to a thin pool
+  command: >-
+    lvconvert -y --zero n -c 512K
+    --thinpool VolDocker/docker-pool
+    --poolmetadata VolDocker/thinpoolmeta
+  when: "docker_pool_segtype == 'linear'"

@@ -1,0 +1,42 @@
+modelVersion: 2.0
+
+docker-images:
+  - k8-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:2.3.1-8
+
+env:
+  - KUBECONFIG
+  - POD_NAME
+  - NAMESPACE (default=eric-eea-ns)
+  - KUBECTL_VERSION (default=1.28.4)
+
+rules:
+  describe-pod-json:
+    - task: describe
+      docker-image: k8-test
+      docker-flags:
+        - "--env POD_NAME=${env.POD_NAME}"
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pod ${env.POD_NAME} --namespace ${env.NAMESPACE} -o json
+
+  get-pods:
+    - task: get
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pods --namespace ${env.NAMESPACE}
+
+  list-all-failed-pods:
+    - task: list
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get pods -A | grep -v Completed | awk '{ if (substr($3,1,1) != substr($3,3,3)) { print } }'

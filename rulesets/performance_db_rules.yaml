@@ -1,0 +1,21 @@
+modelVersion: 2.0
+
+docker-images:
+  - k8-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:2.3.1-8
+
+env:
+  - KUBECONFIG
+  - NAMESPACE (default=monitoring)
+  - SERVICE_NAME (default=eric-victoria-metrics-cluster-vmselect-lb)
+  - KUBECTL_VERSION (default=1.28.4)
+
+rules:
+  get-load-balancer-service:
+    - task: get-service-yaml
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--env KUBECTL_VERSION=${env.KUBECTL_VERSION}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+      cmd:
+        - kubectl get service ${env.SERVICE_NAME} -n ${env.NAMESPACE} -o yaml > .bob/loadbalancer.yaml

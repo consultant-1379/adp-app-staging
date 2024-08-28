@@ -1,0 +1,14 @@
+# Install the required RPM packages on the Ansible controller node
+# This playbook sohuld be once on every controller node as a very 1st step
+- name: "Install required RPM packages on Ansible Controller node"
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  tasks:
+    - zypper:
+        name: jq
+        update_cache: yes
+      become: yes
+    - include_role:
+        name: assign_admin_role_to_iam_users
+        tasks_from: install_chrome.yml

@@ -1,0 +1,47 @@
+---
+- name: configure package repository
+  template:
+    src: repo.j2
+    dest: /etc/zypp/repos.d/SLE15SP1_module_basesystem.repo
+
+- name: ensure MTA is installed
+  package:
+    name: postfix
+
+- name: ensure MTA is running
+  service:
+    name: postfix
+    state: started
+    enabled: yes
+
+- name: configure site smarthost
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: '^relayhost\ =\ $'
+    after: 'mynetworks_style = subnet'
+    replace: "relayhost = {{ site_smarthost }}"
+  notify: restart MTA
+
+- name: configure Netdata alerting
+  template:
+    src: health_alarm_notify.conf.j2
+    dest: "{{ netdata_prefix | default('') }}/etc/netdata/health_alarm_notify.conf"
+    backup: yes
+  notify: restart netdata agent
+
+- name: deactivate outbound packet drop ratio monitoring for tunnel interface
+  replace:
+    path: "{{ netdata_prefix | default('') }}/usr/lib/netdata/conf.d/health.d/net.conf"
+    regexp: 'families: \*$'
+    replace: 'families: !tunl0 *'
+    before: 'template: outbound_packets_dropped_ratio'
+    after: FIFO errors
+    backup: yes
+  notify: restart netdata agent
+
+- name: deactivate alerts for cgroups
+  replace:
+    path: "{{ netdata_prefix | default('') }}/usr/lib/netdata/conf.d/health.d/cgroups.conf"
+    regexp: 'to: sysadmin'
+    replace: 'to: silent'
+  notify: restart netdata agent

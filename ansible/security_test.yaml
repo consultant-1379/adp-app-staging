@@ -1,0 +1,9 @@
+---
+- name: jenkins_slave.yml
+  hosts: buildnode
+  vars:
+    jenkins_home: /data/jenkins/seliius27190
+  roles:
+    - docker
+    - jenkins_slave
+    - security_test

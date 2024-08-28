@@ -1,0 +1,85 @@
+---
+#
+# Create a new composite role for call analyzer,
+# the Spotfire users will get this role assigned
+#
+
+# collect those roles, that will be added as composites for the new Call Analyzer role
+- name: "IAM: collect existing roles parameters for later usage"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/roles/{{ item }}"
+    headers:
+      Authorization: "Bearer {{ iam_admin_token }}"
+    method: GET
+    status_code: [200]
+  loop:
+    - dashboard_user
+    - openapi_user
+    - all-in-one-gas  # not mandatory to add, but requested by dev.team
+  register: iam_roles_get_response
+  until: "iam_roles_get_response is not failed"
+  retries: 5
+  delay: 10
+
+# delete CA role and we will re-create it again
+- name: "IAM: delete {{ iam.role }} role if it exists"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/roles/{{ iam.role }}"
+    headers:
+      Authorization: "Bearer {{ iam_admin_token }}"
+    method: DELETE
+    status_code: [204, 404]  # 404 means that role does not exist
+  register: iam_roles_del_response
+  until: "iam_roles_del_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: "IAM: create composite role {{ iam.role }}"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/roles"
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ iam_admin_token }}"
+    body_format: json
+    body:
+      name: '{{ iam.role }}'
+      description: '{{ iam.role }}_by_Jjob'
+      composite: false
+      clientRole: false
+    method: POST
+    status_code: [201]
+  register: iam_roles_create_response
+  until: "iam_roles_create_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: "IAM: add composites to {{ iam.role }}"
+  uri:
+    return_content: yes
+    validate_certs: no
+    url: "https://{{ iam_proxy_fqdn }}/auth/admin/realms/local-ldap3/roles/{{ iam.role }}/composites"
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ iam_admin_token }}"
+    body_format: json
+    body:
+      - id: '{{ item.json.id }}'
+        name: '{{ item.json.name }}'
+        composite: '{{ item.json.composite }}'
+        clientRole: '{{ item.json.clientRole }}'
+        containerId: '{{ item.json.containerId }}'
+    method: POST
+    status_code: [204]
+  loop: '{{ iam_roles_get_response.results }}'
+  loop_control:
+    pause: 4
+  register: iam_realm_role_add_composites_response
+  until: "iam_realm_role_add_composites_response is not failed"
+  retries: 5
+  delay: 10

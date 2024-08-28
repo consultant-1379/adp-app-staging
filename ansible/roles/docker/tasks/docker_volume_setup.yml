@@ -1,0 +1,101 @@
+---
+- name: Set docker volume device info
+  set_fact:
+    # TODO: get device name dinamically
+    docker_volume_device_name: "sdc"
+    docker_volume_device_name_full: "/dev/sdc"
+    docker_volume_mount_path: "/var/lib/docker/volumes"
+
+- name: Print docker volume info
+  debug: msg="docker_volume_device_name={{ docker_volume_device_name }},
+    docker_volume_device_name_full={{ docker_volume_device_name_full }},
+    docker_volume_mount_path={{ docker_volume_mount_path }}"
+
+- name: Fail task when the {{ docker_volume_device_name }} device not exists
+  fail:
+    msg: "{{ docker_volume_device_name }} device does not exists!"
+  when: ansible_devices[docker_volume_device_name] is not defined
+
+# TODO: this is not working yet
+#- name: Fail task when the {{ docker_volume_device_name }} mount already exists
+#  fail:
+#    msg: "{{ docker_volume_device_name }} has been mounted already, please cleanup first!"
+#  when: ansible_mounts | selectattr('device', 'in', docker_volume_device_name_full) | list
+#
+
+- name: Output disk information - {{ docker_volume_device_name_full }}
+  debug:
+    var: ansible_devices["{{ docker_volume_device_name }}"]
+  when: ansible_devices[docker_volume_device_name] is defined
+
+- name: Output mount information - {{ docker_volume_device_name_full }}
+  debug: msg="{{ item.mount }}"
+  with_items:
+    - "{{ ansible_mounts }}"
+  when: item.device is search(docker_volume_device_name_full)
+
+# TODO: move it cleanup.yml???
+#- name: Unmount and remove from fstab - {{ docker_volume_device_name_full }}
+#  mount:
+#    path: "{{ item.mount }}"
+#    state: absent
+#  with_items:
+#    - "{{ ansible_mounts }}"
+#  when: item.device is search(docker_volume_device_name_full)
+#
+#- name: Unmount - {{ docker_volume_device_name_full }}
+#  mount:
+#    path: "{{ item.mount }}"
+#    state: unmounted
+#  with_items:
+#    - "{{ ansible_mounts }}"
+#  when: item.device is search(docker_volume_device_name_full)
+#
+#- name: Register device info - {{ docker_volume_device_name_full }}
+#  parted: device={{ docker_volume_device_name_full }} unit=MiB
+#  register: device_info
+#
+#- name: Delete partition - {{ docker_volume_device_name_full }}
+#  parted:
+#    device: "{{ docker_volume_device_name_full }}"
+#    number: "{{ item.num }}"
+#    state: absent
+#  with_items:
+#   - "{{ device_info.partitions }}"
+#  when: device_info.partitions[0] is defined
+
+- name: Create partition - {{ docker_volume_device_name_full }}
+  parted:
+    label: gpt
+    device: "{{ docker_volume_device_name_full }}"
+    number: 1
+    state: present
+    part_start: 0%
+    part_end: 100%
+
+- name: Register device info - {{ docker_volume_device_name_full }}
+  parted: device={{ docker_volume_device_name_full }} unit=MiB
+  register: device_info
+
+- name: Check device partitions - {{ docker_volume_device_name_full }}
+  pause:
+    seconds: 5
+  when: device_info.partitions[0] is not defined
+
+- name: Format device for btrfs - {{ docker_volume_device_name_full }}
+  filesystem:
+    force: yes
+    fstype: btrfs
+    dev: "{{ docker_volume_device_name_full }}1"
+
+- name: Get device UUID - {{ docker_volume_device_name_full }}
+  command: blkid "{{ docker_volume_device_name_full }}1" -s UUID -o value
+  register: device_UUID
+
+- name: Mount btrfs - {{ docker_volume_mount_path }} on {{ docker_volume_device_name_full }}
+  mount:
+    path: "{{ docker_volume_mount_path }}"
+    src: 'UUID="{{ device_UUID.stdout_lines[0] }}"'
+    fstype: btrfs
+    opts: "defaults"
+    state: mounted

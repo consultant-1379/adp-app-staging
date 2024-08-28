@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# When there is no match, grep will return exit code 1. That's why it's negated with ! operator
+! git log -1 --pretty=%B | grep -Pzo "Revert.*\n\nThis reverts commit"

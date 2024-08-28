@@ -1,0 +1,29 @@
+---
+- name: Set default and optional client scopes for adp-iam-aa-client
+  community.general.keycloak_clientscope_type:
+    auth_client_id: admin-cli
+    auth_keycloak_url: 'https://{{ iam_proxy_fqdn }}/auth'
+    realm: local-ldap3
+    token: '{{ iam_admin_token }}'
+    validate_certs: no
+    client_id: 'adp-iam-aa-client'
+    default_clientscopes: ['roles']
+    optional_clientscopes: ['profile-adp-auth']
+  register: adp_aa_scopes_set_response
+  until: "adp_aa_scopes_set_response is not failed"
+  retries: 5
+  delay: 10
+
+- name: Enable full-scope for adp-iam-aa-client client
+  community.general.keycloak_client:
+    auth_client_id: admin-cli
+    auth_keycloak_url: 'https://{{ iam_proxy_fqdn }}/auth'
+    realm: local-ldap3
+    token: '{{ iam_admin_token }}'
+    validate_certs: no
+    client_id: 'adp-iam-aa-client'
+    full_scope_allowed: yes
+  register: adp_aa_fullscope_set_response
+  until: "adp_aa_fullscope_set_response is not failed"
+  retries: 5
+  delay: 10

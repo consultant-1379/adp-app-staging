@@ -1,0 +1,32 @@
+---
+
+- name: "download and unpack maven"
+  unarchive:
+    src: "https://eealgcart:{{ arm_seli_gic_api_key }}@arm.seli.gic.ericsson.se/artifactory/apache-remote-cache/org/apache/maven/apache-maven/{{ maven_version }}/apache-maven-{{ maven_version }}-bin.tar.gz"
+    dest: /opt/
+    remote_src: yes
+
+- name: "extend PATH definition with maven"
+  template:
+    src: "{{ role_path }}/templates/maven_path.sh.j2"
+    dest: /etc/profile.d/maven_path.sh
+    owner: root
+    group: root
+    mode: u=rw,g=rw,o=rx
+
+- name: "Add maven into the /etc/environment file"
+  lineinfile:
+    path: /etc/environment
+    line: "M2_HOME=/opt/apache-maven-{{ maven_version }}"
+    state: present
+
+- name: correct maven version selected
+  alternatives:
+    name: maven
+    link: /usr/bin/mvn
+    path: /opt/apache-maven-{{ maven_version }}/bin/mvn
+
+- name: "download and unpack Bash completion to mvn so that you can complete complex Maven commands by hitting Tab multiple times."
+  get_url:
+    url: "https://eealgcart:{{ arm_seli_gic_api_key }}@arm.seli.gic.ericsson.se/artifactory/proj-cea-external-local/ci/3pp/maven-bash-completion/bash_completion.bash"
+    dest: /etc/bash_completion.d/mvn

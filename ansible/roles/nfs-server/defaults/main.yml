@@ -1,0 +1,8 @@
+---
+packages:
+  - nfs-utils
+
+services:
+  - nfs-idmapd
+  - nfs-mountd
+  - nfs-server

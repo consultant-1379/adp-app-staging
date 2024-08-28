@@ -1,0 +1,31 @@
+---
+- name: Find all container image files
+  find:
+    paths: "{{ asset_work_dir }}/images/"
+    file_type: file
+    recurse: no
+    patterns: '*.tar.gz'
+  register: find_images_result
+
+- name: Save all file names to variable
+  set_fact:
+    images_files_all: "{{ find_images_result | json_query('files[*].path') }}"
+
+- debug:
+    var: images_files_all
+
+- name: "Load images to docker (installed on Ansible Controller node)"
+  community.docker.docker_image_load:
+    path: '{{ item }}'
+  loop: '{{ images_files_all }}'
+#  register: load_result
+#- name: Print the loaded image names
+#  ansible.builtin.debug:
+#    msg: "Loaded the following images: {{ load_result }}"
+
+- name: "Re-tag the images and push to container registry"
+  command: "bash -x -e {{ asset_work_dir }}/helper/push_images.sh {{ container_registry_url }} {{ container_registry_port }}"
+  register: push_res
+  until: "push_res is not failed"
+  retries: 5
+  delay: 10

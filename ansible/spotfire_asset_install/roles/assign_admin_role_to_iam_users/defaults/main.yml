@@ -1,0 +1,4 @@
+---
+chrome_package_rpm: https://arm.seli.gic.ericsson.se/artifactory/proj-btap-external-generic-local/com/google/chrome/115.0.5790.170/google-chrome-stable-115.0.5790.170-1.x86_64.rpm
+chrome_driver: https://arm.seli.gic.ericsson.se/artifactory/proj-btap-external-generic-local/com/google/chrome/115.0.5790.170/chromedriver-linux64.zip
+chrome_driver_dir: /usr/bin/chrome_driver

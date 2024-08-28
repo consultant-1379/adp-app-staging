@@ -1,0 +1,8 @@
+{% include 'logstash.yml.j2' %}
+
+# SSL
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.username: logstash_system
+xpack.monitoring.elasticsearch.password: "{{ es_passwords.logstash_system }}"
+xpack.monitoring.elasticsearch.hosts: [ "https://{{ inventory_hostname }}:9200" ]
+xpack.monitoring.elasticsearch.ssl.certificate_authority: /etc/logstash/tls/certs/ca-bundle-ericsson-internal.crt

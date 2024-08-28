@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# The goal for this pre validation check is to prevent old codes with legacy Jenkins anonymous access getting back to the codebase.
+# You always have to call wget|curl commands with auth data for acessing Jenkins urls.
+
+fileFilter='*.Jenkinsfile|*.groovy' # can be extended e.g. '*.Jenkinsfile|*.groovy'
+
+echo "Running hook to check jenkins anonymous access in files: ${fileFilter}"
+COMMIT_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD --diff-filter=ACMRT | grep -E "${fileFilter}")
+for COMMIT_FILE in ${COMMIT_FILES}
+do
+    echo " - file ${COMMIT_FILE} ..."
+    if grep -h -n -E "curl|wget" "$COMMIT_FILE" | grep -i -E "jenkins|build|job" | grep -v -i -E "Art-Api|--user|-u |rev-parse|http.*:.*@.*:|jenkins-cli.jar"; then
+        echo "ERROR: The ${COMMIT_FILE} may contain code with Jenkins anonymous access, please check! Every wget/curl call to Jenkins must be authenticated!" >&2
+        exit 1
+    fi
+done
+exit 0

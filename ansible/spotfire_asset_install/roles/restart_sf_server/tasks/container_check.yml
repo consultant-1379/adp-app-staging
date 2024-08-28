@@ -1,0 +1,27 @@
+---
+- name: 'Wait until all pod and their containers are up'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: '{{ spotfire.namespace }}'
+  register: pod_list
+  until: pod_list | json_query(query) | flatten | unique == [ true ]
+  retries: 12
+  delay: 60
+  vars:
+    # The config jobs can stuck in ERROR state for several times before successful execution.
+    # This is ACCEPTABLE, and we exclude these jobs.
+    query: "resources[*].status.containerStatuses[?name != 'config-job'].ready"
+
+# https://stackoverflow.com/questions/67195319/how-can-i-track-the-time-pods-are-in-terminating-status
+- name: 'Wait until all the Terminating pods disappear'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: '{{ spotfire.namespace }}'
+  register: pod_list
+  until: pod_list | json_query(query) | length == 0
+  retries: 12
+  delay: 60
+  vars:
+    query: "resources[*].metadata.deletionTimestamp"

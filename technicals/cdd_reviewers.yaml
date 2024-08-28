@@ -1,0 +1,6 @@
+rules:
+- path: product/
+  gerritGroup: "cdd-product-reviewers"
+- path: sample_configuration/
+  gerritGroup: "cdd-sample-configuration-reviewers"
+defaultrule: "cdd-manual-commit-reviewers"

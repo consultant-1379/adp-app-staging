@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# The goal for this pre validation check is to prevent old codes with legacy usage of full gerrit url getting back to the codebase.
+# You can use the $GERRIT_HOST Jenkins Global property declared in Jenkins Configuration (https://seliius27190.seli.gic.ericsson.se:8443/configure).
+
+fileFilter='*.Jenkinsfile' # can be extended e.g. '*.Jenkinsfile|*.py'
+checks=('gerrit.ericsson.se') # create an array, # can be extended e.g. ('patter1' 'pattern2' 'patternx')
+
+echo "Running disallowed expression hook to check (" "${checks[@]}" ") in files: ${fileFilter}"
+COMMIT_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD --diff-filter=ACMRT | grep -E "${fileFilter}")
+for COMMIT_FILE in ${COMMIT_FILES}
+do
+    for EXPRESSION in "${checks[@]}"
+    do
+        echo " - file ${COMMIT_FILE}, expression: $EXPRESSION ..."
+        if grep -E "$EXPRESSION" "$COMMIT_FILE"; then
+            echo "ERROR: Disallowed expression \"${EXPRESSION}\" found in file: ${COMMIT_FILE}" >&2
+            exit 1
+        fi
+    done
+done
+exit 0

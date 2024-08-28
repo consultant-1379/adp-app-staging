@@ -1,0 +1,87 @@
+---
+# - name: "Create work dir {{ project_work_dir }}"
+  # file:
+    # path: "{{ project_work_dir }}"
+    # state: directory
+
+- name: "Copy yaml files to {{ project_work_dir }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ project_work_dir }}/"
+    backup: yes
+  with_fileglob:
+    - "{{ asset_chart_dir }}/*.yaml"
+
+- name: "Update registry and namespace in platform.yaml file"
+  replace:
+    path: '{{ platform_yaml_file }}'
+    regexp: '{{ item.regex }}'
+    replace: '{{ item.value }}'
+    backup: no
+  register: replace_result
+  loop:
+    - { regex: '<your-registry>', value: '{{ container_registry_url_with_port }}' }
+    - { regex: '\.eric-eea-ns',   value: '.{{ eea_namespace }}' }
+
+- name: "Validate that all the sed-ish replacement happened in platform.yaml"
+  assert:
+    that: "{{ item.changed }}"
+    quiet: yes
+    fail_msg: "{{ item.item.regex }} not found and not replaced!"
+  when: item.item.regex != '\.eric-eea-ns'  # since this is the original value, it might not be modified
+  loop: '{{ replace_result.results }}'
+
+- name: "Update string type values in platform.yaml"
+  block:
+    - name: "List the keys I want to modify"
+      yedit:
+        src: '{{ platform_yaml_file }}'
+        key: '{{ item.key }}'
+        state: list
+      loop: "{{ keys_to_modify }}"
+      register: list_existing_keys_result
+
+    - name: "Validate that all the keys to be modified exist"
+      assert:
+        that: "{{ item.result != None }}"
+        quiet: yes
+        fail_msg: "The Key {{ item.item.key }} does not exist!"
+      loop: '{{ list_existing_keys_result.results }}'
+
+    - name: "Update key -> values (string type) in platform.yaml"
+      yedit:
+        src: '{{ platform_yaml_file }}'
+        key: '{{ item.key }}'
+        value: '{{ item.value }}'
+        state: present
+      loop: "{{ keys_to_modify }}"
+  vars:
+    keys_to_modify:
+    - { key: 'spotfire-server.toolPassword', value: '{{ spotfire.toolpassword }}' }
+    - { key: 'spotfire-server.configuration.encryptionPassword', value: '{{ spotfire.encryption_password }}' }
+    - { key: 'spotfire-server.configuration.site.publicAddress', value: 'https://{{ spotfire.public_address }}' }
+    - { key: 'spotfire-server.database.bootstrap.username', value: '{{ spotfire.db_user }}' }
+    - { key: 'spotfire-server.database.bootstrap.databaseUrl', value: 'jdbc:postgresql://eric-ts-platform-data-document-database-pg/{{ spotfire.db_name }}' }
+    - { key: 'spotfire-server.database.create-db.spotfiredbDbname', value: '{{ spotfire.db_name }}' }
+
+# We use coreDNS to resolve FQDNs, so no need for hostAliases to set
+- name: "Set hostAliases to null in platform.yaml"
+  yedit:
+    src: '{{ platform_yaml_file }}'
+    key: '{{ item }}'
+    value: 'null'
+    state: present
+  loop:
+    - 'spotfire-server.hostAliases'
+    - 'eric-spotfire-fm-alarm.hostAliases'
+    - 'spotfire-offline-maplayer.hostAliases'
+
+- name: "Annotate ha-proxy LB service in platform.yaml"
+  yedit:
+    src: '{{ platform_yaml_file }}'
+    key: spotfire-server.haproxy.service
+    value:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/address-pool: '{{ oam_pool_name }}'
+    state: present

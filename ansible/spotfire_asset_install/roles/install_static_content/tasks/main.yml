@@ -1,0 +1,143 @@
+# Notes for special variables:
+# 1. arm_url_postfix:
+#    And you should specify here the arm link to static-content.tar.gz
+#    e.g. -e arm_url_postfix=proj-eea4-other-dev-local/com/ericsson/eea4/spotfire-static-content/1.1.11/spotfire-static-content-1.1.11.tar.gz
+# 2. seli_arm_api_token: this should be the valid token towards SELI-ARM
+
+---
+- block:
+    - name: 'Fetch file from url {{ arm_url_prefix }}{{ arm_url_postfix }}'
+      get_url:
+        url: '{{ arm_url_prefix }}{{ arm_url_postfix }}'
+        dest: '{{ download_destination_on_jenkins }}'
+        force_basic_auth: yes
+        timeout: 50
+        headers:
+          Authorization: 'Bearer {{ seli_arm_api_token }}'
+        owner: eceabuild
+        group: eceabuild
+      become: yes  # bug in get_url module! If not executing it as root, then rc will be 401
+  rescue:
+    - name: 'Remove {{ download_destination_on_jenkins }} as clean-up activity'
+      file:
+        path: '{{ download_destination_on_jenkins }}'
+        state: absent
+      become: yes
+
+- debug:
+    msg: "Static content tar.gz is downloaded to {{ download_destination_on_jenkins }} on Controller"
+
+- name: Extract 2/3 part of Static Content to sf-server pod
+  block:
+    - include_role:
+        name: collect_server_pod_details
+
+    - name: "Transfer Static Content tar.gz file to spotfire-server container"
+      kubernetes.core.k8s_cp:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_server_pod_name }}'
+        container: spotfire-server
+        local_path: '{{ download_destination_on_jenkins }}'
+        remote_path: '{{ targz_to_container_destination }}'
+        no_preserve: yes
+        state: to_pod
+
+    - name: "Extract Static Content tar.gz + deploy eea dir"
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_server_pod_name }}'
+        container: spotfire-server
+        command: "{{ item }}"
+      loop:
+        - 'rm -rf {{ sc_extracted_temp_dir }}'
+        - 'mkdir -p {{ sc_extracted_temp_dir }}'
+        - 'tar -zxvf {{ targz_to_container_destination }} -C {{ sc_extracted_temp_dir }}'
+        - 'cp -r {{ sc_extracted_temp_dir }}/eea/ {{ eea_resources_dir | dirname }}/'
+      loop_control:
+        pause: 2
+
+    - name: "Deploy classes dir"
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_server_pod_name }}'
+        container: spotfire-server
+        command: "{{ item }}"
+      loop:
+        - 'cp -r {{ sc_extracted_temp_dir }}/classes {{ classes_dir | dirname }}/'
+      # TODO EEAEPP-100468: remove the when clause and move command to upper loop, this is here only for keeping backward compatibility
+      when:
+        - asset_version == 'spotfire-platform-asset-12.5.0-1.5.4'
+
+    - name: "Cleanup: remove SC tar.gz and temporary extracted dir"
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_server_pod_name }}'
+        container: spotfire-server
+        command: "{{ item }}"
+      loop:
+        - "rm -rf {{ sc_extracted_temp_dir }}"
+        - "rm -rf {{ targz_to_container_destination }}"
+
+    - name: "Create custom-jump-targets.js as an empty file"
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_server_pod_name }}'
+        container: spotfire-server
+        command: '{{ item }}'
+      loop:
+        - "mkdir -p {{ eea_resources_dir }}/jump"
+        - "touch {{ eea_resources_dir }}/eea-jump/custom-jump-targets.js"
+  vars:
+    eea_resources_dir: /opt/tibco/tss/tomcat/webapps/spotfire/resources/eea
+    classes_dir: /opt/tibco/tss/tomcat/webapps/spotfire/WEB-INF/classes
+    sc_extracted_temp_dir: '/tmp/sc-extracted'
+
+- name: Extract 1/3 part of Static Content to Webplayer pod
+  block:
+    - include_role:
+        name: collect_webplayer_pod_details
+
+    - name: Identify IronPython path
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ webplayer_pod_name }}'
+        container: spotfire-webplayer
+        command: 'find /opt/tibco/tsnm/nm/services/WEB_PLAYER/Modules/ -name "*IronPython*" -type d'
+      register: dir_find_result
+      changed_when: no
+
+    - assert:
+        that:
+          - dir_find_result.stdout_lines | length == 1
+
+    - set_fact:
+        iron_python_dir: '{{ dir_find_result.stdout_lines | first }}'
+
+    - name: 'Transfer Static Content file to sf-webplayer pod'
+      kubernetes.core.k8s_cp:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ webplayer_pod_name }}'
+        container: spotfire-webplayer
+        local_path: "{{ download_destination_on_jenkins }}"
+        remote_path: "{{ targz_to_container_destination }}"
+        no_preserve: yes
+        state: to_pod
+
+    - name: "Extract Static Content tar.gz + deploy eea_dash_lib dir"
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ webplayer_pod_name }}'
+        container: spotfire-webplayer
+        command: "{{ item }}"
+      loop:
+        - 'rm -rf {{ sc_extracted_temp_dir }}'
+        - 'mkdir -p {{ sc_extracted_temp_dir }}'
+        - 'tar -zxvf {{ targz_to_container_destination }} -C {{ sc_extracted_temp_dir }}'
+        - 'cp -r {{ sc_extracted_temp_dir }}/eea_dash_lib/ "{{ iron_python_dir }}"/'
+        - 'rm -rf {{ sc_extracted_temp_dir }}'
+        - 'rm -rf {{ targz_to_container_destination }}'
+      vars:
+        sc_extracted_temp_dir: '/tmp/sc-extracted'
+  # TODO EEAEPP-100468: remove the when clause, this is here only for keeping backward compatibility
+  when:
+    - asset_version == 'spotfire-platform-asset-12.5.0-1.5.4'

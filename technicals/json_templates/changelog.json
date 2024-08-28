@@ -1,0 +1,25 @@
+{
+  "microserviceName":"Name of the microservice",
+  "version":"number",
+  "buildImageVersion":"Bob image set version if Bob is used, else the version of the build environment.",
+  "microserviceCiVersion":"microservice CI version",
+  "microserviceTestVersion":"microservice test version",
+  "mockservices":[
+    {
+      "mockService":"mock service name or ID",
+      "mockServiceVersion":"mock service version"
+    }
+  ],
+  "gitHash":"Git hash",
+  "documentFragment":"document fragment",
+  "documentVersion":"document version",
+  "trList":[
+    "TRs that were mentioned in the commit messages"
+  ],
+  "epicList":[
+    "Epics that were mentioned in the commit messages"
+  ],
+  "additionalChanges":[
+    "Additional changes that were mentioned in the commit messages"
+  ]
+}

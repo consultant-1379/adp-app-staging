@@ -1,0 +1,20 @@
+{
+  "microserviceName":"Name of the microservice",
+  "version":"number",
+  "sovInfo":[
+    {
+      "functionalPurpose":"Functional Purpose",
+      "requirementNumber":"Requirement Number",
+      "requirementText":"Requirement Text",
+      "verificationValue":"Verification Value",
+      "testCases":[
+        {
+          "testCaseId":"test case ID",
+          "testLog":"link to the test execution logs"
+        }
+      ],
+      "deviation":"Deviation",
+      "notes":"Notes"
+    }
+  ]
+}

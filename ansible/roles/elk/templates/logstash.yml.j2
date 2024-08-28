@@ -1,0 +1,3 @@
+node.name: {{ ansible_hostname }}
+path.data: {{ data_volumes | json_query(data_path_query.logstash) | first }}
+path.logs: {{ data_volumes | json_query(log_path_query.logstash) | first }}

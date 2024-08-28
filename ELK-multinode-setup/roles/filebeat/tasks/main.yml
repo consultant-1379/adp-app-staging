@@ -1,0 +1,48 @@
+---
+- name: include variables
+  include_vars:
+    file: ../../vars.yml
+
+- name: download filebeat
+  get_url:
+    url: "{{ filebeat_url }}{{ filebeat_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: install filebeat
+  become: yes
+  yum:
+    name: "{{ download }}/{{ filebeat_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: filebeat config remove
+  become: yes
+  file:
+    path: /etc/filebeat/filebeat.yml
+    state: absent
+
+- name: add empty filebeat config
+  become: yes
+  file:
+      path: /etc/filebeat/filebeat.yml
+      state: touch
+
+- name: update fileBeat config
+  become: yes
+  blockinfile:
+      path: /etc/filebeat/filebeat.yml
+      marker: ""
+      block: |
+        filebeat.inputs:
+        - type: log
+          paths:
+          - /var/log/*.log
+        output.logstash:
+          hosts: ["localhost:5044"]
+
+- name: start filebeat
+  become: yes
+  service:
+    name: filebeat
+    state: started

@@ -1,0 +1,80 @@
+---
+- name: List local users in Spotfire cli pod
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: '/opt/tibco/spotfireconfigtool/config.sh list-users --tool-password="{{ toolpasswd }}"'
+  changed_when: false
+  register: existing_sf_users
+
+# this is like a cleanup step to remove all existing LDAP users
+- name: "Remove locally created IAM users from Spotfire server"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: '/opt/tibco/spotfireconfigtool/config.sh delete-user -u {{ item | trim }} --tool-password="{{ toolpasswd }}"'
+  loop: '{{ existing_sf_users.stdout_lines }}'
+  when:
+    - item | regex_search("^f:.*")  # LDAP users start with f: sequence e.g. f:6b150b09-5560-40e2-8320-e1e239217310:rvmisi@https://iam.eea.company-domain.com/
+
+- name: Sleep for 20 seconds and continue with play
+  wait_for:
+    timeout: 20
+
+- name: "Execute Selenium script against Spotfire GUI with the admin LDAP user"
+  script:
+    executable: 'python3'
+    cmd: >
+      login_to_sf_gui.py -u '{{ item.name }}' -p '{{ item.password }}'
+      --url {{ spotfire.public_address }}
+      --chromedriver {{ chrome_driver_dir }}/chromedriver-linux64/chromedriver
+      --screenshots_dir {{ project_work_dir }}
+  register: python_script_result
+  until: "python_script_result is not failed"
+  retries: 3
+  delay: 8
+  loop: '{{ iam.users }}'
+  when:
+    - item.is_admin
+
+- name: "Print script output"
+  debug:
+    var: python_script_result
+
+- name: Sleep for 15 seconds and continue with play
+  wait_for:
+    timeout: 15
+
+- name: "List local users in Spotfire cli pod again"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: '/opt/tibco/spotfireconfigtool/config.sh list-users --tool-password="{{ toolpasswd }}"'
+  changed_when: no
+  register: new_sf_users
+
+- name: Show all the users seen in Spotfire CLI pod
+  debug:
+    var: new_sf_users.stdout_lines
+
+- name: "Validate that 1 IAM user is really present in the list"
+  assert:
+    that:
+      - new_sf_users.stdout | regex_findall(string_to_search, multiline=True) | length > 0
+    fail_msg: "Hmm, In Spotfire CLI pod I cannot see any IAM-authenticated user in the list."
+    success_msg: "I can see IAM-authenticated user! Great!"
+  vars:
+    string_to_search: 'https://{{ iam_proxy_fqdn }}'
+
+- name: "Promote the new user(s) to admin in Spotfire cli pod"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: '/opt/tibco/spotfireconfigtool/config.sh promote-admin --tool-password="{{ toolpasswd }}" --username {{ item | trim }}'
+  loop: '{{ new_sf_users.stdout_lines }}'
+  when:
+    - item | regex_search("^f:.*")  # LDAP users start with f: sequence e.g. f:6b150b09-5560-40e2-8320-e1e239217310:rvmisi@https://iam.eea.company-domain.com/

@@ -1,0 +1,24 @@
+---
+- name: "Identify eric-ts-platform-spotfire-server pod name"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: '{{ spotfire.namespace }}'
+    label_selectors:
+      - app.kubernetes.io/name = spotfire-server
+      - app.kubernetes.io/component = server
+  register: sf_server_pod_list
+  changed_when: no
+
+- name: "Validate number of spotfire-server pods detected"
+  assert:
+    that:
+      - sf_server_pod_list.resources is defined
+      - sf_server_pod_list.resources|length == 1
+    fail_msg: "There should be exactly 1 spotfire-server pod"
+
+- name: Extract and save eric-ts-platform-spotfire-server pod name
+  set_fact:
+    sf_server_pod_name: "{{ sf_server_pod_list.resources[0].metadata.name }}"
+
+- debug:
+    msg: 'Server pod name is {{ sf_server_pod_name }}'

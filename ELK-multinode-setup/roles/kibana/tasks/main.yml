@@ -1,0 +1,36 @@
+---
+- name: include variables
+  include_vars:
+    file: ../../vars.yml
+
+- name: download kibana package
+  get_url:
+    url: "{{ kibana_url }}{{ kibana_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: install kibana
+  become: yes
+  yum:
+    name: "{{ download }}/{{ kibana_version }}-x86_64.rpm"
+  when: ansible_facts['distribution']=="Red Hat Enterprise Linux"
+
+- name: update kibana config (kibana)
+  become: yes
+  lineinfile:
+    destfile: /etc/kibana/kibana.yml
+    regexp: 'server.host'
+    line: 'server.host: "0.0.0.0"'
+
+- name: update kibana config (elastic)
+  become: yes
+  lineinfile:
+    destfile: /etc/kibana/kibana.yml
+    regexp: 'elasticsearch.hosts'
+    line: 'elasticsearch.hosts: ["elk1:9200"]' # elastic ip edit required
+
+- name: start kibana
+  become: yes
+  service:
+    name: kibana
+    state: started

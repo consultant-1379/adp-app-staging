@@ -1,0 +1,562 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "anchore_vuln_schema_v1.json",
+    "type": "object",
+    "title": "The anchore report schema",
+    "description": "The anchore report schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "imageDigest": "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a",
+            "vulnerabilities": [
+                {
+                    "feed": "vulnerabilities",
+                    "feed_group": "github:java",
+                    "fix": "10.0.1",
+                    "nvd_data": [
+                        {
+                            "cvss_v2": {
+                                "base_score": 6.4,
+                                "exploitability_score": 10.0,
+                                "impact_score": 4.9
+                            },
+                            "cvss_v3": {
+                                "base_score": 7.5,
+                                "exploitability_score": 3.9,
+                                "impact_score": 3.6
+                            },
+                            "id": "CVE-2020-8570"
+                        }
+                    ],
+                    "package": "client-java-10.0.0",
+                    "package_cpe": "None",
+                    "package_cpe23": "None",
+                    "package_name": "client-java",
+                    "package_path": "/app/lib/client-java-10.0.0.jar",
+                    "package_type": "java",
+                    "package_version": "10.0.0",
+                    "severity": "High",
+                    "url": "https://github.com/advisories/GHSA-cghx-9gcr-r42x",
+                    "vendor_data": [],
+                    "vuln": "GHSA-cghx-9gcr-r42x"
+                },
+                {
+                    "feed": "nvdv2",
+                    "feed_group": "nvdv2:cves",
+                    "fix": "None",
+                    "nvd_data": [
+                        {
+                            "cvss_v2": {
+                                "base_score": 5.0,
+                                "exploitability_score": 10.0,
+                                "impact_score": 2.9
+                            },
+                            "cvss_v3": {
+                                "base_score": 5.3,
+                                "exploitability_score": 3.9,
+                                "impact_score": 1.4
+                            },
+                            "id": "CVE-2020-13956"
+                        }
+                    ],
+                    "package": "httpclient-4.5",
+                    "package_cpe": "cpe:/a:-:httpclient:4.5:-:-",
+                    "package_cpe23": "cpe:2.3:a:-:httpclient:4.5:-:-:-:-:-:-:-",
+                    "package_name": "httpclient",
+                    "package_path": "/app/lib/httpclient-4.5.13.jar",
+                    "package_type": "java",
+                    "package_version": "4.5",
+                    "severity": "Medium",
+                    "url": "https://nvd.nist.gov/vuln/detail/CVE-2020-13956",
+                    "vendor_data": [],
+                    "vuln": "CVE-2020-13956"
+                }
+            ],
+            "vulnerability_type": "all"
+        }
+    ],
+    "required": [
+        "imageDigest",
+        "vulnerabilities"
+    ],
+    "properties": {
+        "imageDigest": {
+            "$id": "#/properties/imageDigest",
+            "type": "string",
+            "title": "The imageDigest schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "sha256:4f0d0aa988f80a706768ea4e7fac44e4018147993e5d31f6e87ff568b74e574a"
+            ]
+        },
+        "vulnerabilities": {
+            "$id": "#/properties/vulnerabilities",
+            "type": "array",
+            "title": "The vulnerabilities schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "feed": "vulnerabilities",
+                        "feed_group": "github:java",
+                        "fix": "10.0.1",
+                        "nvd_data": [
+                            {
+                                "cvss_v2": {
+                                    "base_score": 6.4,
+                                    "exploitability_score": 10.0,
+                                    "impact_score": 4.9
+                                },
+                                "cvss_v3": {
+                                    "base_score": 7.5,
+                                    "exploitability_score": 3.9,
+                                    "impact_score": 3.6
+                                },
+                                "id": "CVE-2020-8570"
+                            }
+                        ],
+                        "package": "client-java-10.0.0",
+                        "package_cpe": "None",
+                        "package_cpe23": "None",
+                        "package_name": "client-java",
+                        "package_path": "/app/lib/client-java-10.0.0.jar",
+                        "package_type": "java",
+                        "package_version": "10.0.0",
+                        "severity": "High",
+                        "url": "https://github.com/advisories/GHSA-cghx-9gcr-r42x",
+                        "vendor_data": [],
+                        "vuln": "GHSA-cghx-9gcr-r42x"
+                    },
+                    {
+                        "feed": "nvdv2",
+                        "feed_group": "nvdv2:cves",
+                        "fix": "None",
+                        "nvd_data": [
+                            {
+                                "cvss_v2": {
+                                    "base_score": 5.0,
+                                    "exploitability_score": 10.0,
+                                    "impact_score": 2.9
+                                },
+                                "cvss_v3": {
+                                    "base_score": 5.3,
+                                    "exploitability_score": 3.9,
+                                    "impact_score": 1.4
+                                },
+                                "id": "CVE-2020-13956"
+                            }
+                        ],
+                        "package": "httpclient-4.5",
+                        "package_cpe": "cpe:/a:-:httpclient:4.5:-:-",
+                        "package_cpe23": "cpe:2.3:a:-:httpclient:4.5:-:-:-:-:-:-:-",
+                        "package_name": "httpclient",
+                        "package_path": "/app/lib/httpclient-4.5.13.jar",
+                        "package_type": "java",
+                        "package_version": "4.5",
+                        "severity": "Medium",
+                        "url": "https://nvd.nist.gov/vuln/detail/CVE-2020-13956",
+                        "vendor_data": [],
+                        "vuln": "CVE-2020-13956"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/vulnerabilities/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/vulnerabilities/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "feed": "vulnerabilities",
+                                "feed_group": "github:java",
+                                "fix": "10.0.1",
+                                "nvd_data": [
+                                    {
+                                        "cvss_v2": {
+                                            "base_score": 6.4,
+                                            "exploitability_score": 10.0,
+                                            "impact_score": 4.9
+                                        },
+                                        "cvss_v3": {
+                                            "base_score": 7.5,
+                                            "exploitability_score": 3.9,
+                                            "impact_score": 3.6
+                                        },
+                                        "id": "CVE-2020-8570"
+                                    }
+                                ],
+                                "package": "client-java-10.0.0",
+                                "package_cpe": "None",
+                                "package_cpe23": "None",
+                                "package_name": "client-java",
+                                "package_path": "/app/lib/client-java-10.0.0.jar",
+                                "package_type": "java",
+                                "package_version": "10.0.0",
+                                "severity": "High",
+                                "url": "https://github.com/advisories/GHSA-cghx-9gcr-r42x",
+                                "vendor_data": [],
+                                "vuln": "GHSA-cghx-9gcr-r42x"
+                            }
+                        ],
+                        "required": [
+                            "feed",
+                            "feed_group",
+                            "fix",
+                            "nvd_data",
+                            "package",
+                            "package_cpe",
+                            "package_cpe23",
+                            "package_name",
+                            "package_path",
+                            "package_type",
+                            "package_version",
+                            "severity",
+                            "url",
+                            "vendor_data",
+                            "vuln"
+                        ],
+                        "properties": {
+                            "feed": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/feed",
+                                "type": "string",
+                                "title": "The feed schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "vulnerabilities"
+                                ]
+                            },
+                            "feed_group": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/feed_group",
+                                "type": "string",
+                                "title": "The feed_group schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "github:java"
+                                ]
+                            },
+                            "fix": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/fix",
+                                "type": "string",
+                                "title": "The fix schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "10.0.1"
+                                ]
+                            },
+                            "nvd_data": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data",
+                                "type": "array",
+                                "title": "The nvd_data schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": [],
+                                "examples": [
+                                    [
+                                        {
+                                            "cvss_v2": {
+                                                "base_score": 6.4,
+                                                "exploitability_score": 10.0,
+                                                "impact_score": 4.9
+                                            },
+                                            "cvss_v3": {
+                                                "base_score": 7.5,
+                                                "exploitability_score": 3.9,
+                                                "impact_score": 3.6
+                                            },
+                                            "id": "CVE-2020-8570"
+                                        }
+                                    ]
+                                ],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "The first anyOf schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [
+                                                {
+                                                    "cvss_v2": {
+                                                        "base_score": 6.4,
+                                                        "exploitability_score": 10.0,
+                                                        "impact_score": 4.9
+                                                    },
+                                                    "cvss_v3": {
+                                                        "base_score": 7.5,
+                                                        "exploitability_score": 3.9,
+                                                        "impact_score": 3.6
+                                                    },
+                                                    "id": "CVE-2020-8570"
+                                                }
+                                            ],
+                                            "required": [
+                                                "cvss_v2",
+                                                "cvss_v3",
+                                                "id"
+                                            ],
+                                            "properties": {
+                                                "cvss_v2": {
+                                                    "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v2",
+                                                    "type": "object",
+                                                    "title": "The cvss_v2 schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": {},
+                                                    "examples": [
+                                                        {
+                                                            "base_score": 6.4,
+                                                            "exploitability_score": 10.0,
+                                                            "impact_score": 4.9
+                                                        }
+                                                    ],
+                                                    "required": [
+                                                        "base_score",
+                                                        "exploitability_score",
+                                                        "impact_score"
+                                                    ],
+                                                    "properties": {
+                                                        "base_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v2/properties/base_score",
+                                                            "type": "number",
+                                                            "title": "The base_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                6.4
+                                                            ]
+                                                        },
+                                                        "exploitability_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v2/properties/exploitability_score",
+                                                            "type": "number",
+                                                            "title": "The exploitability_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                10.0
+                                                            ]
+                                                        },
+                                                        "impact_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v2/properties/impact_score",
+                                                            "type": "number",
+                                                            "title": "The impact_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                4.9
+                                                            ]
+                                                        }
+                                                    },
+                                                    "additionalProperties": true
+                                                },
+                                                "cvss_v3": {
+                                                    "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v3",
+                                                    "type": "object",
+                                                    "title": "The cvss_v3 schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": {},
+                                                    "examples": [
+                                                        {
+                                                            "base_score": 7.5,
+                                                            "exploitability_score": 3.9,
+                                                            "impact_score": 3.6
+                                                        }
+                                                    ],
+                                                    "required": [
+                                                        "base_score",
+                                                        "exploitability_score",
+                                                        "impact_score"
+                                                    ],
+                                                    "properties": {
+                                                        "base_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v3/properties/base_score",
+                                                            "type": "number",
+                                                            "title": "The base_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                7.5
+                                                            ]
+                                                        },
+                                                        "exploitability_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v3/properties/exploitability_score",
+                                                            "type": "number",
+                                                            "title": "The exploitability_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                3.9
+                                                            ]
+                                                        },
+                                                        "impact_score": {
+                                                            "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/cvss_v3/properties/impact_score",
+                                                            "type": "number",
+                                                            "title": "The impact_score schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                3.6
+                                                            ]
+                                                        }
+                                                    },
+                                                    "additionalProperties": true
+                                                },
+                                                "id": {
+                                                    "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/nvd_data/items/anyOf/0/properties/id",
+                                                    "type": "string",
+                                                    "title": "The id schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": [
+                                                        "CVE-2020-8570"
+                                                    ]
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "package": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package",
+                                "type": "string",
+                                "title": "The package schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "client-java-10.0.0"
+                                ]
+                            },
+                            "package_cpe": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_cpe",
+                                "type": "string",
+                                "title": "The package_cpe schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "None"
+                                ]
+                            },
+                            "package_cpe23": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_cpe23",
+                                "type": "string",
+                                "title": "The package_cpe23 schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "None"
+                                ]
+                            },
+                            "package_name": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_name",
+                                "type": "string",
+                                "title": "The package_name schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "client-java"
+                                ]
+                            },
+                            "package_path": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_path",
+                                "type": "string",
+                                "title": "The package_path schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "/app/lib/client-java-10.0.0.jar"
+                                ]
+                            },
+                            "package_type": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_type",
+                                "type": "string",
+                                "title": "The package_type schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "java"
+                                ]
+                            },
+                            "package_version": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/package_version",
+                                "type": "string",
+                                "title": "The package_version schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "10.0.0"
+                                ]
+                            },
+                            "severity": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/severity",
+                                "type": "string",
+                                "title": "The severity schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "High"
+                                ]
+                            },
+                            "url": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/url",
+                                "type": "string",
+                                "title": "The url schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "https://github.com/advisories/GHSA-cghx-9gcr-r42x"
+                                ]
+                            },
+                            "vendor_data": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/vendor_data",
+                                "type": "array",
+                                "title": "The vendor_data schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": [],
+                                "examples": [
+                                    []
+                                ],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/vendor_data/items"
+                                }
+                            },
+                            "vuln": {
+                                "$id": "#/properties/vulnerabilities/items/anyOf/0/properties/vuln",
+                                "type": "string",
+                                "title": "The vuln schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "GHSA-cghx-9gcr-r42x"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        },
+        "vulnerability_type": {
+            "$id": "#/properties/vulnerability_type",
+            "type": "string",
+            "title": "The vulnerability_type schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "all"
+            ]
+        }
+    },
+    "additionalProperties": true
+}

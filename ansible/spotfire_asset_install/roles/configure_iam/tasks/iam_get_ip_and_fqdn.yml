@@ -1,0 +1,43 @@
+---
+#
+# collect iam proxy info: FQDN and IP address
+#
+- name: 'Retrieve eric-sec-access-mgmt HTTP proxy object'
+  kubernetes.core.k8s_info:
+    api_version: projectcontour.io/v1
+    kind: HTTPProxy
+    name: eric-sec-access-mgmt
+    namespace: '{{ eea_namespace }}'
+  register: iam_proxy_ingress_properties
+
+- fail:
+    msg: "No HTTPProxy object returned for eric-sec-access-mgmt, is EEA4 installed on the cluster??"
+  when: not iam_proxy_ingress_properties.resources
+
+- name: "Get and store IAM FQDN and IP"
+  set_fact:
+    iam_proxy_fqdn: "{{ iam_proxy_ingress_properties.resources[0].spec.virtualhost.fqdn }}"
+    #company_domain: "{{ iam_proxy_ingress_properties.resources[0].spec.virtualhost.fqdn.split('.')[1:] | join('.') }}"
+    iam_proxy_lb_ingress_ip: "{{ iam_proxy_ingress_properties.resources[0].status.loadBalancer.ingress[0].ip}}"
+
+- name: "Perform validations on eric-sec-access-mgmt HTTP proxy object"
+  assert:
+    fail_msg: "{{ iam_proxy_ingress_properties }} HTTP proxy state is not valid, or does not have LoadBalancer IP"
+    that:
+      - 'iam_proxy_ingress_properties.resources[0].status.currentStatus == "valid"'
+      - 'iam_proxy_lb_ingress_ip is match("^\\d+.*")'
+
+#
+# Collect spotfire GUI IP aka haproxy LB IP
+#
+- name: Get eric-ts-platform-haproxy LB address
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: eric-ts-platform-haproxy
+    namespace: '{{ spotfire.namespace }}'
+  register: sf_haproxy_svc_info
+
+- name: 'Save LoadBalancer IP of eric-ts-platform-haproxy service'
+  set_fact:
+    sf_haproxy_lb_ip: '{{ sf_haproxy_svc_info.resources[0].status.loadBalancer.ingress[0].ip }}'

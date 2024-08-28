@@ -1,0 +1,7 @@
+---
+artifactory_host: arm.seli.gic.ericsson.se
+artifactory_user: eceaart
+artifactory_package_project: proj-cea-external-local/ci/3pp
+artifactory_url: "https://{{ artifactory_user }}:{{ api_keys.artifactory[artifactory_user][artifactory_host] }}@{{ artifactory_host }}/artifactory/{{ artifactory_package_project }}"
+jre_package: java-1.8.0-openjdk
+elk_cluster_name: elasticsearch-eea4-ci

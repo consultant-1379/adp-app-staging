@@ -1,0 +1,43 @@
+---
+pki:
+  url: http://pki.ericsson.se/CertData
+  ca_certificates: # internal trust
+    - RootCA
+    - IssuingCA3
+tls:
+  path: /etc/pki/tls
+  certificates:
+    - "{{ ansible_hostname }}.crt"
+    - "{{ ansible_hostname }}.key"
+api:
+  host: localhost
+  auth:
+    username: elastic
+es_security_entities:
+  - name: logstash_write_role
+    type: role
+    request:
+      cluster:
+        - monitor
+        - manage_index_templates
+      indices:
+        - names:
+            - 'logstash*'
+          privileges:
+            - write
+            - create_index
+          field_security:
+            grant:
+              - '*'
+      run_as: []
+      metadata: {}
+      transient_metadata:
+        enabled: true
+  - name: logstash_writer
+    type: user
+    request:
+      roles:
+        - logstash_write_role
+      full_name: Logstash Writer
+      email:
+      enabled: true

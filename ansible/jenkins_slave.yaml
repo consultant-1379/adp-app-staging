@@ -1,0 +1,11 @@
+---
+- name: jenkins_slave.yml
+  hosts: buildnode
+  vars:
+    jenkins_home: /home/eceabuild/seliius27190
+    test_jenkins_home: /home/eceabuild/seliius27102
+  roles:
+    - jenkins_slave
+    - docker
+    - filebeat-install
+    - snmp-agent

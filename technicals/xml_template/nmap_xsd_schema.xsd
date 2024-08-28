@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="nmaprun">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element maxOccurs="unbounded" name="scaninfo">
+            <xs:complexType>
+              <xs:attribute name="type" type="xs:string" use="required" />
+              <xs:attribute name="protocol" type="xs:string" use="required" />
+              <xs:attribute name="numservices" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="services" type="xs:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="verbose">
+            <xs:complexType>
+              <xs:attribute name="level" type="xs:unsignedByte" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="debugging">
+            <xs:complexType>
+              <xs:attribute name="level" type="xs:unsignedByte" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="taskbegin">
+            <xs:complexType>
+              <xs:attribute name="task" type="xs:string" use="required" />
+              <xs:attribute name="time" type="xs:unsignedInt" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="taskend">
+            <xs:complexType>
+              <xs:attribute name="task" type="xs:string" use="required" />
+              <xs:attribute name="time" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="extrainfo" type="xs:string" use="optional" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="taskprogress">
+            <xs:complexType>
+              <xs:attribute name="task" type="xs:string" use="required" />
+              <xs:attribute name="time" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="percent" type="xs:decimal" use="required" />
+              <xs:attribute name="remaining" type="xs:unsignedInt" use="optional" />
+              <xs:attribute name="etc" type="xs:unsignedInt" use="optional" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="host">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="status">
+                  <xs:complexType>
+                    <xs:attribute name="state" type="xs:string" use="required" />
+                    <xs:attribute name="reason" type="xs:string" use="required" />
+                    <xs:attribute name="reason_ttl" type="xs:unsignedByte" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="address">
+                  <xs:complexType>
+                    <xs:attribute name="addr" type="xs:string" use="required" />
+                    <xs:attribute name="addrtype" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="hostnames">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="hostname">
+                        <xs:complexType>
+                          <xs:attribute name="name" type="xs:string" use="required" />
+                          <xs:attribute name="type" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="ports">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="extraports">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="extrareasons">
+                              <xs:complexType>
+                                <xs:attribute name="reason" type="xs:string" use="required" />
+                                <xs:attribute name="count" type="xs:unsignedInt" use="required" />
+                                <xs:attribute name="proto" type="xs:string" use="required" />
+                                <xs:attribute name="ports" type="xs:string" use="required" />
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="state" type="xs:string" use="required" />
+                          <xs:attribute name="count" type="xs:unsignedInt" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="port">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="state">
+                              <xs:complexType>
+                                <xs:attribute name="state" type="xs:string" use="required" />
+                                <xs:attribute name="reason" type="xs:string" use="required" />
+                                <xs:attribute name="reason_ttl" type="xs:unsignedByte"
+                                  use="required" />
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="service">
+                              <xs:complexType>
+                                <xs:sequence minOccurs="0">
+                                  <xs:element name="cpe" type="xs:string" />
+                                </xs:sequence>
+                                <xs:attribute name="name" type="xs:string" use="required" />
+                                <xs:attribute name="servicefp" type="xs:string" use="optional" />
+                                <xs:attribute name="method" type="xs:string" use="required" />
+                                <xs:attribute name="conf" type="xs:unsignedByte" use="required" />
+                                <xs:attribute name="product" type="xs:string" use="optional" />
+                                <xs:attribute name="version" type="xs:string" use="optional" />
+                                <xs:attribute name="tunnel" type="xs:string" use="optional" />
+                                <xs:attribute name="extrainfo" type="xs:string" use="optional" />
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="script">
+                              <xs:complexType>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                  <xs:element name="table" type="tableType" />
+                                  <xs:element name="elem" type="elemType" />
+                                </xs:choice>
+                                <xs:attribute name="id" type="xs:string" use="required" />
+                                <xs:attribute name="output" type="xs:string" use="required" />
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:attribute name="protocol" type="xs:string" use="required" />
+                          <xs:attribute name="portid" type="xs:unsignedShort" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" name="times">
+                  <xs:complexType>
+                    <xs:attribute name="srtt" type="xs:unsignedInt" use="required" />
+                    <xs:attribute name="rttvar" type="xs:unsignedShort" use="required" />
+                    <xs:attribute name="to" type="xs:unsignedInt" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="starttime" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="endtime" type="xs:unsignedInt" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="runstats">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="finished">
+                  <xs:complexType>
+                    <xs:attribute name="time" type="xs:unsignedInt" use="required" />
+                    <xs:attribute name="timestr" type="xs:string" use="required" />
+                    <xs:attribute name="summary" type="xs:string" use="required" />
+                    <xs:attribute name="elapsed" type="xs:decimal" use="required" />
+                    <xs:attribute name="exit" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="hosts">
+                  <xs:complexType>
+                    <xs:attribute name="up" type="xs:unsignedByte" use="required" />
+                    <xs:attribute name="down" type="xs:unsignedByte" use="required" />
+                    <xs:attribute name="total" type="xs:unsignedByte" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="scanner" type="xs:string" use="required" />
+      <xs:attribute name="args" type="xs:string" use="required" />
+      <xs:attribute name="start" type="xs:unsignedInt" use="required" />
+      <xs:attribute name="startstr" type="xs:string" use="required" />
+      <xs:attribute name="version" type="xs:decimal" use="required" />
+      <xs:attribute name="xmloutputversion" type="xs:decimal" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="tableType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element name="table" type="tableType" />
+      <xs:element name="elem" type="elemType" />
+    </xs:choice>
+    <xs:attribute name="key" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="elemType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

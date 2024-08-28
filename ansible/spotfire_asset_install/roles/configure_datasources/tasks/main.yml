@@ -1,0 +1,123 @@
+---
+- include_role:
+    name: collect_cli_pod_details
+
+- name: "Check if headless file {{ headless_client_user_file }} exists"
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: 'ls -1 {{ headless_client_user_file }}'
+  register: list_result
+  changed_when: no
+  ignore_errors: yes
+
+- name: "Register API Client in case we don't find an existing one in the file {{ headless_client_user_file }}"
+  block:
+    - name: Execute config.sh register-api-client command
+      kubernetes.core.k8s_exec:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_cli_pod_name }}'
+        container: spotfire-cli
+        command: >-
+          config.sh register-api-client
+          --name="Headless Client"
+          -Sapi.soap.information-model-service
+          --client-profile=other
+          -Gclient_credentials
+          --tool-password="{{ toolpasswd }}"
+          --bootstrap-config="{{ bootstrap_file }}"
+      register: api_command_response
+
+    - name: "Save API response to file, to save user + pass for later processing"
+      kubernetes.core.k8s_cp:
+        namespace: '{{ spotfire.namespace }}'
+        pod: '{{ sf_cli_pod_name }}'
+        container: spotfire-cli
+        content: "{{ api_command_response.stdout }}"
+        remote_path: "{{ headless_client_user_file }}"
+        no_preserve: yes
+        state: to_pod
+  when: list_result.rc == 2
+
+#
+# Get client ID and password from file
+#
+- name: Read headless user infor from file
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: "cat {{ headless_client_user_file }}"
+  register: user_info_content
+  changed_when: no
+
+- name: "Store Client ID and Secret for Headless user"
+  set_fact:
+    client_id: "{{ user_info_content.stdout | regex_search('^Client ID: (.+)$', '\\1', multiline=True) | first }}"
+    client_secret: "{{ user_info_content.stdout | regex_search('^Client secret: (.+)$', '\\1', multiline=True) | first }}"
+
+- name: "Print Client ID and Secret"
+  debug:
+    msg: "ID: {{ client_id }}  Secret: {{ client_secret }}"
+
+#
+# Add the API client to the Administrator user group as a user
+#
+- name: Add the API client to the Administrator user group as a user
+  kubernetes.core.k8s_exec:
+    namespace: '{{ spotfire.namespace }}'
+    pod: '{{ sf_cli_pod_name }}'
+    container: spotfire-cli
+    command: >-
+      config.sh add-member
+      -g 'Administrator'
+      -u {{ client_id }}@SPOTFIREOAUTH2
+      --tool-password="{{ toolpasswd }}"
+      --bootstrap-config="{{ bootstrap_file }}"
+
+- name: Get eric-ts-platform-haproxy LB address
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: eric-ts-platform-haproxy
+    namespace: '{{ spotfire.namespace }}'
+  register: sf_haproxy_svc_info
+
+- name: 'Save LoadBalancer IP of eric-ts-platform-haproxy service'
+  set_fact:
+    sf_haproxy_lb_ip: '{{ sf_haproxy_svc_info.resources[0].status.loadBalancer.ingress[0].ip }}'
+
+- name: "Configure EEA4VerticaDS datasource"
+  script:
+    executable: bash
+    cmd: >
+       update-data-source.sh
+       --client-id {{ client_id }}
+       --client-secret {{ client_secret }}
+       --spotfire-server-url http://{{ sf_haproxy_lb_ip }}
+       --db-connection-url "jdbc:vertica://eric-eea-analytical-processing-database.eric-eea-ns.svc.cluster.local:5433/vertica_db?keyStorePath=/opt/tibco/tss/tomcat/certs/spotfire_keystore.jks&trustStorePath=/opt/tibco/tss/tomcat/certs/spotfire_keystore.jks&keyStorePassword=changeit&trustStorePassword=changeit&TLSmode=verify-ca"
+       --db-user bitoolreader
+       --db-password akarmiis
+       --library-path "/DataSource/EEA4VerticaDS"
+  register: script_res
+  until: script_res.rc == 0
+  retries: 5
+  delay: 10
+
+- name: "Configure EEA4PostgresDS datasource"
+  script:
+    executable: bash
+    cmd: >
+       update-data-source.sh
+       --client-id {{ client_id }}
+       --client-secret {{ client_secret }}
+       --spotfire-server-url http://{{ sf_haproxy_lb_ip }}
+       --db-connection-url "jdbc:postgresql://eric-ts-platform-data-document-database-pg.spotfire-platform.svc.cluster.local:5432/postgres"
+       --db-user {{ spotfire.db_user }}
+       --db-password {{ spotfire.db_password }}
+       --library-path "/DataSource/EEA4PostgresDS"
+  register: script_res
+  until: script_res.rc == 0
+  retries: 5
+  delay: 10

@@ -1,0 +1,80 @@
+---
+- name: access secrets
+  include_vars: vault.yml
+
+- name: set up local storage
+  include_tasks: storage.yml
+
+- name: configure package repositories
+  include_tasks: repos.yml
+
+- name: install elasticsearch, JRE, logstash and kibana
+  yum:
+    name:
+      - "{{ artifactory_url }}/elasticsearch/{{ elasticsearch_version }}/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+      - "{{ jre_package }}"
+      - "{{ artifactory_url }}/logstash/{{ logstash_version }}/logstash-{{ logstash_version }}.rpm"
+      - "{{ artifactory_url }}/kibana/{{ kibana_version }}/kibana-{{ kibana_version }}-x86_64.rpm"
+    state: present
+
+- name: check for secure marker
+  stat:
+    path: /etc/elasticsearch/.secure
+  register: secure_marker
+
+- name: initial configuration
+  block:
+    - name: configure elasticsearch, logstash and kibana
+      template:
+        src: "{{ service }}.yml.j2"
+        dest: "/etc/{{ service }}/{{ service }}.yml"
+      loop: "{{ elk_services }}"
+      loop_control:
+        loop_var: service
+
+    - name: configure logstash pipeline
+      template:
+        src: logstash_pipeline.conf.j2
+        dest: /etc/logstash/conf.d/beats_to_elastic.conf
+
+  when: not secure_marker.stat.exists
+
+- name: ensure application data is owned by service account
+  file:
+    path: "{{ directory.path }}"
+    state: directory
+    owner: "{{ directory.owner }}"
+  loop: "{{ application_paths }}"
+  loop_control:
+    loop_var: directory
+    label: "{{ directory.path }} -> {{ directory.owner }}"
+  vars:
+    application_paths:
+      - path: "{{ data_volumes | json_query(data_path_query.es) | first }}"
+        owner: elasticsearch
+      - path: "{{ data_volumes | json_query(log_path_query.es) | first }}"
+        owner: elasticsearch
+      - path: "{{ data_volumes | json_query(repo_path_query.es) | first }}"
+        owner: elasticsearch
+      - path: "{{ data_volumes | json_query(data_path_query.logstash) | first }}"
+        owner: logstash
+      - path: "{{ data_volumes | json_query(log_path_query.logstash) | first }}"
+        owner: logstash
+
+- name: open application ports
+  firewalld:
+    port: "{{ port }}"
+    permanent: yes
+    state: enabled
+  loop: "{{ elk_ports }}"
+  loop_control:
+    loop_var: port
+
+- name: start services
+  service:
+    name: "{{ service }}"
+    enabled: yes
+    state: started
+  loop: "{{ elk_services }}"
+  loop_control:
+    loop_var: service

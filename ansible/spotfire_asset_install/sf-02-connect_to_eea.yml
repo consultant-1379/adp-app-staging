@@ -1,0 +1,24 @@
+---
+- name: Perform SF <> EEA integration
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars_files:
+    - vars/sf_vars.yml
+  vars:
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig }}"
+  pre_tasks:
+    - include_role:
+        name: check_deployment_state
+        tasks_from: check_eea_tss_secret.yml
+
+  roles:
+    - configure_iam
+    - update_coredns_config
+    - generate_sf_certs
+    - enable_iam_authentication
+    - restart_sf_server
+    - role: assign_admin_role_to_iam_users
+      when:
+        - enable_optional_features | default(false) | bool

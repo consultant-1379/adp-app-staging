@@ -1,0 +1,7 @@
+cluster.name: {{ elk_cluster_name }}
+node.name: {{ ansible_hostname }}
+path.data: {{ data_volumes | json_query(data_path_query.es) | first }}
+path.logs: {{ data_volumes | json_query(log_path_query.es) | first }}
+path.repo: {{ data_volumes | json_query(repo_path_query.es) | list | to_json }}
+network.host: {{ ( [ "127.0.0.1", "localhost" ] + [ ansible_default_ipv4.address ] ) | to_json }}
+cluster.initial_master_nodes: {{ [ ansible_hostname ] | to_json }}

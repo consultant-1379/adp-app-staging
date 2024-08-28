@@ -1,0 +1,24 @@
+---
+- name: "Identify eric-ts-platform-spotfire-webplayer-pool pod name"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: '{{ spotfire.namespace }}'
+    label_selectors:
+      - app.kubernetes.io/name = spotfire-webplayer-pool-1
+      - app.kubernetes.io/component = webplayer
+  register: webplayer_pod_list
+  changed_when: no
+
+- name: "Validate number of pods detected"
+  assert:
+    that:
+      - webplayer_pod_list.resources is defined
+      - webplayer_pod_list.resources|length == 1
+    fail_msg: "There should be exactly 1 webplayer pod"
+
+- name: Extract and save eric-ts-platform-spotfire-webplayer-pool pod name
+  set_fact:
+    webplayer_pod_name: "{{ webplayer_pod_list.resources[0].metadata.name }}"
+
+- debug:
+    msg: 'Webplayer pod name is {{ webplayer_pod_name }}'

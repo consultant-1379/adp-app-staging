@@ -1,0 +1,6 @@
+#!/bin/bash
+
+whitespace="trailing-space,tab-in-indent"
+
+git -c core.whitespace="$whitespace" \
+  diff --check HEAD^ HEAD -- . ':(exclude)*.go' ':(exclude)*gradlew.bat' ':(exclude)*.[mM][dD]' ':(exclude)*.[mM][iI][bB]'

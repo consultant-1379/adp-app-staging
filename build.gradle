@@ -1,0 +1,136 @@
+import static groovy.io.FileType.*
+
+apply plugin: 'groovy'
+apply plugin: "com.jfrog.artifactory"
+
+buildscript {
+    repositories {
+        maven { url "${artifactory_contextUrl}/proj-cea-dev" }
+        maven { url "${artifactory_contextUrl}/jcenter" }
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.0"
+    }
+}
+
+ext {
+    verifyTasks = "verify"
+}
+
+sourceSets {
+    envCheck
+    pdbTest
+
+    jobs {
+        groovy {
+            srcDir 'jobs'
+        }
+        resources {
+            srcDir 'jobs/resources'
+        }
+    }
+    scripts {
+        groovy {
+            srcDir 'scripts'
+        }
+    }
+}
+
+repositories {
+    maven { url "${artifactory_contextUrl}/proj-cea-dev" }
+}
+
+dependencies {
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.10'
+    compile group: 'org.jenkins-ci.plugins', name: 'job-dsl-core', version: '1.76'
+
+    scriptsCompile rootProject
+
+    pdbTestCompile sourceSets.main.runtimeClasspath
+    envCheckCompile sourceSets.main.runtimeClasspath
+    envCheckCompile sourceSets.jobs.runtimeClasspath
+}
+
+configurations {
+    jobsCompile.extendsFrom compile
+    pdbTestCompile.extendsFrom testCompile
+    pdbTestRuntime.extendsFrom testRuntime
+    envCheckCompile.extendsFrom testCompile
+}
+
+void eachMatchingFileRecurse(String root, Object filePattern, Closure applyTo){
+    new File(root).eachFileMatch(FILES, filePattern){
+        applyTo(it.name)
+    }
+
+    // Process files in subdirectories too
+    new File(root).eachDirRecurse{ dir ->
+        dir.eachFileMatch(FILES, filePattern){
+            //Relative path needs to be passed, relative to jobsDir
+            def subDirFile = new File( new File(root).toURI().relativize( it.toURI() ).toString() )
+            applyTo(subDirFile)
+        }
+    }
+
+}
+
+task genJob(type: JavaExec, dependsOn: 'classes') {
+    group 'CI'
+    description 'generate Jenkins Job(s) from the provided parameter file. Usage: gradle genJob -PjobFileName=jobs/YOUR_TEST_JENKINS_CODE.groovy'
+    classpath = sourceSets.jobs.runtimeClasspath
+    main = 'dslTest.DslTest'
+    workingDir = 'jobs'
+    systemProperties.'dsl.gradleGen' = "true"
+    systemProperties.'dsl.output' = "${buildDir}/jobs"
+
+    //Sample: gradle genJob -PjobFileName=jobs/central_release_17_4_1.groovy
+    if (project.hasProperty('jobFileName'))
+    {
+        args("$projectDir/${project.getProperty('jobFileName')}")
+    }
+}
+
+
+task genJobs(type: JavaExec, dependsOn: 'classes') {
+    group 'CI'
+    description 'generate ALL Jenkins Jobs from jobs directory matching pattern (dsl|test|central)_*.groovy'
+    classpath = sourceSets.jobs.runtimeClasspath
+    main = 'dslTest.DslTest'
+    workingDir = 'jobs'
+    systemProperties.'dsl.gradleGen' = "true"
+    systemProperties.'dsl.output' = "${buildDir}/jobs"
+
+    eachMatchingFileRecurse("$projectDir/jobs", ~/(app_staging|test|dummy)_.*\.groovy/){
+        args(it)
+    }
+}
+
+task runEnvCheck(type: Test) {
+    group 'verification'
+    testClassesDirs = sourceSets.envCheck.output.classesDirs
+    classpath = sourceSets.envCheck.runtimeClasspath
+    systemProperty 'eea.repoRoot', projectDir.parent
+    if (System.properties.'gerrit.branch') {
+        systemProperty 'gerrit.branch', System.properties.'gerrit.branch'
+    }
+    outputs.upToDateWhen { false }
+    testLogging.exceptionFormat = 'full'
+}
+
+task verify {
+    group 'verification'
+    dependsOn genJobs
+    dependsOn runEnvCheck
+}
+
+task runPdbTest(type: Test) {
+    group 'verification'
+    testClassesDirs = sourceSets.pdbTest.output.classesDirs
+    classpath = sourceSets.pdbTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+
+task copyScriptsDependencies(type: Copy){
+    into 'build/dependencies/scripts'
+    from configurations.scriptsRuntime
+}

@@ -1,0 +1,714 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "trivy_report_schema_v2.json",
+    "type": "object",
+    "title": "The trivy report schema",
+    "description": "The trivy report schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [],
+    "required": [
+        "SchemaVersion",
+        "ArtifactName",
+        "ArtifactType",
+        "Metadata",
+        "Results"
+    ],
+    "properties": {
+        "SchemaVersion": {
+            "$id": "#/properties/SchemaVersion",
+            "type": "integer",
+            "title": "The SchemaVersion schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": []
+        },
+        "ArtifactName": {
+            "$id": "#/properties/ArtifactName",
+            "type": "string",
+            "title": "The ArtifactName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": []
+        },
+        "ArtifactType": {
+            "$id": "#/properties/ArtifactType",
+            "type": "string",
+            "title": "The ArtifactType schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": []
+        },
+        "Metadata": {
+            "$id": "#/properties/Metadata",
+            "type": "object",
+            "title": "The Metadata schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [],
+            "required": [
+                "OS",
+                "ImageID",
+                "DiffIDs",
+                "RepoTags",
+                "ImageConfig"
+            ],
+            "properties": {
+                "OS": {
+                    "$id": "#/properties/Metadata/properties/OS",
+                    "type": "object",
+                    "title": "The OS schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [],
+                    "required": [
+                        "Family",
+                        "Name"
+                    ],
+                    "properties": {
+                        "Family": {
+                            "$id": "#/properties/Metadata/properties/OS/properties/Family",
+                            "type": "string",
+                            "title": "The Family schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "Name": {
+                            "$id": "#/properties/Metadata/properties/OS/properties/Name",
+                            "type": "string",
+                            "title": "The Name schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "ImageID": {
+                    "$id": "#/properties/Metadata/properties/ImageID",
+                    "type": "string",
+                    "title": "The ImageID schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": []
+                },
+                "DiffIDs": {
+                    "$id": "#/properties/Metadata/properties/DiffIDs",
+                    "type": "array",
+                    "title": "The DiffIDs schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [[]],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/Metadata/properties/DiffIDs/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/Metadata/properties/DiffIDs/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            }
+                        ]
+                    }
+                },
+                "RepoTags": {
+                    "$id": "#/properties/Metadata/properties/RepoTags",
+                    "type": "array",
+                    "title": "The RepoTags schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [[]],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/Metadata/properties/RepoTags/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/Metadata/properties/RepoTags/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            }
+                        ]
+                    }
+                },
+                "RepoDigests": {
+                    "$id": "#/properties/Metadata/properties/RepoDigests",
+                    "type": "array",
+                    "title": "The RepoDigests schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [[]],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/Metadata/properties/RepoDigests/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/Metadata/properties/RepoDigests/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            }
+                        ]
+                    }
+                },
+                "ImageConfig": {
+                    "$id": "#/properties/Metadata/properties/ImageConfig",
+                    "type": "object",
+                    "title": "The ImageConfig schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [],
+                    "required": [
+                        "architecture",
+                        "created",
+                        "history",
+                        "os",
+                        "rootfs",
+                        "config"
+                    ],
+                    "properties": {
+                        "architecture": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/architecture",
+                            "type": "string",
+                            "title": "The architecture schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "container": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/container",
+                            "type": "string",
+                            "title": "The container schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "created": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/created",
+                            "type": "string",
+                            "title": "The created schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "docker_version": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/docker_version",
+                            "type": "string",
+                            "title": "The docker_version schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "history": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/history",
+                            "type": "array",
+                            "title": "The history schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": [],
+                            "examples": [[]],
+                            "additionalItems": true,
+                            "items": {
+                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items",
+                                "anyOf": [
+                                    {
+                                        "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/0",
+                                        "type": "object",
+                                        "title": "The first anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [],
+                                        "required": [
+                                            "created",
+                                            "created_by"
+                                        ],
+                                        "properties": {
+                                            "created": {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/0/properties/created",
+                                                "type": "string",
+                                                "title": "The created schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            },
+                                            "created_by": {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/0/properties/created_by",
+                                                "type": "string",
+                                                "title": "The created_by schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    },
+                                    {
+                                        "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/1",
+                                        "type": "object",
+                                        "title": "The second anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [],
+                                        "required": [
+                                            "created",
+                                            "created_by",
+                                            "empty_layer"
+                                        ],
+                                        "properties": {
+                                            "created": {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/1/properties/created",
+                                                "type": "string",
+                                                "title": "The created schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            },
+                                            "created_by": {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/1/properties/created_by",
+                                                "type": "string",
+                                                "title": "The created_by schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            },
+                                            "empty_layer": {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/history/items/anyOf/1/properties/empty_layer",
+                                                "type": "boolean",
+                                                "title": "The empty_layer schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": false,
+                                                "examples": []
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    }
+                                ]
+                            }
+                        },
+                        "os": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/os",
+                            "type": "string",
+                            "title": "The os schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": []
+                        },
+                        "rootfs": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/rootfs",
+                            "type": "object",
+                            "title": "The rootfs schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [],
+                            "required": [
+                                "type",
+                                "diff_ids"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/rootfs/properties/type",
+                                    "type": "string",
+                                    "title": "The type schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": []
+                                },
+                                "diff_ids": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/rootfs/properties/diff_ids",
+                                    "type": "array",
+                                    "title": "The diff_ids schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "examples": [[]],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/Metadata/properties/ImageConfig/properties/rootfs/properties/diff_ids/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/rootfs/properties/diff_ids/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "config": {
+                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config",
+                            "type": "object",
+                            "title": "The config schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [],
+                            "required": [
+                                "Env",
+                                "Labels",
+                                "User"
+                            ],
+                            "properties": {
+                                "Entrypoint": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Entrypoint",
+                                    "type": "array",
+                                    "title": "The Entrypoint schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "examples": [[]],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Entrypoint/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Entrypoint/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Env": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Env",
+                                    "type": "array",
+                                    "title": "The Env schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "examples": [[]],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Env/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Env/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": []
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Image": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Image",
+                                    "type": "string",
+                                    "title": "The Image schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": []
+                                },
+                                "Labels": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels",
+                                    "type": "object",
+                                    "title": "The Labels schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": {},
+                                    "examples": [],
+                                    "required": [
+                                        "com.ericsson.product-number",
+                                        "com.ericsson.product-revision",
+                                        "common_base_os",
+                                        "org.opencontainers.image.created",
+                                        "org.opencontainers.image.revision",
+                                        "org.opencontainers.image.title",
+                                        "org.opencontainers.image.vendor",
+                                        "org.opencontainers.image.version"
+                                    ],
+                                    "properties": {
+                                        "com.ericsson.product-number": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/com.ericsson.product-number",
+                                            "type": "string",
+                                            "title": "The com.ericsson.product-number schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "com.ericsson.product-revision": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/com.ericsson.product-revision",
+                                            "type": "string",
+                                            "title": "The com.ericsson.product-revision schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "common_base_os": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/common_base_os",
+                                            "type": "string",
+                                            "title": "The common_base_os schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "org.opencontainers.image.created": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/org.opencontainers.image.created",
+                                            "type": "string",
+                                            "title": "The org.opencontainers.image.created schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "org.opencontainers.image.revision": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/org.opencontainers.image.revision",
+                                            "type": "string",
+                                            "title": "The org.opencontainers.image.revision schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "org.opencontainers.image.title": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/org.opencontainers.image.title",
+                                            "type": "string",
+                                            "title": "The org.opencontainers.image.title schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "org.opencontainers.image.vendor": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/org.opencontainers.image.vendor",
+                                            "type": "string",
+                                            "title": "The org.opencontainers.image.vendor schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        },
+                                        "org.opencontainers.image.version": {
+                                            "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/Labels/properties/org.opencontainers.image.version",
+                                            "type": "string",
+                                            "title": "The org.opencontainers.image.version schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": []
+                                        }
+                                    },
+                                    "additionalProperties": true
+                                },
+                                "User": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/User",
+                                    "type": "string",
+                                    "title": "The User schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": []
+                                },
+                                "WorkingDir": {
+                                    "$id": "#/properties/Metadata/properties/ImageConfig/properties/config/properties/WorkingDir",
+                                    "type": "string",
+                                    "title": "The WorkingDir schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": []
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "Results": {
+            "$id": "#/properties/Results",
+            "type": "array",
+            "title": "The Results schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/Results/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/Results/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [],
+                        "required": [
+                            "Target",
+                            "Class",
+                            "Type",
+                            "Vulnerabilities"
+                        ],
+                        "properties": {
+                            "Target": {
+                                "$id": "#/properties/Results/items/anyOf/0/properties/Target",
+                                "type": "string",
+                                "title": "The Target schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            },
+                            "Class": {
+                                "$id": "#/properties/Results/items/anyOf/0/properties/Class",
+                                "type": "string",
+                                "title": "The Class schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            },
+                            "Type": {
+                                "$id": "#/properties/Results/items/anyOf/0/properties/Type",
+                                "type": "string",
+                                "title": "The Type schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": []
+                            },
+                            "Vulnerabilities": {
+                                "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities",
+                                "type": "array",
+                                "title": "The Vulnerabilities schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": [],
+                                "examples": [],
+                                "additionalItems": true,
+                                "items": {
+                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items",
+                                    "anyOf": [
+                                        {
+                                            "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0",
+                                            "type": "object",
+                                            "title": "The first anyOf schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": {},
+                                            "examples": [],
+                                            "required": [
+                                                "VulnerabilityID",
+                                                "PkgName",
+                                                "InstalledVersion",
+                                                "Layer",
+                                                "Title",
+                                                "Description",
+                                                "Severity",
+                                                "References"
+                                            ],
+                                            "properties": {
+                                                "VulnerabilityID": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/VulnerabilityID",
+                                                    "type": "string",
+                                                    "title": "The VulnerabilityID schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "PkgName": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/PkgName",
+                                                    "type": "string",
+                                                    "title": "The PkgName schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "InstalledVersion": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/InstalledVersion",
+                                                    "type": "string",
+                                                    "title": "The InstalledVersion schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "FixedVersion": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/FixedVersion",
+                                                    "type": "string",
+                                                    "title": "The FixedVersion schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "Layer": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Layer",
+                                                    "type": "object",
+                                                    "title": "The Layer schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": {},
+                                                    "examples": [],
+                                                    "required": [
+                                                        "DiffID"
+                                                    ],
+                                                    "properties": {
+                                                        "DiffID": {
+                                                            "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Layer/properties/DiffID",
+                                                            "type": "string",
+                                                            "title": "The DiffID schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": "",
+                                                            "examples": []
+                                                        }
+                                                    },
+                                                    "additionalProperties": true
+                                                },
+                                                "Title": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Title",
+                                                    "type": "string",
+                                                    "title": "The Title schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "Description": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Description",
+                                                    "type": "string",
+                                                    "title": "The Description schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "Severity": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/Severity",
+                                                    "type": "string",
+                                                    "title": "The Severity schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": "",
+                                                    "examples": []
+                                                },
+                                                "References": {
+                                                    "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References",
+                                                    "type": "array",
+                                                    "title": "The References schema",
+                                                    "description": "An explanation about the purpose of this instance.",
+                                                    "default": [],
+                                                    "examples": [[]],
+                                                    "additionalItems": true,
+                                                    "items": {
+                                                        "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References/items",
+                                                        "anyOf": [
+                                                            {
+                                                                "$id": "#/properties/Results/items/anyOf/0/properties/Vulnerabilities/items/anyOf/0/properties/References/items/anyOf/0",
+                                                                "type": "string",
+                                                                "title": "The first anyOf schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": "",
+                                                                "examples": []
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

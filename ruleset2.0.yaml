@@ -1,0 +1,210 @@
+modelVersion: 2.0
+
+docker-images:
+  - adp-helm-chart-auto: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/adp-int-helm-chart-auto:0.27.4-2
+  - as-toolbox: armdocker.rnd.ericsson.se/proj-eea-drop/as-toolbox:1.48.0
+  - doc-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-docbuilder:2.12.0-0
+
+properties:
+  - chart-name: eric-eea-ci-code-helm-chart
+  - chart-repo-dev: ${env.HELM_CHART_REPO_SERVER}/${env.HELM_CHART_REPO_PATH_DEV}/
+  - chart-repo-ci-internal: ${env.HELM_CHART_REPO_SERVER}/${env.HELM_CHART_REPO_PATH_CI_INTERNAL}/
+  - chart-repo-drop: ${env.HELM_CHART_REPO_SERVER}/${env.HELM_CHART_REPO_PATH_DROP}/
+  - chart-repo-released: ${env.HELM_CHART_REPO_SERVER}/${env.HELM_CHART_REPO_PATH_RELEASED}/
+  - meta-chart-name: eric-eea-ci-meta-helm-chart
+  - repositories-yaml-path: .bob/repositories.yaml
+  - git_branch: master
+
+env:
+  - API_TOKEN_ADP (default=notset)
+  - API_TOKEN_EEA (default=notset)
+  - USER_ARM (default=notset)
+  - CHART_NAME
+  - CHART_REPO
+  - CHART_VERSION
+  - HELM_VERSION (default=3.13.0)
+  - HELM_CHART_REPO_SERVER (default=https://arm.seli.gic.ericsson.se/artifactory)
+  - HELM_CHART_REPO_PATH_DEV (default=proj-eea-dev-helm)
+  - HELM_CHART_REPO_PATH_CI_INTERNAL (default=proj-eea-ci-internal-helm)
+  - HELM_CHART_REPO_PATH_DROP (default=proj-eea-drop-helm)
+  - HELM_CHART_REPO_PATH_RELEASED (default=proj-eea-released-helm)
+  - GERRIT_USERNAME
+  - GERRIT_PASSWORD
+  - GERRIT_REFSPEC
+  - GERRIT_HOST
+  - IGNORE_NON_RELEASED (default=false)
+  - AUTOMATIC_RELEASE (default=false)
+  - ALWAYS_RELEASE (default=false)
+  - PLUS_RELEASE_MODE (default=false)
+  - JENKINS_URL
+  - JOB_NAME
+  - BUILD_NUMBER
+  - GERRIT_HOST (default=gerrit.ericsson.se)
+  - GIT_REPO_URL (default=https://${env.GERRIT_HOST}/EEA/adp-app-staging)
+  - JIRA_API_TOKEN (default=notset)
+  - MD_FILES
+
+rules:
+  clean:
+    - task: rm
+      cmd:
+        - rm -rf .bob/
+        - mkdir .bob
+        - rm -f artifact.properties
+        - rm -f *.tgz
+
+  lint-meta:
+    - rule: prepare-common
+    - task: helm
+      docker-image: adp-helm-chart-auto
+      docker-flags:
+        - "--env HELM_VERSION=${env.HELM_VERSION}"
+      cmd:
+        - helm lint ${meta-chart-name}
+
+  markdown-lint:
+    - task: markdown-lint
+      docker-image: doc-builder
+      cmd: markdownlint ${env.MD_FILES} --disable MD013 MD024 MD026 MD040
+
+  prepare-common:
+    - task: prepare-repositories-yaml
+      cmd:
+       - cp repositories.yaml.template ${repositories-yaml-path}
+       - sed -i "s/USERNAME/${env.USER_ARM}/" ${repositories-yaml-path}
+       - sed -i "s/API_TOKEN_ADP/${env.API_TOKEN_ADP}/" ${repositories-yaml-path}
+       - sed -i "s/API_TOKEN_EEA/${env.API_TOKEN_EEA}/" ${repositories-yaml-path}
+
+  prepare:
+    - rule: prepare-common
+    - task: prepare-chart
+      docker-image: adp-helm-chart-auto
+      docker-flags:
+        - --env CHART_PATH="${chart-name}"
+        - --env CHART_NAME
+        - --env CHART_REPO
+        - --env CHART_VERSION
+        - --env GERRIT_REFSPEC
+        - --env GERRIT_USERNAME="${env.GERRIT_USERNAME}"
+        - --env GERRIT_PASSWORD="${env.GERRIT_PASSWORD}"
+        - --env HELM_INTERNAL_REPO="${chart-repo-ci-internal}"
+        - --env HELM_DROP_REPO="${chart-repo-drop}"
+        - --env HELM_RELEASED_REPO="${chart-repo-released}"
+        - --env GIT_REPO_URL="${env.GIT_REPO_URL}"
+        - --env ARM_API_TOKEN=${env.API_TOKEN_EEA}
+        - --env UPLOAD_INTERNAL="true"
+        - --env HELM_REPO_CREDENTIALS=${repositories-yaml-path}
+        - --env HELM_REPOSITORIES=${repositories-yaml-path}
+        - --env HELM_VERSION="${env.HELM_VERSION}"
+      cmd: ihc-auto prepare
+
+  prepare-meta:
+    - rule: prepare-common
+    - task: prepare-chart
+      docker-image: adp-helm-chart-auto
+      docker-flags:
+        - --env CHART_PATH="${meta-chart-name}"
+        - --env CHART_NAME
+        - --env CHART_REPO
+        - --env CHART_VERSION
+        - --env GERRIT_REFSPEC
+        - --env GERRIT_USERNAME="${env.GERRIT_USERNAME}"
+        - --env GERRIT_PASSWORD="${env.GERRIT_PASSWORD}"
+        - --env HELM_INTERNAL_REPO="${chart-repo-ci-internal}"
+        - --env HELM_DROP_REPO="${chart-repo-drop}"
+        - --env HELM_RELEASED_REPO="${chart-repo-released}"
+        - --env GIT_REPO_URL="${env.GIT_REPO_URL}"
+        - --env ARM_API_TOKEN=${env.API_TOKEN_EEA}
+        - --env UPLOAD_INTERNAL="true"
+        - --env HELM_REPO_CREDENTIALS=${repositories-yaml-path}
+        - --env HELM_REPOSITORIES=${repositories-yaml-path}
+        - --env HELM_VERSION="${env.HELM_VERSION}"
+      cmd: ihc-auto prepare
+
+  publish:
+    - rule: prepare-common
+    - task: publish-chart
+      docker-image: adp-helm-chart-auto
+      docker-flags:
+        - --env CHART_PATH="${chart-name}"
+        - --env CHART_NAME
+        - --env CHART_REPO
+        - --env CHART_VERSION
+        - --env GERRIT_USERNAME="${env.GERRIT_USERNAME}"
+        - --env GERRIT_PASSWORD="${env.GERRIT_PASSWORD}"
+        - --env GERRIT_REFSPEC
+        - --env GIT_BRANCH=${git_branch}
+        - --env HELM_INTERNAL_REPO="${chart-repo-dev}"
+        - --env HELM_DROP_REPO="${chart-repo-drop}"
+        - --env HELM_RELEASED_REPO="${chart-repo-released}"
+        - --env GIT_REPO_URL="${env.GIT_REPO_URL}"
+        - --env ARM_API_TOKEN=${env.API_TOKEN_EEA}
+        - --env UPLOAD_INTERNAL="false"
+        - --env HELM_REPO_CREDENTIALS=${repositories-yaml-path}
+        - --env HELM_REPOSITORIES=${repositories-yaml-path}
+        - --env ALLOW_DOWNGRADE="false"
+        - --env IGNORE_NON_RELEASED="${env.IGNORE_NON_RELEASED}"
+        - --env AUTOMATIC_RELEASE="${env.AUTOMATIC_RELEASE}"
+        - --env ALWAYS_RELEASE="${env.ALWAYS_RELEASE}"
+        - --env PLUS_RELEASE_MODE="${env.PLUS_RELEASE_MODE}"
+        - --env SOURCE=${env.JENKINS_URL}/job/${env.JOB_NAME}/${env.BUILD_NUMBER}
+        - --env GERRIT_TOPIC="inca"
+        - --env GIT_TAG_ENABLED="true"
+        - --env COMMIT_MESSAGE_FORMAT_AUTOMATIC="NO-JIRA Updated %CHART_NAME with %CHART_VERSION"
+        - --env COMMIT_MESSAGE_FORMAT_MANUAL="%ORIGINAL_TITLE"
+        - --env HELM_VERSION="${env.HELM_VERSION}"
+      cmd: ihc-auto publish
+
+  publish-meta:
+    - rule: prepare-common
+    - task: publish-chart
+      docker-image: adp-helm-chart-auto
+      docker-flags:
+        - --env CHART_PATH="${meta-chart-name}"
+        - --env CHART_NAME
+        - --env CHART_REPO
+        - --env CHART_VERSION
+        - --env GERRIT_USERNAME="${env.GERRIT_USERNAME}"
+        - --env GERRIT_PASSWORD="${env.GERRIT_PASSWORD}"
+        - --env GERRIT_REFSPEC
+        - --env GIT_BRANCH=${git_branch}
+        - --env HELM_INTERNAL_REPO="${chart-repo-dev}"
+        - --env HELM_DROP_REPO="${chart-repo-drop}"
+        - --env HELM_RELEASED_REPO="${chart-repo-released}"
+        - --env GIT_REPO_URL="${env.GIT_REPO_URL}"
+        - --env ARM_API_TOKEN=${env.API_TOKEN_EEA}
+        - --env UPLOAD_INTERNAL="false"
+        - --env HELM_REPO_CREDENTIALS=${repositories-yaml-path}
+        - --env HELM_REPOSITORIES=${repositories-yaml-path}
+        - --env ALLOW_DOWNGRADE="false"
+        - --env IGNORE_NON_RELEASED="${env.IGNORE_NON_RELEASED}"
+        - --env AUTOMATIC_RELEASE="${env.AUTOMATIC_RELEASE}"
+        - --env ALWAYS_RELEASE="${env.ALWAYS_RELEASE}"
+        - --env PLUS_RELEASE_MODE="${env.PLUS_RELEASE_MODE}"
+        - --env SOURCE=${env.JENKINS_URL}/job/${env.JOB_NAME}/${env.BUILD_NUMBER}
+        - --env GERRIT_TOPIC="inca"
+        - --env GIT_TAG_ENABLED="true"
+        - --env COMMIT_MESSAGE_FORMAT_AUTOMATIC="Updated %CHART_NAME with %CHART_VERSION"
+        - --env COMMIT_MESSAGE_FORMAT_MANUAL="%ORIGINAL_TITLE"
+        - --env HELM_VERSION="${env.HELM_VERSION}"
+      cmd: ihc-auto publish
+
+  sanity-annotations:
+    - task: check-product-name
+      cmd:
+        cat ${env.CHART_NAME}/Chart.yaml | grep "^description:" | awk '{$1 = \"\"; print $0;}'
+    - task: check-product-number
+      cmd:
+        cat ${env.CHART_NAME}/values.yaml | sed -e "/productInfo:/,/rstate:/!d" | grep "rstate:" | awk "{print $2}"
+    - task: check-product-revision
+      cmd:
+        cat ${env.CHART_NAME}/values.yaml | sed -e "/productInfo:/,/productNumber:/!d" | grep "productNumber:" | awk "{$1 = \"\"; print $0;}"
+
+  run-jira-component-validator:
+    - task: run-jcv
+      docker-image: as-toolbox
+      docker-flags:
+        - "--env JIRA_API_TOKEN=${env.JIRA_API_TOKEN}"
+        - "--workdir /home/scripts/jira_component_validator"
+      cmd:
+        - python3 app.py --verbose

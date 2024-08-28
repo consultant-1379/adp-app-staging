@@ -1,0 +1,165 @@
+{
+    "$schema": "SOC schema",
+    "$id": "soc_schema.json",
+    "type": "object",
+    "title": "The SOC schema",
+    "description": "The SOC schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "microserviceName": "Name of the microservice",
+            "version": "number",
+            "socInfo": [
+                {
+                    "functionalPurpose": "Functional Purpose",
+                    "requirementNumber": "Requirement Number",
+                    "requirementText": "Requirement Text",
+                    "complianceValue": "Compliance Value",
+                    "deviation": "Deviation",
+                    "notes": "Notes"
+                }
+            ]
+        }
+    ],
+    "required": [
+        "microserviceName",
+        "version",
+        "socInfo"
+    ],
+    "properties": {
+        "microserviceName": {
+            "$id": "#/properties/microserviceName",
+            "type": "string",
+            "title": "The microserviceName schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Name of the microservice"
+            ]
+        },
+        "version": {
+            "$id": "#/properties/version",
+            "type": "string",
+            "title": "The version schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "number"
+            ]
+        },
+        "socInfo": {
+            "$id": "#/properties/socInfo",
+            "type": "array",
+            "title": "The socInfo schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "functionalPurpose": "Functional Purpose",
+                        "requirementNumber": "Requirement Number",
+                        "requirementText": "Requirement Text",
+                        "complianceValue": "Compliance Value",
+                        "deviation": "Deviation",
+                        "notes": "Notes"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/socInfo/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/socInfo/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "functionalPurpose": "Functional Purpose",
+                                "requirementNumber": "Requirement Number",
+                                "requirementText": "Requirement Text",
+                                "complianceValue": "Compliance Value",
+                                "deviation": "Deviation",
+                                "notes": "Notes"
+                            }
+                        ],
+                        "required": [
+                            "functionalPurpose",
+                            "requirementNumber",
+                            "requirementText",
+                            "complianceValue",
+                            "deviation",
+                            "notes"
+                        ],
+                        "properties": {
+                            "functionalPurpose": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/functionalPurpose",
+                                "type": "string",
+                                "title": "The functionalPurpose schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Functional Purpose"
+                                ]
+                            },
+                            "requirementNumber": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/requirementNumber",
+                                "type": "string",
+                                "title": "The requirementNumber schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Requirement Number"
+                                ]
+                            },
+                            "requirementText": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/requirementText",
+                                "type": "string",
+                                "title": "The requirementText schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Requirement Text"
+                                ]
+                            },
+                            "complianceValue": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/complianceValue",
+                                "type": "string",
+                                "title": "The complianceValue schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Compliance Value"
+                                ]
+                            },
+                            "deviation": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/deviation",
+                                "type": "string",
+                                "title": "The deviation schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Deviation"
+                                ]
+                            },
+                            "notes": {
+                                "$id": "#/properties/socInfo/items/anyOf/0/properties/notes",
+                                "type": "string",
+                                "title": "The notes schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "Notes"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}

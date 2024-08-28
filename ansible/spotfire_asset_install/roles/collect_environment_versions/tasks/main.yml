@@ -1,0 +1,58 @@
+---
+# k8s
+- name: Get K8S cluster information
+  kubernetes.core.k8s_cluster_info:
+  register: k8s_api_status
+
+- name: Store Kubernetes major and minor versions
+  set_fact:
+    client_minor_ver: "{{ k8s_api_status.version.client.split('.')[0] | int}}"  # e.g client version is "28.1.0",
+    server_major_ver: "{{ k8s_api_status.version.server.kubernetes.major | int }}"
+    server_minor_ver: "{{ k8s_api_status.version.server.kubernetes.minor | int }}"
+    server_full_ver: "{{ k8s_api_status.version.server.kubernetes.gitVersion }}"  # e.g "v1.27.1"
+
+- name: "Validate that Python k8s client version >= k8s server version"
+  assert:
+    that:
+      - client_minor_ver >= server_minor_ver
+    fail_msg: "K8S server version ({{ server_full_ver }}) is higher than Python client available on Ansible conroller!"
+
+
+# helm
+- name: "Get deployed helm version on Ansible Controller node"
+  command: "{{ helm_bin }} version"
+  register: helm_bin_version
+
+- name: Extract helm version from printout
+  set_fact:
+    # "stdout": "version.BuildInfo{Version:\"v3.13.1\",
+    helm_client: "{{ helm_bin_version.stdout | regex_search('{Version:\"v([0-9.]+)\"', '\\1') | first }}"
+
+- name: "Print deployed helm version on Ansible Controller node"
+  debug:
+    msg: "{{ helm_bin }} version is {{ helm_client }}"
+
+- name: "Get latest helm binary version info from internet"
+  uri:
+    return_content: no
+    validate_certs: no
+    url: https://github.com/helm/helm/releases/latest
+    method: GET
+  register: helm_version_inet
+
+- name: "Validate that deployed helm ({{ helm_ver }}) supports the Kubernetes version ({{ kubernetes_ver }}) of cluster in question"
+  assert:
+    that:
+      - "helm_ver in helm_to_kubernetes"
+      - "kubernetes_ver in helm_to_kubernetes[helm_ver]"
+    fail_msg: "The deployed helm binary ({{ helm_ver }}) does not support you Kubernetes version ({{ kubernetes_ver }})!"
+  vars:
+    kubernetes_ver: "{{ server_major_ver }}.{{ server_minor_ver }}"  # only major and minor versions
+    helm_ver: "{{ helm_client.split('.')[:2] | join('.') }}"  # only major and minor versions
+
+# - name: "Extract helm version from the url for the latest available version"
+  # set_fact:
+    # e.g for helm_version_inet.url value: https://github.com/helm/helm/releases/tag/v3.13.2
+    # latest_helm_version: "{{ helm_version_inet.url | regex_search('v([0-9.]+)$', '\\1') | first }}"
+# - debug:
+    # var: latest_helm_version

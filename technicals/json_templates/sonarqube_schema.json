@@ -1,0 +1,55 @@
+{
+        "type": "object",
+        "properties": {
+            "projectStatus":{
+                "type": "object",
+                "properties": {
+                    "status" : {
+                        "type" : "string",
+                        "enum": [ "OK","WARN","NONE","ERROR"],
+                        "pattern": "^OK$"
+                    },
+                    "ignoredConditions": {"type" : "boolean"},
+                    "conditions" : {
+                        "type": "array",
+                        "contains": {
+                            "type": "object",
+                            "properties": {
+                                "status" : {"type" : "string"},
+                                "metricKey" : {"type" : "string",
+                                "pattern": "^coverage$"},
+                                "comparator" : {"type" : "string"},
+                                "periodIndex" : {"type" : "number"},
+                                "errorThreshold" : {"type" : "string"},
+                                "actualValue" : {"type" : "string"}
+                            },
+                            "required": ["metricKey"]
+                        },
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "status" : {"type" : "string"},
+                                "metricKey" : {"type" : "string"},
+                                "comparator" : {"type" : "string"},
+                                "periodIndex" : {"type" : "number"},
+                                "errorThreshold" : {"type" : "string"},
+                                "actualValue" : {"type" : "string"}
+                           }
+                        }
+                    },
+                    "periods": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties" : {
+                                "index" :  {"type" : "number"},
+                                "mode" :  {"type" : "string"},
+                                "date" : {"type" : "string"},
+                                "parameter" : {"type" : "string"}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+}

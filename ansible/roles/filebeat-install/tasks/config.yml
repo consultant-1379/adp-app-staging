@@ -1,0 +1,15 @@
+---
+- name: Create /etc/filebeat/ directory if it does not exist
+  file:
+    path: "{{ filebeat_folder }}"
+    state: directory
+    mode: '0755'
+
+- name: create filebeat configuration
+  template:
+    src: "{{ filebeat_template }}"
+    dest: "{{ filebeat_folder }}/filebeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart filebeat

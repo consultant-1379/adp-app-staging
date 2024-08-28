@@ -1,0 +1,12 @@
+# https://terryhowe.github.io/ansible-modules-hashivault/user_guide/collections_using.html
+---
+collections:
+  - name: kubernetes.core
+    version: 3.0.0
+    source: https://galaxy.ansible.com
+  - name: community.docker
+    #version: 2.7.6  # the last version that is compatible with Ansible 2.9
+    source: https://galaxy.ansible.com
+
+roles:
+  - name: kwoodson.yedit

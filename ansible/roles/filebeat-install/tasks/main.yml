@@ -1,0 +1,58 @@
+---
+- name: install filebeat
+  zypper:
+    name:
+      - "{{ artifactory_url }}/filebeat/{{ filebeat_version }}/filebeat-{{ filebeat_version }}-x86_64.rpm"
+    state: present
+    disable_gpg_check: yes
+
+- name: install insserv-compat
+  zypper:
+    name:
+      - insserv-compat
+    state: present
+
+- include_tasks: config.yml
+  when: filebeat_create_config | bool
+
+- name: start filebeat service
+  systemd:
+    name: filebeat.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
+  register: filebeat_result
+
+- name: checking configuration and connectivity to logstash
+  block:
+    - name: check filebeat configuration settings
+      command: filebeat test config
+      register: configtest_result
+
+    - name: print message if test configuration passed ssuccessefully
+      debug:
+        msg: "Test config settings passed successfully"
+      when: configtest_result.rc == 0 or configtest_result.stdout == "Config OK"
+
+    - name: print message if test configuration did not pass
+      debug:
+        msg: "Test config settings did not passed successfully. Check if config is correct"
+      when: configtest_result.rc != 0
+
+    - name: test the filebeat connectivity to logstash
+      command: filebeat test output
+      register: outputtest_result
+
+    - debug:
+        var: outputtest_result
+
+    - name: print message if filebeat could connect to logstash
+      debug:
+        msg: "Filebeat connection to logstash passed successfully"
+      when: outputtest_result.rc == 0
+
+    - name: print message if filebeat could not connect to logstash
+      debug:
+        msg: "Filebeat connection to logstash did not pass succesfully. Check network settings"
+      when: outputtest_result.rc != 0
+  when: filebeat_result.state == "started"

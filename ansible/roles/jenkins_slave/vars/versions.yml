@@ -1,0 +1,2 @@
+helm_version: "3.14.2"
+python_kubernetes_version: "29.0.0"
